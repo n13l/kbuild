@@ -1,0 +1,10 @@
+obj-y += errno.o file.o gary.o exit.o timestamp.o link.o
+obj-y += string/attr.o string/eval.o string/comp.o string/unesc.o
+obj-y += opt/alloc.o opt/context.o opt/input.o \
+         opt/intr.o opt/journal.o opt/units.o \
+         opt/section.o opt/threads.o
+obj-y += opt/fastbuf.o opt/fb-buffer.o opt/fb-file.o opt/fb-mem.o \
+         opt/fb-mmap.o opt/fb-param.o opt/fb-pool.c opt/ff-printf.o \
+         opt/ff-string.o opt/trans.o opt/resource.o opt/res-mempool.o \
+         opt/res-subpool.o opt/res-mem.o
+

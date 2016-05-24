@@ -1,0 +1,25 @@
+-I.
+-I./arch/x86
+-I./arch/x86/include
+-I./arch/x86/asm
+-I./include
+-I/usr/include
+-I./obj/include/generated/uapi
+-I./lib
+-I./sys/linux
+-I./net
+-I./mem
+-I./net
+-I./net/ip
+-I./net/eth
+-I./sys
+-I./crypto
+-I./clib
+-I./net/sctp
+-I./modules/pkcs11
+-Imodules/pkcs11
+-DCONFIG_PLATFORM=KBUILD_STR(linux)
+-DCONFIG_LINUX=1
+-D_GNU_SOURCE=1
+-include ./obj/include/generated/autoconf.h
+-include sys/linux/platform.h

@@ -1,0 +1,1 @@
+obj-y += trampoline.o page.o

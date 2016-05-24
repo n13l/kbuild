@@ -1,0 +1,6 @@
+-I/usr/include/c++/5.3.1/
+-I/usr/include/c++/5.3.1/x86_64-redhat-linux/
+-I/usr/include/c++/5.3.1/backward/
+-I/usr/local/include/
+-I/usr/lib/clang/3.7.0/include/
+-I/usr/include/
