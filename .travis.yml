@@ -2,9 +2,9 @@ language: c
 
 os:
         - linux
-        - osx
 
 before_install:
+        - export HOSTCC=gcc
         - sudo apt-get -qq update
         - sudo apt-get install flex bison gperf libncurses-dev pkg-config
 
