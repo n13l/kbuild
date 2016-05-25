@@ -6,7 +6,7 @@ compiler:
 - gcc
 - clang
 env: 
-- CROSS_COMPILE="i686-w64-mingw64-"
+- CROSS_COMPILE="i686-w64-mingw32-"
 - CROSS_COMPILE=""
 before_install:
 - export HOSTCC=clang
