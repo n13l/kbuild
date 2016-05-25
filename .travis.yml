@@ -9,11 +9,13 @@ env:
   global:
     - BUILD_BRANCH=$TRAVIS_BRANCH
     - BUILD_ID=$TRAVIS_BUILD_ID
-      TARGET=native
+    - TARGET=native
 matrix:
   include:
     - compiler: gcc
-      env: TARGET=win32
+      env: 
+        - TARGET=win32
+        - TARGET=win64
 
 before_install:
 - export HOSTCC=clang
