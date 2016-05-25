@@ -13,11 +13,10 @@ matrix:
   env: PLATFORM="win32"
 before_install:
 - export HOSTCC=clang
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; if [[ "$PLATFORM" == "win32" ]]; then export CROSS_COMPILE="i686-w64-mingw32-" ; fi fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install flex bison gperf libncurses-dev pkg-config mingw32-binutils mingw32 mingw32-runtime ; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install flex bison gperftools ; fi
-- if [[ "$PLATFORM" == "win32" ]]; then export CROSS_COMPILE=i686-w64-mingw32-" ; fi
 script:
 - uname -a
 - make defconfig
