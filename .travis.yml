@@ -7,10 +7,6 @@ compiler:
 - clang
 env: 
 - PLATFORM="win32"
-matrix:
-  exclude:
-  - os: osx
-  env: PLATFORM="win32"
 before_install:
 - export HOSTCC=clang
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; if [[ "$PLATFORM" == "win32" ]]; then export CROSS_COMPILE="i686-w64-mingw32-" ; fi fi
