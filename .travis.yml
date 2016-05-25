@@ -7,7 +7,7 @@ compiler:
 - clang
 env: 
 - CROSS_BUILD="win32"
-- CROSS_BUILD=""
+- CROSS_BUILD="no"
 before_install:
 - export HOSTCC=clang
 - if [[ "$CROSS_BUILD" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi 
