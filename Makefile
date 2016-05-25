@@ -484,7 +484,7 @@ PHONY += outputmakefile
 # output directory.
 outputmakefile:
 ifneq ($(KBUILD_SRC),)
-	$(Q)if [[ -L source ]]; then unlink source ; fi
+	$(Q)if [ -d source ]; then unlink source ; fi
 	$(Q)ln -fs $(srctree) source
 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile \
 	    $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)

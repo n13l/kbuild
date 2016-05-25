@@ -13,5 +13,5 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install flex bison gperf pkg-config ; fi
 script:
 - uname -a
-- bash make defconfig
-- bash make V=1
+- make defconfig
+- make V=1
