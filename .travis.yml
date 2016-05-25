@@ -6,17 +6,16 @@ compiler:
 - gcc
 - clang
 env: 
-- PLATFORM="win32"
+- CROSS_COMPILE="i686-w64-mingw64-"
 before_install:
 - export HOSTCC=clang
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install flex bison gperf libncurses-dev pkg-config binutils-mingw-w64-i686 gcc-mingw-w64-i686 ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; unset PLATFORM; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; unset CROSS_COMPILE; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install flex bison gperftools ; fi
 - export MINGW=/opt/mingw64
 - export PATH=$MINGW/bin:$PATH
 script:
 - uname -a
-  - if [[ "$PLATFORM" == "win32" ]]; then export CROSS_COMPILE="i686-w64-mingw64-" ; fi
 - make defconfig V=1
 - make V=1
