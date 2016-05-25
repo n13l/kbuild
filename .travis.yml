@@ -12,12 +12,16 @@ env:
 matrix:
   include:
     - compiler: gcc
+      os: linux
       env: TARGET=native
     - compiler: gcc
+      os: linux
       env: TARGET=win32
     - compiler: gcc
+      os: linux
       env: TARGET=win64
     - compiler: clang
+      os: osx
       env: TARGET=native
 
 before_install:
