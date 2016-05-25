@@ -2,9 +2,11 @@ language: c
 os:
 - linux
 - osx
+compiler:
+- gcc
+- clang
 before_install:
 - export HOSTCC=clang
-- export CC=clang
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install flex bison gperf libncurses-dev pkg-config ; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
@@ -12,4 +14,4 @@ before_install:
 script:
 - uname -a
 - make defconfig
-- make 
+- make
