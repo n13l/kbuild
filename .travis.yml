@@ -6,13 +6,10 @@ compiler:
 - gcc
 - clang
 matrix:
-        include:
-        - os: osx
-        env: TARGET=native
-        include:
-        - compiler: gcc
-        env: TARGET=native
+        exclude:
+        - compiler: clang
         env: TARGET=win32
+        - compiler: clang
         env: TARGET=win64
 before_install:
 - export HOSTCC=clang
