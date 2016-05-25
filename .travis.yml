@@ -11,8 +11,6 @@ matrix:
   exclude:
   - os: osx
   env: PLATFORM="win32"
-  - compiler: clang
-  env: PLATFORM="win32"
 before_install:
 - export HOSTCC=clang
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
