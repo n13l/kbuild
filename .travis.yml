@@ -1,0 +1,18 @@
+language: c
+
+os:
+        - linux
+        - osx
+
+before_install:
+        - brew update
+        - brew install flex gperf bison
+        - sudo apt-get -qq update
+        - sudo apt-get install flex bison gperf ncurses
+
+compiler:
+        - clang
+        - gcc
+
+
+script: make defconfig && make
