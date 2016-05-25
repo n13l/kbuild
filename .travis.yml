@@ -23,11 +23,18 @@ matrix:
     - compiler: clang
       os: osx
       env: TARGET=native
+     - compiler: clang
+      os: osx
+      env: TARGET=native
+      osx_image: xcode7.3
     - compiler: clang
       os: osx
       env: TARGET=native
       osx_image: xcode7.2
-
+    - compiler: clang
+      os: osx
+      env: TARGET=native
+      osx_image: xcode7.1
 
 before_install:
 - if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi 
