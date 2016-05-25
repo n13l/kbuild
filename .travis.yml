@@ -12,12 +12,13 @@ env:
 matrix:
   include:
     - compiler: gcc
-      env: 
-        - TARGET=native
-        - TARGET=win32
-        - TARGET=win64
+      env: TARGET=native
+    - compiler: gcc
+      env: TARGET=win32
+    - compiler: gcc
+      env: TARGET=win64
     - compiler: clang
-        - TARGET=native
+      env: TARGET=native
 
 before_install:
 - if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi 
