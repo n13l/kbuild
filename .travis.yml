@@ -12,6 +12,11 @@ addons:
   apt:
     packages:
       - graphviz
+      - flex 
+      - bison 
+      - gperf 
+      - libncurses-dev 
+      - pkg-config        
 
 before install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
