@@ -12,4 +12,4 @@ before_install:
 script:
 - uname -a
 - make defconfig
-- make V=1
+- make 
