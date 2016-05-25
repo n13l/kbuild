@@ -6,7 +6,7 @@ os:
 
 before_install:
         - sudo apt-get -qq update
-        - sudo apt-get install flex bison gperf ncurses
+        - sudo apt-get install flex bison gperf libncurses-dev pkg-config
 
 compiler:
         - clang
