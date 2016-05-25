@@ -4,7 +4,7 @@ os:
         - linux
 
 before_install:
-        - export HOSTCC=gcc
+        - export HOSTCC=clang
         - sudo apt-get -qq update
         - sudo apt-get install flex bison gperf libncurses-dev pkg-config
 
@@ -12,4 +12,4 @@ compiler:
         - clang
         - gcc
 
-script: make defconfig && make
+script: make defconfig && make V=1
