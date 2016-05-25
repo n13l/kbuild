@@ -2,16 +2,17 @@ language: c
   matrix:
     include:
       - os: linux
+        language: generic
         sudo: required
         env: TOXENV=clang HOSTCC=clang CC=clang
       - os: osx
         language: generic
+        sudo: required
         env: TOKENV=osx-clang HOSTCC=clang CC=clang
 
 addons:
   apt:
     packages:
-      - graphviz
       - flex 
       - bison 
       - gperf 
