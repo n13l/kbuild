@@ -15,6 +15,9 @@ matrix:
       os: linux
       env: TARGET=win64
     - compiler: clang
+      os: linux
+      env: TARGET=native
+    - compiler: clang
       os: osx
       env: TARGET=native
 
