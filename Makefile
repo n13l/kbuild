@@ -305,7 +305,7 @@ HOSTCC       ?= gcc
 HOSTCXX      ?= g++
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wno-format-security \
 	       -Wno-char-subscripts\
-	       -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu11
+	       -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu99
 HOSTCXXFLAGS = -O2
 
 ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
@@ -417,7 +417,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes \
 		   -fno-strict-aliasing \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-		   -std=gnu11 \
+		   -std=gnu99 \
 		   -D_GNU_SOURCE=1
 
 -include scripts/Makefile.shared

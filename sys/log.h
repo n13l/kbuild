@@ -18,6 +18,7 @@ static inline bool syscall_filep(FILE *arg) { return arg ? false: true;}
 static inline bool syscall_int  (int arg)   { return arg >= 0 ? false: true;}
 static inline bool syscall_lint (long int arg){ return arg >= 0 ? false: true;}
 
+/*
 #define __syscall_die(fn, args...) \
 ({ \
 	__typeof__(fn args) __v = fn args; \
@@ -28,6 +29,8 @@ static inline bool syscall_lint (long int arg){ return arg >= 0 ? false: true;}
 		{ __syscall_error(#fn, #args); exit(errno);} \
 	__v; \
 })
+
+*/
 
 #define sys_dbg(fmt, ...) \
 	printf(fmt "\n", ## __VA_ARGS__)

@@ -87,7 +87,7 @@ main(int argc, char *argv[])
 #ifdef CONFIG_LINUX
 	const char *file = "/usr/lib64/libssl.so";
 #endif
-	void *dll = __syscall_die(dlopen(file, RTLD_NOW));
+	void *dll = dlopen(file, RTLD_NOW);
 
 	linkmap_init();
 
