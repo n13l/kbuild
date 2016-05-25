@@ -9,6 +9,10 @@ env:
 - TARGET=win32
 - TARGET=win64
 - TARGET=native
+matrix:
+        exclude:
+        - os: osx
+        env: TARGET=native
 before_install:
 - export HOSTCC=clang
 - if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi 
