@@ -17,5 +17,6 @@ before_install:
 - export PATH=$MINGW/bin:$PATH
 script:
 - uname -a
-- make defconfig
-- if [[ "$PLATFORM" == "win32" ]]; then make CROSS_COMPILE="i686-w64-mingw64-" ; else make ; fi
+  - if [[ "$PLATFORM" == "win32" ]]; then export CROSS_COMPILE="i686-w64-mingw64-" ; fi
+- make defconfig V=1
+- make V=1
