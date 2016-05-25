@@ -9,10 +9,12 @@ env:
   global:
     - BUILD_BRANCH=$TRAVIS_BRANCH
     - BUILD_ID=$TRAVIS_BUILD_ID
-  matrix:
-    - TARGET=win32
-    - TARGET=win64
-    - TARGET=native
+      TARGET=native
+matrix:
+  include:
+    - compiler: gcc
+      env: TARGET=win32
+
 before_install:
 - export HOSTCC=clang
 - if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi 
