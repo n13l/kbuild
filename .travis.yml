@@ -1,17 +1,17 @@
 nguage: c
 os:
-        - linux
-        - osx
+- linux
+- osx
 compiler:
-        - clang
-        - gcc
+- clang
+- gcc
 before_install:
-        - export HOSTCC=clang
-        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
-        - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install flex bison gperf libncurses-dev pkg-config ; fi
-        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
-        - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install flex bison gperf pkg-config ; fi
+- export HOSTCC=clang
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install flex bison gperf libncurses-dev pkg-config ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install flex bison gperf pkg-config ; fi
 script:
-        - uname -a
-        - make defconfig
-        - make V=1
+- uname -a
+- bash make defconfig
+- bash make V=1
