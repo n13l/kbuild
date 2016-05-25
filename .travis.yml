@@ -5,12 +5,10 @@ os:
 compiler:
 - gcc
 - clang
-matrix:
-        include:
-        - compiler: gcc
-        env: TARGET=win32
-        - compiler: gcc
-        env: TARGET=win64
+env:
+- TARGET=win32
+- TARGET=win64
+- TARGET=native
 before_install:
 - export HOSTCC=clang
 - if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi 
