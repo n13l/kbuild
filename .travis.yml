@@ -1,15 +1,25 @@
 language: c
+matrix:
+fast_finish: true
+include:
+        - compiler: ": w64"
+        env: PLATFORM="mingw32" ARCH="x86_64" BITSIZE=64 HOST="x86_64"
+        - compiler: ": w32"
+        env: PLATFORM="mingw32" ARCH="x86" BITSIZE=32 HOST="i686"
+install:
+- sudo apt-get update -qq
+- sudo apt-get install flex bison gperf libncurses-dev pkg-config
+- uname -m
+- sudo apt-get install -y mingw32
+- if [ $BITSIZE == 32 ]; then sudo apt-get install -y mingw32-x-binutils mingw32-x-gcc mingw32-x-runtime; fi
+- if [ $BITSIZE == 64 ]; then sudo apt-get install -y mingw64-x-binutils mingw64-x-gcc mingw64-x-runtime; fi
+- export CROSS_COMPILE=$HOST-w64-mingw32-
+- export HOSTCC=clang
+- export CC=gcc
 
-os:
-        - linux
-
-before_install:
-        - export HOSTCC=clang
-        - sudo apt-get -qq update
-        - sudo apt-get install flex bison gperf libncurses-dev pkg-config
-
-compiler:
-        - clang
-        - gcc
-
-script: make defconfig && make V=1
+script:
+- make -v
+- gcc -v
+- gcc -dumpmachine
+- make defconfig
+- make V=1
