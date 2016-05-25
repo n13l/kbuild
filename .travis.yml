@@ -20,6 +20,9 @@ matrix:
     - compiler: clang
       os: osx
       env: TARGET=native
+    - compiler: gcc
+      os: osx
+      env: TARGET=native
 
 before_install:
 - if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi 
