@@ -1,4 +1,8 @@
 #!/bin/sh
+export BUILD_MAJOR=0
+export BUILD_MINOR=0
+export BUILD_REVISION=1
+
 num=`echo $1 | cut -d. -f1`
 if [[ $num = *[[:digit:]]* ]]; then export BUILD_MAJOR=$num ; fi
 num=`echo $1 | cut -d. -f2`
