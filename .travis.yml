@@ -1,71 +1,74 @@
 language:
-  - c
-  - java
+- c
+- java
 jdk:
-  - oraclejdk8
+- oraclejdk8
 env:
   global:
-    - BUILD_BRANCH=$TRAVIS_BRANCH
-    - BUILD_ID=$TRAVIS_BUILD_ID
+  - BUILD_BRANCH=$TRAVIS_BRANCH
+  - BUILD_ID=$TRAVIS_BUILD_ID
 matrix:
   include:
-    - compiler: gcc
-      os: linux
-      env: TARGET=native
-    - compiler: gcc
-      os: linux
-      env: TARGET=win32
-    - compiler: gcc
-      os: linux
-      env: TARGET=win64
-    - compiler: clang
-      os: linux
-      env: TARGET=native
-    - compiler: gcc
-      os: osx
-      env: TARGET=native
-    - compiler: clang
-      os: osx
-      env: TARGET=native
-    - compiler: clang
-      os: osx
-      env: TARGET=native
-      osx_image: xcode7.3
-    - compiler: clang
-      os: osx
-      env: TARGET=native
-      osx_image: xcode7.2
-    - compiler: clang
-      os: osx
-      env: TARGET=native
-      osx_image: xcode7.1
-    - compiler: clang
-      os: osx
-      env: TARGET=native
-      osx_image: beta-xcode6.1
-deploy:
-  provider: releases
-  api_key:
-    secure: [redacted]
-  file: 
-    - $(find . -type f | egrep '\.(dylib|dll|so)$')
-  skip_cleanup: true
-  on:
-    tags: true
+  - compiler: gcc
+    os: linux
+    env: TARGET=native
+  - compiler: gcc
+    os: linux
+    env: TARGET=win32
+  - compiler: gcc
+    os: linux
+    env: TARGET=win64
+  - compiler: clang
+    os: linux
+    env: TARGET=native
+  - compiler: gcc
+    os: osx
+    env: TARGET=native
+  - compiler: clang
+    os: osx
+    env: TARGET=native
+  - compiler: clang
+    os: osx
+    env: TARGET=native
+    osx_image: xcode7.3
+  - compiler: clang
+    os: osx
+    env: TARGET=native
+    osx_image: xcode7.2
+  - compiler: clang
+    os: osx
+    env: TARGET=native
+    osx_image: xcode7.1
+  - compiler: clang
+    os: osx
+    env: TARGET=native
+    osx_image: beta-xcode6.1
 before_install:
 - source ./scripts/version.sh $TRAVIS_BRANCH
 - export VERSION="$BUILD_MAJOR"
 - export PATCHLEVEL="$BUILD_MINOR"
 - export SUBLEVEL="$BUILD_REVISION"
-- if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi 
-- if [[ "$TARGET" == "win64" ]]; then unset CC ; export CROSS_COMPILE="x86_64-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi
+- if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-";
+  export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi
+- if [[ "$TARGET" == "win64" ]]; then unset CC ; export CROSS_COMPILE="x86_64-w64-mingw32-";
+  export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi
 - unset TARGET;
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install swig flex bison gperf libncurses-dev pkg-config binutils-mingw-w64-i686 gcc-mingw-w64-i686 binutils-mingw-w64 gcc-mingw-w64; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install swig flex bison
+  gperf libncurses-dev pkg-config binutils-mingw-w64-i686 gcc-mingw-w64-i686 binutils-mingw-w64
+  gcc-mingw-w64; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; unset CROSS_COMPILE; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install swig flex bison gperftools ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install swig flex bison gperftools
+  ; fi
 script:
 - uname -a
 - make defconfig
 - make
 - file ./obj/sysconfig
+deploy:
+  provider: releases
+  api_key:
+    secure: OfYWkedmramdd2ML/dL+lQ+rYWLNaLWy1HfMxxyKwOZThIgWekxhy9EeqEVAisGXBU6qEe9FpsrOi3EUb3OwUNLmKz5b46fs8DpcjsFTKEGhkpXPDJJiwf5Sk0kOUvQp34euv5tBzMFrDxcB/vOpgFMjvWVx5j7BM+e8X0t3RMJANp7vEK5v71KjbbvERZTVaVAeFLrC5vcqcbwad/0fVGJYcvDXRmzs0W8Vc9v8OznfhbwtCj0f8HyfYoPkUXudzDYyDGoGbadKrbeLYYx/fQqlCeLxxLsfjTStYe3fGer2pPUJIBHUL3vvQRhBNr4t89zVvkUcmg7ems2/SG1gCeIX1E1WbnMxpNd98v1CP4Ku7LfJTkpjOv+0FWCbKj32AtoklOMzU8FQw/X/Ys4+Qpo42v4u4NVzWcDTR7y7TQcnOqqmhBbU5GJs+xz3p1bDm0Q2aOwqUGo7OACQ4my5xjjPLCNrV5/FFv3GYn4XutHZjvyLPie7AMArggITSTPZEMn3SYYdxyDp+VloW2vHfI3jByDFwjDGMr3TN6dZyGXXI9DWXeqizVKG5t9P3zc6Vda+VLCaq3AC2vl57RSooDEg3m3kPEEuI+P2omnHuCgAXuHVQaxw5aji+fk72G6zYuTcAMhJJQujWFIQxRtuSZwDZc7M7DOpg5xE7dTfrVA=
+  file: './obj/sysconfig'
+  on:
+    repo: n13l/kbuild
