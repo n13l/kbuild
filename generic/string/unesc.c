@@ -6,10 +6,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
-#include <clib/strings.h>
 #include <mem/map.h>
 #include <mem/stack.h>
 #include <mem/alloc.h>
+
+#include <generic/strings.h>
 
 char *
 str_unesc(char *d, const char *s)

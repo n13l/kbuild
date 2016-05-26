@@ -16,7 +16,7 @@
 #include <opt/conf.h>
 #include <opt/getopt.h>
 #include <opt/conf-internal.h>
-#include <clib/gary.h>
+#include <generic/gary.h>
 
 #include <string.h>
 #include <stdio.h>

@@ -21,4 +21,4 @@
  */
 
 #include <sys/compiler.h>
-#include <clib/strings.h>
+#include <generic/strings.h>

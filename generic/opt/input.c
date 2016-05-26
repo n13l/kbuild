@@ -10,13 +10,14 @@
 
 #include <sys/compiler.h>
 #include <sys/log.h>
-#include <clib/strings.h>
 #include <opt/conf.h>
 #include <opt/conf-internal.h>
 #include <mem/list.h>
 #include <mem/pool.h>
 #include <mem/stack.h>
 #include <opt/fastbuf.h>
+
+#include <generic/strings.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -28,11 +29,11 @@
 
 #define MAX_LINE	4096
 
-#include <clib/bbuf.h>
+#include <generic/bbuf.h>
 
 #define GBUF_TYPE	uint
 #define GBUF_PREFIX(x)	split_##x
-#include <clib/gbuf.h>
+#include <generic/gbuf.h>
 
 struct cf_parser_state {
   const char *name_parse_fb;

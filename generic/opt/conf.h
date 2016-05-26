@@ -13,7 +13,7 @@
 
 #include <sys/compiler.h>
 #include <mem/list.h>
-#include <clib/gary.h>
+#include <generic/gary.h>
 
 struct mempool;
 

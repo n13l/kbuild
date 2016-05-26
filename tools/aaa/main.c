@@ -43,7 +43,8 @@
 
 #include <link.h>
 
-#include <clib/strings.h>
+#include <generic/strings.h>
+
 #include <sys/abi.h>
 #include <aaa/lib.h>
 

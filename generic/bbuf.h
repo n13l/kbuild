@@ -12,7 +12,7 @@
 
 #define	GBUF_TYPE	byte
 #define	GBUF_PREFIX(x)	bb_##x
-#include <clib/gbuf.h>
+#include <generic/gbuf.h>
 
 /**
  * printf() into a growing buffer with `va_list` arguments.

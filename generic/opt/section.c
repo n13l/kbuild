@@ -13,8 +13,8 @@
 #include <opt/conf.h>
 #include <opt/conf-internal.h>
 #include <mem/list.h>
-#include <clib/bsearch.h>
-#include <clib/gary.h>
+#include <generic/bsearch.h>
+#include <generic/gary.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -38,7 +38,7 @@ cf_add_dirty(struct cf_section *sec, void *ptr)
 #define ASORT_PREFIX(x)	dirtsec_##x
 #define ASORT_KEY_TYPE	struct dirty_section
 #define ASORT_LT(x,y)	(x.sec < y.sec) || (x.sec == y.sec && x.ptr < y.ptr)
-#include <clib/sorter/array-simple.h>
+#include <generic/sorter/array-simple.h>
 
 static void
 sort_dirty(struct cf_context *cc)

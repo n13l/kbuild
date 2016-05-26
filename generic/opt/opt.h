@@ -14,7 +14,7 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
-#include <clib/opt/conf.h>
+#include "conf.h"
 
 #include <stdlib.h>
 #include <stdio.h>

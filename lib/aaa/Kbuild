@@ -14,7 +14,7 @@ ccflags-$(CONFIG_JNI) += -DBUILD_JNI=1
 swopt                 := 
 swopt4j               := -package com.openaaa -I$(src) -I./java -java
 
-libaaa-dirs           := clib mem net crypto lib/aaa sys/$(PLATFORM)
+libaaa-dirs           := generic mem net crypto lib/aaa sys/$(PLATFORM)
 libaaa-objs           := $(patsubst %,%/built-in.o, $(libaaa-dirs))
 libaaa-libs           := $(patsubst %,%/lib.a, $(libs-y))
 libaaa-all            := $(libaaa-objs) $(libaaa-libs) $(KBUILD_LIBS)

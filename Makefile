@@ -627,7 +627,7 @@ else
 include/config/auto.conf: ;
 endif # $(dot-config)
 
-objs-y        += arch/$(SRCARCH) sys/$(PLATFORM) mem net clib crypto lib
+objs-y        += arch/$(SRCARCH) sys/$(PLATFORM) mem net generic crypto lib
 
 include arch/$(SRCARCH)/Makefile                                                
 include modules/Makefile                                                        

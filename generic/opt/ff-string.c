@@ -13,7 +13,8 @@
 #include <mem/pool.h>
 #include <opt/fastbuf.h>
 #include <mem/pool.h>
-#include <clib/bbuf.h>
+
+#include <generic/bbuf.h>
 
 char *					/* Non-standard */
 bgets(struct fastbuf *f, char *b, uint l)

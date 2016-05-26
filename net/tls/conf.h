@@ -31,7 +31,7 @@
 #include <sys/compiler.h>
 #include <sys/cpu.h>
 #include <mem/unaligned.h>
-#include <clib/opt/conf.h>
+#include <generic/opt/conf.h>
 
 struct cf_tls_rfc5705 {
 	char *context;

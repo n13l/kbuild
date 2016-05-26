@@ -35,7 +35,7 @@ struct dirty_section {
 
 #define GBUF_TYPE	struct dirty_section
 #define GBUF_PREFIX(x)	dirtsec_##x
-#include <clib/gbuf.h>
+#include <generic/gbuf.h>
 
 /* Configuration context */
 

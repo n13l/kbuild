@@ -1,8 +1,9 @@
 #include <sys/compiler.h>
 #include <sys/cpu.h>
 #include <mem/page.h>
-#include <clib/hash/fn.h>
-#include <clib/hash/table.h>
+
+#include <generic/hash/fn.h>
+#include <generic/hash/table.h>
 
 #include <aaa/lib.h>
 

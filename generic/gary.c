@@ -1,6 +1,6 @@
 #include <sys/compiler.h>
-#include <clib/gary.h>
 #include <mem/alloc.h>
+#include <generic/gary.h>
 #include <string.h>
 
 struct gary gary_empty_hdr;

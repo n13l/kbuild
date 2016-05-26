@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <mem/list.h>
-#include <clib/opt/opt.h>
-#include <clib/opt/conf.h>
+#include <generic/opt/opt.h>
+#include <generic/opt/conf.h>
 
 #include <net/tls/proto.h>
 #include <net/tls/conf.h>
