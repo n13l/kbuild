@@ -53,9 +53,9 @@ before_install:
 - if [[ "$TARGET" == "win64" ]]; then unset CC ; export CROSS_COMPILE="x86_64-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi
 - unset TARGET;
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install flex bison gperf libncurses-dev pkg-config binutils-mingw-w64-i686 gcc-mingw-w64-i686 binutils-mingw-w64 gcc-mingw-w64; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install swig flex bison gperf libncurses-dev pkg-config binutils-mingw-w64-i686 gcc-mingw-w64-i686 binutils-mingw-w64 gcc-mingw-w64; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; unset CROSS_COMPILE; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install flex bison gperftools ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install swig flex bison gperftools ; fi
 script:
 - uname -a
 - make defconfig
