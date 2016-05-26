@@ -1,34 +1,7 @@
 #include <sys/compiler.h>
 #include <sys/cpu.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdbool.h>
-
-#include <dlfcn.h>
-
-#include "../arch/x86/include/tramp.h"
-
 #include <mem/pool.h>
 #include <mem/page.h>
-
-/*
-void die(const char *str, ...)
-{
-	arch_call_intr_vec(3);
-	exit(1);
-
-}
-
-void vdie(const char *fmt, va_list args)
-{
-	arch_call_intr_vec(3);
-	exit(1);
-}
-
-void giveup(const char *fmt, ...)
-{
-}
-*/
 
 int
 main(int argc, char *argv[])
