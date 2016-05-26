@@ -52,3 +52,4 @@ script:
 - uname -a
 - make defconfig
 - make
+- file ./obj/sysconfig
