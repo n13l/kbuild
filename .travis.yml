@@ -44,7 +44,7 @@ matrix:
     env: TARGET=native
     osx_image: beta-xcode6.1
 before_deploy:
-- export ARCHIVE=kbuild-$TRAVIS_OS_NAME-$TARGET.tar.gz
+- export ARCHIVE=kbuild-$BUILD_TARGET.tar.gz
 - ./scripts/archive.sh $ARCHIVE
 - echo "deploying $ARCHIVE to GitHub Releases"
 before_install:
@@ -52,9 +52,10 @@ before_install:
 - export VERSION="$BUILD_MAJOR"
 - export PATCHLEVEL="$BUILD_MINOR"
 - export SUBLEVEL="$BUILD_REVISION"
-- if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-";
+- export BUILD_TARGET="$TRAVIS_OS_NAME"
+- if [[ "$TARGET" == "win32" ]]; then export BUILD_TARGET=$TARGET ; unset CC ; export CROSS_COMPILE="i686-w64-mingw32-";
   export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi
-- if [[ "$TARGET" == "win64" ]]; then unset CC ; export CROSS_COMPILE="x86_64-w64-mingw32-";
+- if [[ "$TARGET" == "win64" ]]; then export BUILD_TARGET=$TARGET ; unset CC ; export CROSS_COMPILE="x86_64-w64-mingw32-";
   export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi
 - unset TARGET;
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
