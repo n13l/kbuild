@@ -1,6 +1,8 @@
 language:
   - c
   - java
+jdk:
+  - oraclejdk8
 env:
   global:
     - BUILD_BRANCH=$TRAVIS_BRANCH
