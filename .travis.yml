@@ -1,4 +1,6 @@
-language: c
+language:
+  - c
+  - java
 env:
   global:
     - BUILD_BRANCH=$TRAVIS_BRANCH
