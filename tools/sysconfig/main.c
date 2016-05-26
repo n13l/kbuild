@@ -11,6 +11,7 @@
 #include <mem/pool.h>
 #include <mem/page.h>
 
+/*
 void die(const char *str, ...)
 {
 	arch_call_intr_vec(3);
@@ -27,6 +28,7 @@ void vdie(const char *fmt, va_list args)
 void giveup(const char *fmt, ...)
 {
 }
+*/
 
 int
 main(int argc, char *argv[])

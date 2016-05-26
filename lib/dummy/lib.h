@@ -1,5 +1,5 @@
 /*
- * (AAA) Autentication, Authorisation and Accounting) Library
+ * Dummy library
  *
  * The MIT License (MIT)         Copyright (c) 2015 Daniel Kubec <niel@rtfm.cz>
  *                                                                              
@@ -23,20 +23,19 @@
  *
  */
 
-#ifndef __AAA_PRV_H__
-#define __AAA_PRV_H__
+#ifndef __DUMMY_LIB_PUBLIC_H__
+#define __DUMMY_LIB_PUBLIC_H__
 
 #include <stdlib.h>
 #include <stdarg.h>
 #include <sys/types.h>
-#include <mem/pool.h>
 
-struct aaa {
-	struct mempool *mp;
-	const char *config;
-};
+/* A private structures containing the context */
+struct dummy;
 
-void                                                                            
-aaa_config_load(struct aaa *c);
+/* public api functions */
+struct dummy *dummy_new(void);
+void dummy_free(struct dummy *);
+void dummy_test(struct dummy *);
 
-#endif
+#endif/*__DUMMY_LIB_H__*/

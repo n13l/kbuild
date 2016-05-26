@@ -1,9 +1,9 @@
-package com.openaaa;
+package com.dummy;
 
 class Test {
 	public static void main(String[] args) throws Exception {
-		AAA aaa = new AAA(1);
+		DUMMY dummy = new DUMMY();
 
-		aaa.finalize();
+		dummy.finalize();
 	}
 }

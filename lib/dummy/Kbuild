@@ -1,10 +1,10 @@
-lib                   := aaa
+lib                   := dummy
 libname               := lib$(lib)-$(PACKAGEVERSION)
 
 always                += $(if $(CONFIG_MODULES),$(libname).$(so),)
 always                += $(if $(JDK_HOME),$(libname).jar,)
 
-obj-y                 += acc.o env.o cnf.o api.o 
+obj-y                 += dummy.o
 obj-$(CONFIG_JNI)     += built-jni.o
 
 ccflags-$(CONFIG_JNI) += -I$(JDK_HOME)/include -I$(JDK_HOME)/include/$(PLATFORM)
@@ -12,22 +12,22 @@ ccflags-$(CONFIG_JNI) += -DBUILD_JNI=1
 
 #swflags              := -debug-module 1
 swopt                 := 
-swopt4j               := -package com.openaaa -I$(src) -I./java -java
+swopt4j               := -package com.dummy -I$(src) -I./java -java
 
-libaaa-dirs           := generic mem net crypto lib/aaa sys/$(PLATFORM)
-libaaa-objs           := $(patsubst %,%/built-in.o, $(libaaa-dirs))
-libaaa-libs           := $(patsubst %,%/lib.a, $(libs-y))
-libaaa-all            := $(libaaa-objs) $(libaaa-libs) $(KBUILD_LIBS)
+libdummy-dirs           := generic mem net crypto lib/dummy sys/$(PLATFORM)
+libdummy-objs           := $(patsubst %,%/built-in.o, $(libdummy-dirs))
+libdummy-libs           := $(patsubst %,%/lib.a, $(libs-y))
+libdummy-all            := $(libdummy-objs) $(libdummy-libs) $(KBUILD_LIBS)
 
-$(obj)/$(libname).$(so): $(libaaa-objs) $(libaaa-libs)
+$(obj)/$(libname).$(so): $(libdummy-objs) $(libdummy-libs)
 	$(call if_changed,$(libname).$(so))
 
 quiet_cmd_$(libname).$(so) = LD [M]  $@
 	cmd_$(libname).$(so) = $(CC) $(LDFLAGS) $(SHLIB_LDFLAGS) -o $@ \
-	                             $(libaaa-all)
+	                             $(libdummy-all)
 
-PHONY += $(libaaa-dirs)
-$(libaaa-dirs): scripts_basic
+PHONY += $(libdummy-dirs)
+$(libdummy-dirs): scripts_basic
 	$(Q)$(MAKE) $(build)=$@
 clean-files  += $(libname).$(so) $(libname).jar
 
@@ -36,7 +36,7 @@ $(obj)/$(libname).jar: $(obj)/built-jni.c
 
 quiet_cmd_$(libname).jar = JR      $@
 	cmd_$(libname).jar = $(JAR) cf $(obj)/$(libname).jar \
-	$(subst $(obj)/,-C $(obj) , $(wildcard $(obj)/com/openaaa/*.class))
+	$(subst $(obj)/,-C $(obj) , $(wildcard $(obj)/com/dummy/*.class))
 
 $(obj)/Test.java: $(KBUILD_SRC)/$(src)/java/Test.java
 	@cp $(KBUILD_SRC)/$(src)/java/Test.java $(obj)/Test.java
