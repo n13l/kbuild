@@ -45,7 +45,7 @@ matrix:
     osx_image: beta-xcode6.1
 before_deploy:
 - export ARCHIVE=kbuild-$TRAVIS_OS_NAME-$TARGET.tar.gz
-- find . -type f | egrep '\\.(dylib|dll|so|exe)$' | xargs tar -czvf $ARCHIVE
+- ./scripts/archive.sh $ARCHIVE
 - echo "deploying $ARCHIVE to GitHub Releases"
 before_install:
 - source ./scripts/version.sh $TRAVIS_BRANCH
