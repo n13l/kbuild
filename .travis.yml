@@ -45,12 +45,13 @@ deploy:
   provider: releases
   api_key: "GITHUB OAUTH TOKEN"
   file: 
-    - find . -type f | egrep '\.(dylib|dll|so)$'
+    - $(find . -type f | egrep '\.(dylib|dll|so)$')
   skip_cleanup: true
   on:
     tags: true
 before_install:
 - ./scripts/version.sh $TRAVIS_BRANCH
+- echo "$BUILD_MAJOR $BUILD_MINOR $BUILD_REVISION"
 - if [[ "$TARGET" == "win32" ]]; then unset CC ; export CROSS_COMPILE="i686-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi 
 - if [[ "$TARGET" == "win64" ]]; then unset CC ; export CROSS_COMPILE="x86_64-w64-mingw32-"; export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi
 - unset TARGET;
