@@ -72,4 +72,5 @@ deploy:
   file: './obj/sysconfig'
   skip_cleanup: true
   on:
+    tags: yes
     repo: n13l/kbuild
