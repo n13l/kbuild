@@ -3,15 +3,27 @@ language:
 - java
 jdk:
 - oraclejdk8
+addons:
+  apt:
+    packages:
+    - flex
+    - bison
+    - gperf
+    - pkg-config
+    - binutils-mingw-w64-i686
+    - gcc-mingw-w64-i686
+    - binutils-mingw-w64
+    - gcc-mingw-w64
 env:
   global:
   - BUILD_BRANCH=$TRAVIS_BRANCH
   - BUILD_ID=$TRAVIS_BUILD_ID
+
 matrix:
   include:
   - compiler: gcc
     os: linux
-    env: TARGET=native
+    env: TARGET=linux
   - compiler: gcc
     os: linux
     env: TARGET=win32
@@ -20,62 +32,51 @@ matrix:
     env: TARGET=win64
   - compiler: clang
     os: linux
-    env: TARGET=native
+    env: TARGET=linux
   - compiler: gcc
     os: osx
-    env: TARGET=native
+    env: TARGET=osx
   - compiler: clang
     os: osx
-    env: TARGET=native
+    env: TARGET=osx
   - compiler: clang
     os: osx
-    env: TARGET=native
+    env: TARGET=osx
     osx_image: xcode7.3
   - compiler: clang
     os: osx
-    env: TARGET=native
+    env: TARGET=osx
     osx_image: xcode7.2
   - compiler: clang
     os: osx
-    env: TARGET=native
+    env: TARGET=osx
     osx_image: xcode7.1
   - compiler: clang
     os: osx
     env: TARGET=native
     osx_image: beta-xcode6.1
+
 before_deploy:
-- export ARCHIVE=kbuild-$BUILD_TARGET.tar.gz
-- ./scripts/archive.sh $ARCHIVE
-- echo "deploying $ARCHIVE to GitHub Releases"
+- export BUILD_ARCHIVE=kbuild-$BUILD_MAJOR.$BUILD_MINOR.$BUILD_REVISION-$BUILD_OS_NAME-$BUILD_OS_ARCH-$BUILD_OS_RELEASE.tar.gz
+- ./scripts/travis/archive.sh $BUILD_ARCHIVE
 before_install:
-- source ./scripts/version.sh $TRAVIS_BRANCH
-- export VERSION="$BUILD_MAJOR"
-- export PATCHLEVEL="$BUILD_MINOR"
-- export SUBLEVEL="$BUILD_REVISION"
-- export BUILD_TARGET="$TRAVIS_OS_NAME"
-- if [[ "$TARGET" == "win32" ]]; then export BUILD_TARGET=$TARGET ; unset CC ; export CROSS_COMPILE="i686-w64-mingw32-";
-  export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi
-- if [[ "$TARGET" == "win64" ]]; then export BUILD_TARGET=$TARGET ; unset CC ; export CROSS_COMPILE="x86_64-w64-mingw32-";
-  export MINGW=/opt/mingw64; export PATH=$MINGW/bin:$PATH; fi
-- unset TARGET;
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -qq update ; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install swig flex bison
-  gperf libncurses-dev pkg-config binutils-mingw-w64-i686 gcc-mingw-w64-i686 binutils-mingw-w64
-  gcc-mingw-w64; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; unset CROSS_COMPILE; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install swig flex bison gperftools
-  ; fi
+  - source ./scripts/travis/before_install.sh
+
 script:
 - uname -a
 - make defconfig
 - make
 - file ./obj/sysconfig
+notifications:
+  on_success: never
+  on_failure: never
+  email: false
 deploy:
   provider: releases
   api_key:
     secure: OfYWkedmramdd2ML/dL+lQ+rYWLNaLWy1HfMxxyKwOZThIgWekxhy9EeqEVAisGXBU6qEe9FpsrOi3EUb3OwUNLmKz5b46fs8DpcjsFTKEGhkpXPDJJiwf5Sk0kOUvQp34euv5tBzMFrDxcB/vOpgFMjvWVx5j7BM+e8X0t3RMJANp7vEK5v71KjbbvERZTVaVAeFLrC5vcqcbwad/0fVGJYcvDXRmzs0W8Vc9v8OznfhbwtCj0f8HyfYoPkUXudzDYyDGoGbadKrbeLYYx/fQqlCeLxxLsfjTStYe3fGer2pPUJIBHUL3vvQRhBNr4t89zVvkUcmg7ems2/SG1gCeIX1E1WbnMxpNd98v1CP4Ku7LfJTkpjOv+0FWCbKj32AtoklOMzU8FQw/X/Ys4+Qpo42v4u4NVzWcDTR7y7TQcnOqqmhBbU5GJs+xz3p1bDm0Q2aOwqUGo7OACQ4my5xjjPLCNrV5/FFv3GYn4XutHZjvyLPie7AMArggITSTPZEMn3SYYdxyDp+VloW2vHfI3jByDFwjDGMr3TN6dZyGXXI9DWXeqizVKG5t9P3zc6Vda+VLCaq3AC2vl57RSooDEg3m3kPEEuI+P2omnHuCgAXuHVQaxw5aji+fk72G6zYuTcAMhJJQujWFIQxRtuSZwDZc7M7DOpg5xE7dTfrVA=
   file_glob: true
-  file: "./*.tar.gz"
+  file: "$BUILD_ARCHIVE"
   skip_cleanup: true
   on:
     tags: yes
