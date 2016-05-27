@@ -68,7 +68,7 @@ script:
 - make defconfig
 - make
 - file ./obj/sysconfig
-- ./obj/sysconfig
+- $OS_EXEC ./obj/sysconfig
 notifications:
   on_success: never
   on_failure: never
