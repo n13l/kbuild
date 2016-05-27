@@ -18,13 +18,13 @@ addons:
 env:
   global:
   - BUILD_BRANCH=$TRAVIS_BRANCH
-  - BUILD_ID=$TRAVIS_BUILD_ID
+  - BUILD_ID=$TRAVIS_BUILD_NUMBER
 
 matrix:
   include:
   - compiler: gcc
     os: linux
-    env: BUILD_DEPLOY=0 BUILD_TARGET=linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=linux
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=1 BUILD_TARGET=win32
@@ -36,25 +36,25 @@ matrix:
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux
   - compiler: gcc
     os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx OS_VERSION="10.9"
   - compiler: clang
     os: osx
-    env: iBUILD_DEPLOY=0 BUILD_TARGET=osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx OS_VERSION="10.9"
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=1 BUILD_TARGET=osx
+    env: BUILD_DEPLOY=1 BUILD_TARGET=osx OS_VERSION="10.11"
     osx_image: xcode7.3
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx OS_VERSION="10.11"
     osx_image: xcode7.2
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx OS_VERSION="10.10"
     osx_image: xcode7.1
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=1 BUILD_TARGET=osx
+    env: BUILD_DEPLOY=1 BUILD_TARGET=osx OS_VERSION="10.9"
     osx_image: beta-xcode6.1
 
 before_deploy:
