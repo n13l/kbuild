@@ -27,7 +27,7 @@ if [ "$BUILD_TARGET" == "win32" ]; then
   export BUILD_OS_NAME="win"
   export BUILD_OS_ARCH="x86"
   export BUILD_OS_RELEASE="generic"
-  export OS_EXEC="wine"
+  export OS_EXEC="WINEDEBUG=-all,warn-all wine"
 fi 
 if [ "$BUILD_TARGET" == "win64" ]; then 
   unset CC 
@@ -37,7 +37,7 @@ if [ "$BUILD_TARGET" == "win64" ]; then
   export BUILD_OS_NAME="win"
   export BUILD_OS_ARCH="x86_64"
   export BUILD_OS_RELEASE="generic"
-  export OS_EXEC="wine"
+  export OS_EXEC="WINEDEBUG=-all,warn-all wine"
 fi
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   unset CROSS_COMPILE 
