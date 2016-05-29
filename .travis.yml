@@ -39,7 +39,7 @@ matrix:
     env: BUILD_DEPLOY=0 BUILD_TARGET=osx OS_VERSION="10.9"
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx OS_VERSION="10.9"
+    env: BUILD_DEPLOY=1 BUILD_TARGET=osx OS_VERSION="10.9"
   - compiler: clang
     os: osx
     env: BUILD_DEPLOY=1 BUILD_TARGET=osx OS_VERSION="10.11"
