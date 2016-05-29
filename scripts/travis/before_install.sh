@@ -53,7 +53,7 @@ if [ "$BUILD_ARCH" == "armv7" ]; then
   export OS_EXEC="echo"
   export BUILD_OS_ARCH="armv7"
   # evil workarround sysroot
-  export OS_EXEC="qemu-arm-static"
+  export OS_EXEC="qemu-arm-static /usr/arm-linux-gnueabi/libhf/ld-linux-armhf.so.3 --library-path /usr/arm-linux-gnueabi/libhf"
 fi
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   unset CROSS_COMPILE 
