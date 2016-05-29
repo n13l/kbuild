@@ -48,8 +48,8 @@ cpu_vendor(void)
 #define bit_SSE4_2 bit_SSE42
 #endif
 
-#ifndef bit_SSE4_2
-#define bit_SSE4_2 bit_SSE41
+#ifndef bit_SSE4_1
+#define bit_SSE4_1 bit_SSE41
 #endif
 
 void
