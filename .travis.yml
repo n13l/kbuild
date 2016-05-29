@@ -79,6 +79,7 @@ script:
 - uname -a
 - make defconfig
 - make
+- cat ./obj/.config
 - file ./obj/sysconfig
 - $OS_EXEC ./obj/sysconfig
 notifications:
