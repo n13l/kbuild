@@ -74,9 +74,11 @@ matrix:
     os: osx
     env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
     osx_image: beta-xcode6.2
-allow_failures:                                                               
-  - env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=s390x
-  - env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=arm
+allow_failures:
+  - compiler: gcc
+    env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=s390x
+  - compiler: gcc
+    env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=arm
 before_deploy:
 - export BUILD_ARCHIVE=kbuild-$BUILD_MAJOR.$BUILD_MINOR.$BUILD_REVISION-$BUILD_OS_NAME-$BUILD_OS_ARCH-$BUILD_OS_RELEASE.tar.gz
 - ./scripts/travis/archive.sh $BUILD_ARCHIVE
