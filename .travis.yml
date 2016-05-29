@@ -20,8 +20,8 @@ addons:
     - binutils-arm-linux-gnueabihf
     - libc6-dev-s390x-cross
     - libc6-dev
-    - gcc-5-cross
-    - libgcc-5-cross
+    - gcc-cross
+    - libgcc-cross
     - wine
 env:
   global:
