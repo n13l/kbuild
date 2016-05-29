@@ -16,7 +16,8 @@ addons:
     - gcc-mingw-w64
     - gcc-arm-linux-gnueabi
     - binutils-arm-linux-gnueabi      
-    - libgcc-5-s390x-cross
+    - gcc-5-cross
+    - libgcc-5-cross
     - wine
 env:
   global:
