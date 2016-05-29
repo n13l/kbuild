@@ -15,7 +15,7 @@ addons:
     - binutils-mingw-w64
     - gcc-mingw-w64
     - binutils-s390x-linux-gnu
-    - gcc-s390x-linux-gnu
+    - *s390*
     - wine
 env:
   global:
