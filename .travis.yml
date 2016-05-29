@@ -49,6 +49,17 @@ matrix:
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=s390x
+    addons:
+      apt:
+        packages: &armv7_unknown_linux_gnueabihf
+        # Cross compiler and cross compiled C libraries
+        - gcc-s390x-linux-gnu
+        - binutils-s390x-linux-gnu
+        - libc-s390x-cross
+        - libc-dev-s390x-cross
+        # Transparent emulation
+        - qemu-user-static
+        - binfmt-support
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=arm
