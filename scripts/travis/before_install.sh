@@ -54,6 +54,7 @@ if [ "$BUILD_ARCH" == "armv7" ]; then
   export BUILD_OS_ARCH="armv7"
   # evil workarround sysroot
   export OS_EXEC=$(shell scripts/travis/arm-ld.sh)
+  echo "OS_EXEC=$OS_EXEC"
 fi
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   unset CROSS_COMPILE 
