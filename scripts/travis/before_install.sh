@@ -47,11 +47,12 @@ if [ "$BUILD_ARCH" == "s390x" ]; then
   export OS_EXEC="echo"
   export BUILD_OS_ARCH="x86_64"
 fi
-if [ "$BUILD_ARCH" == "arm" ]; then
+if [ "$BUILD_ARCH" == "armv7" ]; then
   unset CC
   export CROSS_COMPILE=arm-linux-gnueabihf-
   export OS_EXEC="echo"
-  export BUILD_OS_ARCH="x86_64"
+  export BUILD_OS_ARCH="armv7"
+  export OS_EXEC="qemu-arm"
 fi
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   unset CROSS_COMPILE 

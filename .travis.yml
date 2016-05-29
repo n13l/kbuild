@@ -62,7 +62,7 @@ matrix:
         - binfmt-support
   - compiler: gcc
     os: linux
-    env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=arm
+    env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=armv7
     addons:
       apt:
         packages: &armv7_unknown_linux_gnueabihf
@@ -132,7 +132,7 @@ script:
 - uname -a
 - make defconfig
 - cat ./obj/.config
-- make V=1
+- make
 - file ./obj/sysconfig
 - $OS_EXEC ./obj/sysconfig
 notifications:
