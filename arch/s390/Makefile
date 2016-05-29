@@ -15,7 +15,7 @@
 
 ifndef CONFIG_64BIT
 LD_BFD		:= elf32-s390
-LDFLAGS		:= -m elf_s390
+#LDFLAGS		:= -m elf_s390
 KBUILD_CFLAGS	+= -m31
 KBUILD_AFLAGS	+= -m31
 UTS_MACHINE	:= s390
@@ -23,7 +23,7 @@ STACK_SIZE	:= 8192
 CHECKFLAGS	+= -D__s390__ -msize-long
 else
 LD_BFD		:= elf64-s390
-LDFLAGS		:= -m elf64_s390
+#LDFLAGS		:= -m elf64_s390
 KBUILD_AFLAGS_MODULE += -fPIC
 KBUILD_CFLAGS_MODULE += -fPIC
 KBUILD_CFLAGS	+= -m64

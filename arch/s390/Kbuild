@@ -1,2 +1,2 @@
-obj-y += mm/
 obj-y += elf/
+obj-y += init.o
