@@ -33,6 +33,10 @@ endif
 ifeq ($(ARCH),s390)
 endif
 
+ifeq ($(ARCH),arm)
+KBUILD_CFLAGS += "--sysroot=/usr/arm-linux-gnueabi"
+endif
+
 ifeq ($(PLATFORM),darwin)
 #SO=dylib
 #SHLIB_LDFLAGS=-dynamiclib
