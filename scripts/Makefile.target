@@ -1,5 +1,5 @@
 CROSS_COMPILER ?= gcc
-CC ?= $(CROSS_COMPILE)$(CROSS_COMPILER)
+CC ?= $(CROSS_COMPILE)$(CROSS_COMPILER) -v
 
 UNAME_SYSTEM:=$(shell uname -s)
 UNAME_MACHINE:=$(shell uname -m)
@@ -34,7 +34,7 @@ ifeq ($(ARCH),s390)
 endif
 
 ifeq ($(ARCH),arm)
-KBUILD_CFLAGS += "--sysroot=/usr/arm-linux-gnueabi"
+#KBUILD_CFLAGS += "--sysroot=/usr/arm-linux-gnueabi -B/usr/arm-linux-gnueabi/libhfa"
 endif
 
 ifeq ($(PLATFORM),darwin)
