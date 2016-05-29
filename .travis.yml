@@ -33,6 +33,7 @@ addons:
     - binutils-mingw-w64
     - gcc-mingw-w64
     - gcc-arm-linux-gnueabihf
+    - gcc-multilib-arm-linux-gnueabihf
     - binutils-arm-linux-gnueabihf
       #    - gcc-s390x-linux-gnu
       #    - binutils-s390x-linux-gnu
