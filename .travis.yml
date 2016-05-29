@@ -32,9 +32,6 @@ addons:
     - gcc-mingw-w64-i686
     - binutils-mingw-w64
     - gcc-mingw-w64
-    - gcc-arm-linux-gnueabihf
-    - gcc-multilib-arm-linux-gnueabihf
-    - binutils-arm-linux-gnueabihf
       #    - gcc-s390x-linux-gnu
       #    - binutils-s390x-linux-gnu
       #    - libc-dev-s390x-cross
@@ -55,6 +52,16 @@ matrix:
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=arm
+    addons:
+    apt:
+    packages: &armv7_unknown_linux_gnueabihf
+    # Cross compiler and cross compiled C libraries
+    - gcc-arm-linux-gnueabihf
+    - libc6-armhf-cross
+    - libc6-dev-armhf-cross
+    # Transparent emulation
+    - qemu-user-static
+    - binfmt-support        
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=1 BUILD_TARGET=win32 BUILD_ARCH=x86_32
