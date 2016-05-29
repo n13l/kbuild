@@ -53,7 +53,7 @@ if [ "$BUILD_ARCH" == "armv7" ]; then
   export OS_EXEC="echo"
   export BUILD_OS_ARCH="armv7"
   # evil workarround sysroot
-  export OS_EXEC=$(shell scripts/travis/arm-ld.sh)
+  export OS_EXEC=$(/bin/sh scripts/travis/arm-ld.sh)
   echo "OS_EXEC=$OS_EXEC"
 fi
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
