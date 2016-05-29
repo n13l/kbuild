@@ -12,7 +12,7 @@
 #include <sys/log.h>
 #include <opt/conf.h>
 #include <opt/conf-internal.h>
-#include <mem/list.h>
+#include <generic/list.h>
 #include <generic/bsearch.h>
 #include <generic/gary.h>
 

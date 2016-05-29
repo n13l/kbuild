@@ -3,7 +3,8 @@
 #include <asm/cache.h>
 #include <asm/instr.h>
 
-static __thread unsigned __branch[1024];
+/* static __thread unsigned __branch[1024]; */
+static unsigned __branch[1024];
 
 _noinline int
 bsect_inc(int id)

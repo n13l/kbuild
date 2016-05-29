@@ -3,7 +3,8 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
-#include <mem/list.h>
+
+#include <generic/list.h>
 
 /* fixed-size memory block    */
 struct mem_block {

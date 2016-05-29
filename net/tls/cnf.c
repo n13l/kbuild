@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <mem/list.h>
+
+#include <generic/list.h>
 #include <generic/opt/opt.h>
 #include <generic/opt/conf.h>
 

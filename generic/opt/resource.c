@@ -9,10 +9,8 @@
 
 #include <sys/compiler.h>
 #include <sys/log.h>
-#include <mem/list.h>
 #include <mem/pool.h>
 #include <opt/resource.h>
-#include <stdio.h>
 
 struct respool *
 rp_new(const char *name, struct mempool *mp)

@@ -11,9 +11,9 @@
 #define _UCW_RESPOOL_H
 
 #include <sys/compiler.h>
-#include <mem/list.h>
 #include <mem/pool.h>
 #include <opt/threads.h>
+#include <generic/list.h>
 
 /**
  * A resource pool. It contains a name of the pool (which is printed

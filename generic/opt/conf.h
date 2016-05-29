@@ -12,7 +12,7 @@
 #define	_UCW_CONF_H
 
 #include <sys/compiler.h>
-#include <mem/list.h>
+#include <generic/list.h>
 #include <generic/gary.h>
 
 struct mempool;

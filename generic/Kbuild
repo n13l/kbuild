@@ -1,4 +1,4 @@
-obj-y += errno.o file.o gary.o exit.o timestamp.o link.o
+obj-y += errno.o file.o gary.o exit.o timestamp.o link.o list.o
 obj-y += string/attr.o string/eval.o string/comp.o string/unesc.o
 obj-y += opt/alloc.o opt/context.o opt/input.o \
          opt/intr.o opt/journal.o opt/units.o \

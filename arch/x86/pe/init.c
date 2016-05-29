@@ -3,7 +3,7 @@
 #include <sys/log.h>
 #include <elf/lib.h>
 
-#include <mem/list.h>
+#include <generic/list.h>
 
 #include <stdlib.h>
 #include <stdio.h>

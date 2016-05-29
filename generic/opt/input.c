@@ -12,11 +12,11 @@
 #include <sys/log.h>
 #include <opt/conf.h>
 #include <opt/conf-internal.h>
-#include <mem/list.h>
 #include <mem/pool.h>
 #include <mem/stack.h>
 #include <opt/fastbuf.h>
 
+#include <generic/list.h>
 #include <generic/strings.h>
 
 #include <stdlib.h>

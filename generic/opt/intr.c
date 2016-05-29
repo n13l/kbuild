@@ -10,12 +10,13 @@
 
 #include <sys/compiler.h>
 #include <sys/log.h>
-#include <mem/list.h> 
 #include <mem/pool.h>
 
 #include <opt/conf.h>
 #include <opt/getopt.h>
 #include <opt/conf-internal.h>
+
+#include <generic/list.h> 
 #include <generic/gary.h>
 
 #include <string.h>

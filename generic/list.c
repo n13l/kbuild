@@ -3,7 +3,7 @@
 #include <sys/compiler.h>
 #include <sys/cpu.h>
 #include <mem/alloc.h>
-#include <mem/list.h>
+#include <generic/list.h>
 
 void
 debug_list_remove(struct node *n)

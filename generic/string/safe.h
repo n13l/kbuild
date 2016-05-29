@@ -25,9 +25,6 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
-#include <mem/pool.h>
-#include <mem/list.h>
-
 #include <string.h>
 
 int                                                                             
