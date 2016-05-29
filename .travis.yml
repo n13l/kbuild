@@ -114,7 +114,7 @@ matrix:
     osx_image: beta-xcode6.4
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9-beta"
     osx_image: beta-xcode6.2
   allow_failures:
   - compiler: gcc
