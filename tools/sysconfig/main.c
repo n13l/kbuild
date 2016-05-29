@@ -4,6 +4,8 @@
 #include <mem/page.h>
 #include <cpuid.h>
 
+#define CPU_VENDOR_MAX 12
+
 enum cpu_vendor {
 	CPU_VENDOR_UNKNOWN,
 	CPU_VENDOR_INTEL,
@@ -34,14 +36,21 @@ cpu_vendor(void)
 	unsigned eax, ebx, ecx, edx;
 	__get_cpuid(0, &eax, &ebx, &ecx, &edx);    
 
-	int regs[4] = {ebx, edx, ecx, 0};
-	char vendor[13];
-	memcpy(vendor + 0, &regs[0], 4);   // copy EBX
-	memcpy(vendor + 4, &regs[1], 4); // copy ECX
-	memcpy(vendor + 8, &regs[2], 4); // copy EDX
-	vendor[12] = '\0';
+	char vendor[CPU_VENDOR_MAX + 1];
+	memcpy(vendor + 0, &ebx, sizeof(ebx)); 
+	memcpy(vendor + sizeof(ebx), &edx, sizeof(edx));
+	memcpy(vendor + sizeof(edx) + sizeof(ebx), &ecx, sizeof(ecx));
+	vendor[CPU_VENDOR_MAX] = '\0';
 	printf("cpu.vendor=%s\n", vendor);
 }
+
+#ifndef bit_SSE4_2
+#define bit_SSE4_2 bit_SSE42
+#endif
+
+#ifndef bit_SSE4_2
+#define bit_SSE4_2 bit_SSE41
+#endif
 
 void
 cpu_extension(unsigned ecx)
