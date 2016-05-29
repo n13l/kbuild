@@ -30,6 +30,9 @@ SHLIB_EX=dll
 EXEC_EX=exe
 endif
 
+ifeq ($(ARCH),s390)
+endif
+
 ifeq ($(PLATFORM),darwin)
 #SO=dylib
 #SHLIB_LDFLAGS=-dynamiclib
@@ -37,5 +40,5 @@ endif
 
 export PLATFORM PLATFORM_U
 export ARCH HOST TARGET SO
-export SHLIB_EX
+export SHLIB_EX KBUILD_CFLAGS
 #

@@ -10,7 +10,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <limits.h>
-#include <assert.h>
 
 typedef uint8_t      byte;            /* Exactly 8 bits, unsigned            */
 typedef uint8_t      u8;              /* Exactly 8 bits, unsigned            */

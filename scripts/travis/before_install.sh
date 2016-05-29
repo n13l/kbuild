@@ -41,6 +41,23 @@ if [ "$BUILD_TARGET" == "win64" ]; then
   export WINEDEBUG="-all,warn-all"
   export OS_EXEC="wine"
 fi
+if [ "$BUILD_ARCH" == "s390x" ]; then
+  unset CC
+  export CROSS_COMPILE=s390x-linux-
+  export OS_EXEC="echo"
+  export BUILD_OS_ARCH="x86_64"
+fi
+if [ "$BUILD_ARCH" == "arm" ]; then
+  sudo apt-get build-dep -aarmhf foo-pkg
+  sudo apt-get source foo-pkg
+  cd foo-pkg-*
+  sudo dpkg-buildpackage -aarmhf
+  cd ..
+  unset CC
+  export CROSS_COMPILE=arm-linux-gnu-
+  export OS_EXEC="echo"
+  export BUILD_OS_ARCH="x86_64"
+fi
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   unset CROSS_COMPILE 
   export BUILD_OS_NAME="osx"
