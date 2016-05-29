@@ -66,20 +66,20 @@ cflags-$(CONFIG_FRAME_POINTER) += -fno-optimize-sibling-calls
 
 # old style option for packed stacks
 ifeq ($(call cc-option-yn,-mkernel-backchain),y)
-cflags-$(CONFIG_PACK_STACK)  += -mkernel-backchain -D__PACK_STACK
-aflags-$(CONFIG_PACK_STACK)  += -D__PACK_STACK
+#cflags-$(CONFIG_PACK_STACK)  += -mkernel-backchain -D__PACK_STACK
+#aflags-$(CONFIG_PACK_STACK)  += -D__PACK_STACK
 endif
 
 # new style option for packed stacks
 ifeq ($(call cc-option-yn,-mpacked-stack),y)
-cflags-$(CONFIG_PACK_STACK)  += -mpacked-stack -D__PACK_STACK
-aflags-$(CONFIG_PACK_STACK)  += -D__PACK_STACK
+#cflags-$(CONFIG_PACK_STACK)  += -mpacked-stack -D__PACK_STACK
+#aflags-$(CONFIG_PACK_STACK)  += -D__PACK_STACK
 endif
 
 ifeq ($(call cc-option-yn,-mstack-size=8192 -mstack-guard=128),y)
-cflags-$(CONFIG_CHECK_STACK) += -mstack-size=$(STACK_SIZE)
+#cflags-$(CONFIG_CHECK_STACK) += -mstack-size=$(STACK_SIZE)
 ifneq ($(call cc-option-yn,-mstack-size=8192),y)
-cflags-$(CONFIG_CHECK_STACK) += -mstack-guard=$(CONFIG_STACK_GUARD)
+#cflags-$(CONFIG_CHECK_STACK) += -mstack-guard=$(CONFIG_STACK_GUARD)
 endif
 endif
 
@@ -92,13 +92,13 @@ ifdef CONFIG_FUNCTION_TRACER
 cc_hotpatch	:= -mhotpatch=0,3
 ifeq ($(call cc-option-yn,$(cc_hotpatch)),y)
 CC_FLAGS_FTRACE := $(cc_hotpatch)
-KBUILD_AFLAGS	+= -DCC_USING_HOTPATCH
-KBUILD_CFLAGS	+= -DCC_USING_HOTPATCH
+#KBUILD_AFLAGS	+= -DCC_USING_HOTPATCH
+#KBUILD_CFLAGS	+= -DCC_USING_HOTPATCH
 endif
 endif
 
-KBUILD_CFLAGS	+= -mbackchain -msoft-float $(cflags-y)
-KBUILD_CFLAGS	+= -pipe -fno-strength-reduce -Wno-sign-compare
+#KBUILD_CFLAGS	+= -mbackchain -msoft-float $(cflags-y)
+#KBUILD_CFLAGS	+= -pipe -fno-strength-reduce -Wno-sign-compare
 KBUILD_AFLAGS	+= $(aflags-y)
 
 OBJCOPYFLAGS	:= -O binary
