@@ -1,2 +1,1 @@
-obj-y += mm/
 obj-y += elf/
