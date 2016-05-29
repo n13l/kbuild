@@ -43,7 +43,7 @@ if [ "$BUILD_TARGET" == "win64" ]; then
 fi
 if [ "$BUILD_ARCH" == "s390x" ]; then
   unset CC
-  export CROSS_COMPILE=s390x-linux-
+  export CROSS_COMPILE=s390x-linux-gnu-
   export OS_EXEC="echo"
   export BUILD_OS_ARCH="x86_64"
 fi
