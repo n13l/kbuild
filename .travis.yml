@@ -106,8 +106,8 @@ before_install:
 script:
 - uname -a
 - make defconfig
-- make V=1
 - cat ./obj/.config
+- make V=1
 - file ./obj/sysconfig
 - $OS_EXEC ./obj/sysconfig
 notifications:
