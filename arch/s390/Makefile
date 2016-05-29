@@ -117,15 +117,15 @@ OBJCOPYFLAGS	:= -O binary
 
 #boot		:= arch/s390/boot
 
-all:  image bzImage
+#all:  image bzImage
 
-install: vmlinux
+#install: vmlinux
 #	$(Q)$(MAKE) $(build)=$(boot) $@
 
-image bzImage: vmlinux
+#image bzImage: vmlinux
 #	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
-zfcpdump:
+#zfcpdump:
 #$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 
 archclean:

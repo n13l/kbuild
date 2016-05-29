@@ -19,6 +19,7 @@ endif
 
 TARGET ?= $(shell $(CC) -dumpmachine 2>&1)
 ARCH ?= $(shell echo $(TARGET) | sed -e s/i.86.*/i386/ -e s/x86_64.*/x86_64/ \
+	                             -e s/.390.*/s390/ \
                                      -e s/arm.*/arm/)
 
 PLATFORM ?= $(shell $(src)/scripts/host_from_sys.sh $(TARGET))
@@ -26,6 +27,7 @@ PLAT:=$(shell echo "$(PLATFORM)" | tr '[:lower:]' '[:upper:]')
 
 ifeq ($(PLATFOWM),win32)
 SHLIB_EX=dll
+EXEC_EX=exe
 endif
 
 ifeq ($(PLATFORM),darwin)
