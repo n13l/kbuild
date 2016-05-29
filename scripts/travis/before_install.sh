@@ -52,7 +52,7 @@ if [ "$BUILD_ARCH" == "armv7" ]; then
   export CROSS_COMPILE=arm-linux-gnueabihf-
   export OS_EXEC="echo"
   export BUILD_OS_ARCH="armv7"
-  export OS_EXEC="qemu-arm"
+  export OS_EXEC="qemu-static"
 fi
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   unset CROSS_COMPILE 
