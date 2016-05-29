@@ -41,7 +41,7 @@ matrix:
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=x86_64
   - compiler: gcc
     os: osx
-    env: BUILD_DEPLOY=1 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
+    env: BUILD_DEPLOY=1 BUILD_TARGET=osx   BUILD_ARCH=x86_64 OS_VERSION="10.9"
   - compiler: clang
     os: osx
     env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
@@ -63,11 +63,11 @@ matrix:
     osx_image: xcode7
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx OS_VERSION="10.10"
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.10"
     osx_image: beta-xcode6.4
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx OS_VERSION="10.9"
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
     osx_image: beta-xcode6.2
 
 before_deploy:
