@@ -67,6 +67,10 @@ matrix:
       apt:
         packages: &armv7_unknown_linux_gnueabihf
         # Cross compiler and cross compiled C libraries
+        - flex
+        - bison
+        - gperf
+        - pkg-config
         - gcc-arm-linux-gnueabihf
         - libc6-armhf-cross
         - libc6-dev-armhf-cross
