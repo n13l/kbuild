@@ -90,7 +90,7 @@ matrix:
     os: osx
     env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
     osx_image: beta-xcode6.2
-allow_failures:
+  allow_failures:
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=s390x
