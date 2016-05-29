@@ -1,5 +1,5 @@
 CROSS_COMPILER ?= gcc
-CC ?= $(CROSS_COMPILE)$(CROSS_COMPILER) -v
+CC ?= $(CROSS_COMPILE)$(CROSS_COMPILER)
 
 UNAME_SYSTEM:=$(shell uname -s)
 UNAME_MACHINE:=$(shell uname -m)

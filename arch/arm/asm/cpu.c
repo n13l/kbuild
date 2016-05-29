@@ -6,6 +6,7 @@
 const char *
 cpu_vendor(void)
 {
+	printf("cpu.vendor=arm\n");
 	return NULL;
 }
 
