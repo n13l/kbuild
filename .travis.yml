@@ -132,6 +132,7 @@ script:
 - uname -a
 - make defconfig
 - cat ./obj/.config
+- find /usr/arm-linux-gnueabi*
 - make
 - file ./obj/sysconfig
 - $OS_EXEC ./obj/sysconfig
