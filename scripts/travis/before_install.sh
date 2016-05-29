@@ -49,7 +49,7 @@ if [ "$BUILD_ARCH" == "s390x" ]; then
 fi
 if [ "$BUILD_ARCH" == "arm" ]; then
   unset CC
-  export CROSS_COMPILE=arm-linux-gnueabi-
+  export CROSS_COMPILE=arm-linux-gnueabihf-
   export OS_EXEC="echo"
   export BUILD_OS_ARCH="x86_64"
 fi
