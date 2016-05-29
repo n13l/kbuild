@@ -47,11 +47,11 @@ if [ "$BUILD_ARCH" == "s390x" ]; then
   export OS_EXEC="echo"
   export BUILD_OS_ARCH="x86_64"
 fi
-if [ "$BUILD_ARCH" == "armv7" ]; then
+if [ "$BUILD_ARCH" == "arm32" ]; then
   unset CC
   export CROSS_COMPILE=arm-linux-gnueabihf-
   export OS_EXEC="echo"
-  export BUILD_OS_ARCH="armv7"
+  export BUILD_OS_ARCH="arm32"
   # evil workarround sysroot
   export OS_EXEC=$(/bin/sh scripts/travis/arm-ld.sh)
   echo "OS_EXEC=$OS_EXEC"
