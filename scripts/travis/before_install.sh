@@ -53,7 +53,7 @@ if [ "$BUILD_ARCH" == "armv7" ]; then
   export OS_EXEC="echo"
   export BUILD_OS_ARCH="armv7"
   # evil workarround sysroot
-  sudo cp /usr/arm-linux-gnueabi/libhf/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
+  //sudo cp /usr/arm-linux-gnueabi/libhf/ld-linux-armhf.so.3 /lib/ld-linux-armhf.so.3
   export OS_EXEC="qemu-arm-static"
 fi
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
