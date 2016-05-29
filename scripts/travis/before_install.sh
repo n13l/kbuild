@@ -27,6 +27,7 @@ if [ "$BUILD_TARGET" == "win32" ]; then
   export BUILD_OS_NAME="win"
   export BUILD_OS_ARCH="x86"
   export BUILD_OS_RELEASE="generic"
+  export WINEDEBUG="-all,warn-all"
   export OS_EXEC="wine"
 fi 
 if [ "$BUILD_TARGET" == "win64" ]; then 
@@ -37,6 +38,7 @@ if [ "$BUILD_TARGET" == "win64" ]; then
   export BUILD_OS_NAME="win"
   export BUILD_OS_ARCH="x86_64"
   export BUILD_OS_RELEASE="generic"
+  export WINEDEBUG="-all,warn-all"
   export OS_EXEC="wine"
 fi
 if [ "$TRAVIS_OS_NAME" == "osx" ]; then
