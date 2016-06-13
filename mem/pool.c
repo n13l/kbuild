@@ -13,7 +13,5 @@ __pool_alloc_aligned(struct mm_pool *pool, size_t size, size_t align)
 		return __pool_alloc_avail(pool, size, avail);
 	if (size <= pool->threshold)
 		return __pool_alloc_threashold(pool, size);
-
-	return __pool_alloc_aligned_block(pool, size);
+	return __pool_alloc_aligned_block(pool, size, CPU_SIMD_ALIGN);
 }
-#
