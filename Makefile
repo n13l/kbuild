@@ -428,6 +428,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes \
 		   -fno-strict-aliasing \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
+		   -D_GNU_SOURCE=1
 
 
 #		   -std=c11
