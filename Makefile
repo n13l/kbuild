@@ -423,14 +423,15 @@ KBUILD_CPPFLAGS := -D"CONFIG_PLATFORM=KBUILD_STR($(PLATFORM))" \
 		   -D"PACKAGE_VERSION=KBUILD_STR($(PACKAGE_VERSION))"\
                    -DCONFIG_$(PLAT)=1 \
 
+# -Werror-implicit-function-declaration \
 
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes \
 		   -fno-strict-aliasing \
-		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
 		   -D_GNU_SOURCE=1 \
-		   -D_POSIX_SOURCE=1 \
 		   -std=c1x
+#		   -D_POSIX_SOURCE=1 \
+#		   -std=c1x
 
 -include scripts/Makefile.shared
 

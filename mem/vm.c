@@ -1,5 +1,6 @@
 #include <sys/compiler.h>
 #include <sys/cpu.h>
+#include <sys/types.h>
 #include <sys/mman.h>
 #include <mem/alloc.h>
 

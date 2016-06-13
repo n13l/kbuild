@@ -14,7 +14,6 @@ ifeq ($(PLATFORM),darwin)
 so                    := dylib
 SHLIB_LDFLAGS         := -dynamiclib
 #EXE_LDFLAGS           := -Wl,-pie
-#KBUILD_CFLAGS += -fPIC
 export SHLIB_LDFLAGS so
 endif
 ifeq ($(PLATFORM),linux)
