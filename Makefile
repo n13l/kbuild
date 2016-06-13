@@ -428,6 +428,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
 		   -std=c1x \
+		   -D__STDC_WANT_LIB_EXT1__=1
 		   -D_GNU_SOURCE=1
 
 -include scripts/Makefile.shared
