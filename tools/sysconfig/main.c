@@ -1,0 +1,89 @@
+/*
+ *                                                  Daniel Kubec <niel@rtfm.cz>
+ * The MIT License (MIT)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"),to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#include <sys/compiler.h>
+#include <sys/cpu.h>
+#include <mem/alloc.h>
+#include <mem/page.h>
+#include <mem/pool.h>
+#include <mem/stack.h>
+#include <arch/cpu.h>
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <getopt.h>
+
+_unused static struct option long_options[] = {
+	{"cpu-info", no_argument, 0, 0  },
+	{"sys-info", no_argument, 0, 0  },
+	{"mem-test", no_argument, 0, 0  },
+	{"version",  no_argument, 0, 'v'},
+	{0,          0,           0,  0 }
+};
+
+static void 
+info_cpu(void)
+{
+	info("cpu.vendor=%s", cpu_vendor());
+	info("cpu.arch=%s", CONFIG_ARCH);
+	info("cpu.bits=%d", sizeof(void *) == 8 ? 64 : 32);
+	info("cpu.pagesize=%d", CPU_PAGE_SIZE);
+	info("cpu.cacheline=%d",  L1_CACHE_BYTES);
+
+	cpu_dump_extension();
+
+	info("cpu.has.crc32c=%d", cpu_has_crc32c());
+}
+
+static void 
+info_sys(void)
+{
+	info("sys.platform=%s", CONFIG_PLATFORM);
+	info("sys.stack.avail=%d", 0);
+	info("sys.sizeof int=%d", (int)sizeof(int));
+	info("sys.sizeof long=%d", (int)sizeof(long));
+	info("sys.sizeof long long int=%d", (int)sizeof(long long int));
+	info("sys.sizeof ptr=%d", (int)sizeof(void *));
+}
+
+_unused static inline void
+package_version(void)
+{
+	info("sysconfig version %s " __TIME__ " " __DATE__  " (%s)", 
+	       PACKAGE_VERSION, CONFIG_PLATFORM);
+}
+
+int
+main(int argc, char *argv[])
+{
+
+	printf("sysconfig v%s %s/%s %s " __TIME__ " " __DATE__  "\n", 
+	       PACKAGE_VERSION, CONFIG_PLATFORM, CONFIG_SRCARCH, CONFIG_ARCH);
+
+	info_cpu();
+	info_sys();
+
+	return 0;
+}

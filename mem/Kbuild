@@ -1,0 +1,2 @@
+obj-y += alloc.o vm.o block.o page.o map.o
+obj-$(CONFIG_DEBUG_MEMPOOL) += pool.o

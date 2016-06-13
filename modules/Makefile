@@ -1,0 +1,1 @@
+objs-m += modules/dummy

@@ -1,0 +1,29 @@
+ifeq ($(PLATFORM),win32)
+KBUILD_LIBS           += -lcomdlg32 -lwinspool -lcomctl32 -lsetupapi -lwininet \
+                         -lwin32spl -lws2_32 -lpsapi -lshlwapi -ladvapi32 \
+                         -lgdi32 -lpsapi -lole32 -lshlwapi
+SHLIB_LDFLAGS         := -shared -static-libgcc -static-libstdc++ \
+                         -Wl,--subsystem,console -Wl,--add-stdcall-alias
+#LD                    := $(CC)
+so                    := dll
+exe                   := .exe
+export KBUILD_LIBS SHLIB_LDFLAGS so exe
+endif
+ifeq ($(PLATFORM),darwin)
+so                    := dylib
+SHLIB_LDFLAGS         := -dynamiclib
+#EXE_LDFLAGS           := -Wl,-pie
+#KBUILD_CFLAGS += -fPIC
+export SHLIB_LDFLAGS so
+endif
+ifeq ($(PLATFORM),linux)
+#KBUILD_LIBS           += -lm
+ifdef CONFIG_MODULES
+#KBUILD_CFLAGS         += -fPIC
+endif
+SHLIB_LDFLAGS         := -shared 
+#EXE_LDFLAGS           := -e main
+#EXE_LD_FLAGS          += -static
+so                    := so
+export KBUILD_LIBS KBUILD_CFLAGS SHLIB_LDFLAGS LDFLAGS LD so
+endif 

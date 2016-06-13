@@ -1,0 +1,3 @@
+obj-y += errno.o file.o exit.o timestamp.o link.o units.o
+
+obj-$(CONFIG_DEBUG_LIST) += list.o

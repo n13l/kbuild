@@ -1,0 +1,205 @@
+sudo: required
+#dist: trusty
+language:
+- c
+- java
+- android
+jdk:
+- oraclejdk8
+android:
+  components:
+  - platform-tools
+  - tools
+# The BuildTools version used by your project
+  - build-tools-19.1.0
+# The SDK version used to compile your project
+  - android-19
+# Additional components
+  - extra-google-google_play_services
+  - extra-google-m2repository
+  - extra-android-m2repository
+  - addon-google_apis-google-19
+# Specify at least one system image,
+# if you need to run emulator(s) during your tests
+  - sys-img-armeabi-v7a-android-19
+  - sys-img-x86-android-17
+addons:
+  apt:
+    packages:
+    - flex
+    - bison
+    - gperf
+    - pkg-config
+env:
+  global:
+  - BUILD_BRANCH=$TRAVIS_BRANCH
+  - BUILD_ID=$TRAVIS_BUILD_NUMBER
+
+matrix:
+  include:
+  - compiler: gcc
+    os: linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=linux BUILD_ARCH=x86_64
+  - compiler: gcc
+    dist: trusty
+    os: linux
+    env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=s390x
+    addons:
+      apt:
+        sources:
+        - debian-sid              
+        packages: &armv7_unknown_linux_gnueabihf
+        - flex
+        - bison
+        - gperf
+        - pkg-config
+        # Cross compiler and cross compiled C libraries
+        - gcc-s390x-linux-gnu
+        - binutils-s390x-linux-gnu
+        - linux-libc-dev-s390x-cross
+        - libc6-s390x-cross 
+        - libc6-dev-s390x-cross          
+        # Transparent emulation
+        - qemu-user-static
+        - binfmt-support
+  - compiler: gcc
+    os: linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=linux BUILD_ARCH=arm32
+    addons:
+      apt:
+        packages: &armv7_unknown_linux_gnueabihf
+        # Cross compiler and cross compiled C libraries
+        - flex
+        - bison
+        - gperf
+        - pkg-config
+        - gcc-arm-linux-gnueabihf
+        - libc6-armhf-cross
+        - libc6-dev-armhf-cross
+        # Transparent emulation
+        - qemu-user-static
+        - binfmt-support
+  - compiler: gcc
+    dist: trusty
+    os: linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=linux BUILD_ARCH=arm64
+    addons:
+      apt:
+        packages: &armv7_unknown_linux_gnueabihf
+        # Cross compiler and cross compiled C libraries
+        - flex
+        - bison
+        - gperf
+        - pkg-config
+        - gcc-aarch64-linux-gnu
+        - libc6-arm64-cross 
+        - libc6-dev-arm64-cross 
+        # Transparent emulation
+        - qemu-user-static
+        - binfmt-support
+  - compiler: gcc
+    os: linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=win32 BUILD_ARCH=x86_32
+    addons:
+      apt:
+        packages:
+        - flex
+        - bison
+        - gperf
+        - pkg-config
+        - binutils-mingw-w64-i686
+        - gcc-mingw-w64-i686
+        - wine
+  - compiler: gcc
+    os: linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=win64 BUILD_ARCH=x86_64
+    addons:
+      apt:
+        packages:
+        - flex
+        - bison
+        - gperf
+        - pkg-config
+        - binutils-mingw-w64
+        - gcc-mingw-w64
+        - wine
+  - compiler: clang
+    os: linux
+    env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=x86_64
+  - compiler: gcc
+    os: osx
+    env: BUILD_DEPLOY=1 BUILD_TARGET=osx   BUILD_ARCH=x86_64 OS_VERSION="10.9"
+  - compiler: clang
+    os: osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
+  - compiler: clang
+    os: osx
+    env: BUILD_DEPLOY=1 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
+    osx_image: xcode7.3
+  - compiler: clang
+    os: osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
+    osx_image: xcode7.2
+  - compiler: clang
+    os: osx
+    env: BUILD_DEPLOY=1 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.10"
+    osx_image: xcode7.1
+  - compiler: clang
+    os: osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.10"
+    osx_image: xcode7
+  - compiler: clang
+    os: osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.10"
+    osx_image: beta-xcode6.4
+  - compiler: clang
+    os: osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
+    osx_image: beta-xcode6.2
+  allow_failures:
+  - compiler: gcc
+    os: linux
+    env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=s390x
+  - compiler: gcc
+    os: linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=linux BUILD_ARCH=arm32
+  - compiler: gcc
+    os: linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=linux BUILD_ARCH=arm64
+  - compiler: gcc
+    os: linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=win32 BUILD_ARCH=x86_32
+  - compiler: gcc
+    os: linux
+    env: BUILD_DEPLOY=1 BUILD_TARGET=win64 BUILD_ARCH=x86_64
+ 
+before_deploy:
+- export BUILD_ARCHIVE=kbuild-$BUILD_MAJOR.$BUILD_MINOR.$BUILD_REVISION-$BUILD_OS_NAME-$BUILD_OS_ARCH-$BUILD_OS_RELEASE.tar.gz
+- ./scripts/travis/archive.sh $BUILD_ARCHIVE
+before_install:
+  - source ./scripts/travis/before_install.sh
+script:
+- uname -a
+- make defconfig
+- cat ./obj/.config
+- make
+- file ./obj/sysconfig
+- $OS_EXEC ./obj/sysconfig
+- $OS_EXEC ./obj/test/perf_alloc
+notifications:
+  on_success: never
+  on_failure: never
+  email: false
+deploy:
+  provider: releases
+  prerelease: true
+  draft: true
+  api_key:
+    secure: OfYWkedmramdd2ML/dL+lQ+rYWLNaLWy1HfMxxyKwOZThIgWekxhy9EeqEVAisGXBU6qEe9FpsrOi3EUb3OwUNLmKz5b46fs8DpcjsFTKEGhkpXPDJJiwf5Sk0kOUvQp34euv5tBzMFrDxcB/vOpgFMjvWVx5j7BM+e8X0t3RMJANp7vEK5v71KjbbvERZTVaVAeFLrC5vcqcbwad/0fVGJYcvDXRmzs0W8Vc9v8OznfhbwtCj0f8HyfYoPkUXudzDYyDGoGbadKrbeLYYx/fQqlCeLxxLsfjTStYe3fGer2pPUJIBHUL3vvQRhBNr4t89zVvkUcmg7ems2/SG1gCeIX1E1WbnMxpNd98v1CP4Ku7LfJTkpjOv+0FWCbKj32AtoklOMzU8FQw/X/Ys4+Qpo42v4u4NVzWcDTR7y7TQcnOqqmhBbU5GJs+xz3p1bDm0Q2aOwqUGo7OACQ4my5xjjPLCNrV5/FFv3GYn4XutHZjvyLPie7AMArggITSTPZEMn3SYYdxyDp+VloW2vHfI3jByDFwjDGMr3TN6dZyGXXI9DWXeqizVKG5t9P3zc6Vda+VLCaq3AC2vl57RSooDEg3m3kPEEuI+P2omnHuCgAXuHVQaxw5aji+fk72G6zYuTcAMhJJQujWFIQxRtuSZwDZc7M7DOpg5xE7dTfrVA=
+  file_glob: true
+  file: "$BUILD_ARCHIVE"
+  skip_cleanup: true
+  on:
+    tags: yes
+    repo: n13l/kbuild
+    condition: "$BUILD_DEPLOY = 1"
