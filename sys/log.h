@@ -25,7 +25,7 @@
 #ifdef CONFIG_LOGGING
 # ifdef CONFIG_LOGGING_TIME
 #  define log_timespec \
-	char __tss[100]; char __tms[100] = {0}; struct timespec ts; \
+	char __tss[100]; struct timespec ts; \
 	posix_clock_gettime(CLOCK_REALTIME, &ts); \
 	strftime(__tss, sizeof __tss, "%D %T", gmtime(&ts.tv_sec)); 
 #  define log_time_fmt "%s.%09ld %s: "
