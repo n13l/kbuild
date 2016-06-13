@@ -7,6 +7,7 @@ SHLIB_LDFLAGS         := -shared -static-libgcc -static-libstdc++ \
 #LD                    := $(CC)
 so                    := dll
 exe                   := .exe
+KBUILD_CFLAGS         += -D_WIN32_WINNT=0x0501
 export KBUILD_LIBS SHLIB_LDFLAGS so exe
 endif
 ifeq ($(PLATFORM),darwin)
