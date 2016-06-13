@@ -18,8 +18,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-#include <sys/decls.h>
-#include <sys/missing.h>
+//#include <sys/missing.h>
 #include <mem/page.h>
 
 #ifndef PAGE_SIZE
@@ -219,7 +218,5 @@ mmap_close(void *p)
 	struct pagemap *map = (struct pagemap *)p;
 	return munmap(map, map->size);
 }
-
-__END_DECLS
 
 #endif

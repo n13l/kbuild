@@ -27,9 +27,9 @@
 #  define log_timespec \
 	char __tss[100]; struct timespec ts; \
 	posix_clock_gettime(CLOCK_REALTIME, &ts); \
-	strftime(__tss, sizeof __tss, "%D %T", gmtime(&ts.tv_sec)); 
-#  define log_time_fmt "%s.%09ld %s: "
-#  define log_time_arg __tss, ts.tv_nsec, KBUILD_BASENAME
+	strftime(__tss, sizeof __tss - 1, "%D %T", gmtime(&ts.tv_sec)); 
+#  define log_time_fmt "%s.%09ld "
+#  define log_time_arg __tss, ts.tv_nsec
 # endif
 #endif
 

@@ -26,7 +26,6 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
-#include <sys/decls.h>
 #include <mem/alloc.h>
 #include <mem/safe.h>
 #include <mem/debug.h>

@@ -231,4 +231,8 @@ typedef u32 __bitwise __wsum;
 
 #define EXPORT_SYMBOL(sym) extern typeof(sym) sym
 
+#ifndef O_NOATIME
+#define O_NOATIME 0
+#endif
+
 #endif

@@ -35,7 +35,11 @@
 #include <unistd.h>
 #include <getopt.h>
 
+#undef KBUILD_MODNAME
+#define KBUILD_MODNAME KBUILD_STR(sysconfig)
+
 _unused static struct option long_options[] = {
+	{"cpu-caps", no_argument, 0, 0  },
 	{"cpu-info", no_argument, 0, 0  },
 	{"sys-info", no_argument, 0, 0  },
 	{"mem-test", no_argument, 0, 0  },
@@ -46,15 +50,9 @@ _unused static struct option long_options[] = {
 static void 
 info_cpu(void)
 {
-	info("cpu.vendor=%s", cpu_vendor());
-	info("cpu.arch=%s", CONFIG_ARCH);
-	info("cpu.bits=%d", sizeof(void *) == 8 ? 64 : 32);
-	info("cpu.pagesize=%d", CPU_PAGE_SIZE);
-	info("cpu.cacheline=%d",  L1_CACHE_BYTES);
-
+	_unused const char *vendor = cpu_vendor();
 	cpu_dump_extension();
 
-	info("cpu.has.crc32c=%d", cpu_has_crc32c());
 }
 
 static void 
@@ -71,14 +69,13 @@ info_sys(void)
 _unused static inline void
 package_version(void)
 {
-	info("sysconfig version %s " __TIME__ " " __DATE__  " (%s)", 
-	       PACKAGE_VERSION, CONFIG_PLATFORM);
+	printf("sysconfig v%s %s/%s %s " __TIME__ " " __DATE__  "\n", 
+	       PACKAGE_VERSION, CONFIG_PLATFORM, CONFIG_SRCARCH, CONFIG_ARCH);
 }
 
 int
 main(int argc, char *argv[])
 {
-
 	printf("sysconfig v%s %s/%s %s " __TIME__ " " __DATE__  "\n", 
 	       PACKAGE_VERSION, CONFIG_PLATFORM, CONFIG_SRCARCH, CONFIG_ARCH);
 

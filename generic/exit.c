@@ -1,11 +1,10 @@
+#include <sys/compiler.h>
+#include <sys/cpu.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <errno.h>
-
-#include <sys/compiler.h>
-#include <sys/cpu.h>
-#include <sys/decls.h>
 
 _noreturn void
 die(const char *fmt, ...) 

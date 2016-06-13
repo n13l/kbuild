@@ -31,6 +31,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#undef KBUILD_MODNAME
+#define KBUILD_MODNAME KBUILD_STR(x86)
+
 /* X86 Vendor %ebx, %edx, %ecx signatures */
 #define X86_EBX_AMD               0x68747541
 #define X86_EDX_AMD               0x69746e65
@@ -213,6 +216,8 @@ cpu_vendor(void)
 		if (cpu->ebx != ebx || cpu->ecx != ecx || cpu->edx != edx)
 			continue;
 
+		debug("cpu.vendor=%s", x86_vendor_names[cpu->idx]);
+
 		return x86_vendor_names[cpu->idx];
 	}
 
@@ -246,30 +251,37 @@ cpu_dump_extension(void)
 	u32 eax = 0, ebx = 0, ecx = 0, edx = 0;
 	__get_cpuid(1, &eax, &ebx, &ecx, &edx);    
 /*
-	info("cpu.stepping %d", eax & 0xF);
-	info("cpu.model %d", (eax >> 4) & 0xF);
-	info("cpu.family %d", (eax >> 8) & 0xF);
-	info("cpu.processor type %d", (eax >> 12) & 0x3);
-	info("cpu.extended model %d", (eax >> 16) & 0xF);
-	info("cpu.extended family %d", (eax >> 20) & 0xFF);
+	debug("cpu.stepping %d", eax & 0xF);
+	debug("cpu.model %d", (eax >> 4) & 0xF);
+	debug("cpu.family %d", (eax >> 8) & 0xF);
+	debug("cpu.processor type %d", (eax >> 12) & 0x3);
+	debug("cpu.extended model %d", (eax >> 16) & 0xF);
+	debug("cpu.extended family %d", (eax >> 20) & 0xFF);
 */
-	info("cpu.has.sse4.2=%s", ecx & X86_BIT_SSE42 ? "yes" : "no");
+	debug("cpu.arch=%s", CONFIG_ARCH);
+	debug("cpu.bits=%d", sizeof(void *) == 8 ? 64 : 32);
+	debug("cpu.pagesize=%d", CPU_PAGE_SIZE);
+	debug("cpu.cacheline=%d",  L1_CACHE_BYTES);
+
+	debug("cpu.has.crc32c=%d", cpu_has_crc32c());
+
+	debug("cpu.has.sse4.2=%s", ecx & X86_BIT_SSE42 ? "yes" : "no");
 	if (ecx & X86_BIT_SSE42)
 		return;
 
-	info("cpu.has.sse4.1=%s", ecx & X86_BIT_SSE41 ? "yes" : "no");
+	debug("cpu.has.sse4.1=%s", ecx & X86_BIT_SSE41 ? "yes" : "no");
 	if (ecx & X86_BIT_SSE41)
 		return;
 	
-	info("cpu.has.sse3=%s",   ecx & X86_BIT_SSE3  ? "yes" : "no");
+	debug("cpu.has.sse3=%s",   ecx & X86_BIT_SSE3  ? "yes" : "no");
 	if (ecx & X86_BIT_SSE3)
 		return;
 	
-	info("cpu.has.sse2=%s",   ecx & X86_BIT_SSE2  ? "yes" : "no");
+	debug("cpu.has.sse2=%s",   ecx & X86_BIT_SSE2  ? "yes" : "no");
 	if (ecx & X86_BIT_SSE2)
 		return;
 	
-	info("cpu.has.sse=%s", ecx & X86_BIT_SSE ? "yes" : "no");
+	debug("cpu.has.sse=%s", ecx & X86_BIT_SSE ? "yes" : "no");
 	if (ecx & X86_BIT_SSE)
 		return;
 }

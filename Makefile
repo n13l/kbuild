@@ -639,7 +639,7 @@ objs-y += arch/$(SRCARCH) posix/$(PLATFORM) mem net generic crypto lib
 # TODO: tests in objs-m does not look right
 objs-m += test
 
-include arch/$(SRCARCH)/Makefile                                                
+#include arch/$(SRCARCH)/Makefile                                                
 include modules/Makefile                                                        
 include tools/Makefile
 
@@ -1240,7 +1240,8 @@ PHONY += distclean
 
 distclean: mrproper
 ifneq ($(KBUILD_OUTPUT),)
-	@rm -rf $(KBUILD_OUTPUT)/
+	@rm -rf $(srctree)/$(KBUILD_OUTPUT)/*
+
 endif
 	@find $(srctree) $(RCS_FIND_IGNORE) \
 		\( -name '*.orig' -o -name '*.rej' -o -name '*~' \
@@ -1249,7 +1250,7 @@ endif
 		-type f -print | xargs rm -f
 
 
-# Packaging of the kernel to various formats
+# Packaging of the to various formats
 # ---------------------------------------------------------------------------
 # rpm target kept for backward compatibility
 package-dir	:= scripts/package

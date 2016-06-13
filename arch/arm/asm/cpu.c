@@ -3,9 +3,13 @@
 #include <sys/log.h>
 #include <elf/lib.h>
 
+#undef KBUILD_MODNAME
+#define KBUILD_MODNAME KBUILD_STR(arm)
+
 const char *
 cpu_vendor(void)
 {
+	debug("cpu.vendor=arm");
 	return "arm";
 }
 
