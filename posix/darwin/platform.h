@@ -16,6 +16,10 @@ mremap(void *addr, int size , int , int);
 #define CLOCK_MONOTONIC 2
 #endif
 
+#ifndef gmtime_s
+#define gmtime_s(a,b) gmtime_r(b,a)
+#endif
+
 struct timespec;
 
 int

@@ -421,15 +421,17 @@ KBUILD_CPPFLAGS := -D"CONFIG_PLATFORM=KBUILD_STR($(PLATFORM))" \
                    -D"CONFIG_SRCARCH=KBUILD_STR($(SRCARCH))" \
 		   -D"CONFIG_ARCH=KBUILD_STR($(ARCH))" \
 		   -D"PACKAGE_VERSION=KBUILD_STR($(PACKAGE_VERSION))"\
-                   -DCONFIG_$(PLAT)=1
+                   -DCONFIG_$(PLAT)=1 \
+
 
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes \
 		   -fno-strict-aliasing \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
 		   -std=c1x \
-		   -D__STDC_WANT_LIB_EXT1__=1
-		   -D_GNU_SOURCE=1
+		   -D__STDC_WANT_LIB_EXT1__=1 \
+		   -D_GNU_SOURCE=1 \
+		   -D_POSIX_C_SOURCE=1
 
 -include scripts/Makefile.shared
 

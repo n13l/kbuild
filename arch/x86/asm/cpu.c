@@ -30,6 +30,7 @@
 #include <cpuid.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #undef KBUILD_MODNAME
 #define KBUILD_MODNAME KBUILD_STR(x86)
