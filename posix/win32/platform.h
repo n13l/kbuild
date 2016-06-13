@@ -1,6 +1,10 @@
 #ifndef __SYS_PLATFORM_H__
 #define __SYS_PLATFORM_H__
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+
 #define SHLIB_EX           "dll"
 
 #define HAVE_STRING_H
@@ -35,6 +39,10 @@ fcntl(int fd, int cmd, ... /* arg */ );
 
 #else
 
+#endif
+
+#ifndef gmtime_r
+#define gmtime_r(a,b) gmtime_s(b,a)
 #endif
 
 struct timespec;

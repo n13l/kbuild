@@ -28,13 +28,11 @@ PLATFORM ?= $(shell $(src)/scripts/host_from_sys.sh $(TARGET))
 PLAT:=$(shell echo "$(PLATFORM)" | tr '[:lower:]' '[:upper:]')
 
 ifeq ($(PLATFOWM),win32)
-KBUILD_CFLAGS += -std=c1x
 SHLIB_EX=dll
 EXEC_EX=exe
 endif
 
 ifeq ($(PLATFORM),linux)
-KBUILD_CFLAGS += -std=c11
 KBUILD_LIBS += -lrt -lm
 endif
 
@@ -45,13 +43,10 @@ EXE_LDFLAGS          += -L/usr/s390x-linux-gnu/lib -lgcc_s -lSegFault
 endif
 
 ifeq ($(ARCH),arm)
-KBUILD_CFLAGS += -std=c11
-
 #KBUILD_CFLAGS += "--sysroot=/usr/arm-linux-gnueabi -B/usr/arm-linux-gnueabi/libhfa"
 endif
 
 ifeq ($(PLATFORM),darwin)
-KBUILD_CFLAGS += -std=c11
 #SO=dylib
 #SHLIB_LDFLAGS=-dynamiclib
 endif

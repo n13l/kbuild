@@ -1,7 +1,6 @@
 #ifndef __SYS_LOG_H__
 #define __SYS_LOG_H__
 
-#include <time.h>
 #include <sys/compiler.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,7 +8,6 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <time.h>
-#include <sys/time.h>
 #include <generic/timestamp.h>
 
 #ifndef CLOCK_REALTIME

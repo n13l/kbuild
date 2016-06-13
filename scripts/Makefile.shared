@@ -25,5 +25,5 @@ SHLIB_LDFLAGS         := -shared
 #EXE_LDFLAGS           := -e main
 #EXE_LD_FLAGS          += -static
 so                    := so
-export KBUILD_LIBS KBUILD_CFLAGS SHLIB_LDFLAGS LDFLAGS LD so
+export KBUILD_LIBS KBUILD_CFLAGS SHLIB_LDFLAGS LDFLAGS LD so PLATFORM
 endif 

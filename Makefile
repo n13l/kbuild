@@ -428,12 +428,9 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes \
 		   -fno-strict-aliasing \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-		   -D_GNU_SOURCE=1
-
-
-#		   -std=c11
-#		   -D_POSIX_C_SOURCE=199309L
-# -D_GNU_SOURCE=1 
+		   -D_GNU_SOURCE=1 \
+		   -D_POSIX_SOURCE=1 \
+		   -std=c1x
 
 -include scripts/Makefile.shared
 
