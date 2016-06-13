@@ -23,15 +23,13 @@
 #ifndef KBUILD_MODNAME
 #define KBUILD_MODNAME "test"
 #endif
-/* struct tm *__tm; __tm = gmtime_r(&ts.tv_sec, &__tm);  */
-/* posix_clock_gettime(CLOCK_REALTIME, &ts); */
 
 #ifdef CONFIG_LOGGING
 # ifdef CONFIG_LOGGING_TIME
 #  define log_timespec \
 	char __tss[100]; _unused struct tm __tm; struct timespec ts; \
 	time_t __tmt = time(NULL); \
-	gmtime_s(&__tm, &__tmt); \
+	gmtime_r(&__tmt, &__tm); \
 	posix_clock_gettime(CLOCK_REALTIME, &ts); \
 	strftime(__tss, sizeof(__tss) - 1, "%m/%d/%Y %H:%M:%S", &__tm);
 #  define log_time_fmt "%s.%09ld "
