@@ -401,7 +401,7 @@ USERINCLUDE    := \
 		-Iinclude/generated/uapi \
 		-include include/generated/autoconf.h \
 		-I$(srctree)/lib \
-		-Ilib \
+		-Ilib -I$(srctree)/arch \
 		-I$(srctree)/arch/$(hdr-arch) \
                 -include $(srctree)/posix/$(PLATFORM)/platform.h \
 		-I$(srctree)/posix/$(PLATFORM) \

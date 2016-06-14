@@ -1,7 +1,7 @@
-testprogs-y += alloc_stack
-testprogs-y += alloc_heap
+#testprogs-y += alloc_stack
+#testprogs-y += alloc_heap
 #testprogs-y += alloc_pool
 testprogs-y += perf_alloc
-testprogs-y += table
+#testprogs-y += table
 #testprogs-y += align
 #testprogs-y += timespec

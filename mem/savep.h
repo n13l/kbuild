@@ -40,10 +40,12 @@ struct mm_savep {
 static inline void
 mm_savep_dump(struct mm_savep *savep)
 {
+/*	
 	mem_dbg("node %p next=%p avail=%u:%u final=%p:%p",
 	        (void *)&savep->node, (void *)&savep->node.next, 
 	        (unsigned int)savep->avail[0], (unsigned int)savep->avail[1],
 	        savep->final[0], savep->final[1]);
+*/		
 }
 
 #endif

@@ -1,1 +1,0 @@
-obj-y := ssl.o nss.o gsk.o

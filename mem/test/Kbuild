@@ -1,5 +1,0 @@
-obj-y := dummy.o  # workarround built-in requirement
-
-# memory tests
-#testprogs-y += alloc_stack
-

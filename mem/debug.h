@@ -33,20 +33,17 @@
 #define MM_ADDR_POISON2  ((void *) 0x00200200)
 
 #ifdef CONFIG_DEBUG_MEMPOOL
-#define mem_pool_dbg(fmt, ...) printf(fmt "\n", __VA_ARGS__);
-#define mem_dbg(fmt, ...) printf(fmt "\n", __VA_ARGS__);
+#define mem_pool_dbg(fmt, ...) debug(fmt, __VA_ARGS__);
+#define mem_dbg(fmt, ...) debug(fmt, __VA_ARGS__);
 #else
 #define mem_pool_dbg(fmt, ...) do { } while(0)
 #define mem_dbg(fmt, ...) do { } while(0)
 #endif
 
 #ifdef CONFIG_DEBUG_MEMSTACK
-#define mem_stack_dbg(fmt, ...) printf(fmt "\n", __VA_ARGS__);
+#define mem_stack_dbg(fmt, ...) debug(fmt, __VA_ARGS__);
 #else
 #define mem_stack_dbg(fmt, ...) do { } while(0)
 #endif
-
-#define mm_debug_call(call, args) \
-	printf("%s (%s)\n", #call, #args)
 
 #endif
