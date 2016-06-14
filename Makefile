@@ -643,8 +643,8 @@ objs-y += arch/$(SRCARCH) posix/$(PLATFORM) mem net generic crypto lib
 objs-m += test
 
 #include arch/$(SRCARCH)/Makefile                                                
-include modules/Makefile                                                        
-include tools/Makefile
+-include modules/Makefile                                                        
+-include tools/Makefile
 
 package-dirs  := $(objs-y) $(libs-y) $(objs-m) 
 package-objs  := $(patsubst %,%/built-in.o, $(objs-y))
