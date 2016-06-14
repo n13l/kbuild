@@ -41,9 +41,14 @@ fcntl(int fd, int cmd, ... /* arg */ );
 
 #endif
 
+/*
 #ifndef gmtime_r
 #define gmtime_r(a,b) gmtime_s(b,a)
 #endif
+*/
+
+struct tm *
+gmtime_r(const time_t *timep, struct tm *result);
 
 struct timespec;
 

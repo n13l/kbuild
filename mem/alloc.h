@@ -111,7 +111,7 @@ extern struct mm_pool  *MM_POOL;
  * @flags
  */
 
-#define mm_create(mm, size, flags) __extension__ \
+#define mm_create(mm, size, flags) \
 	({ void *_X = mm_create_dispatch(mm, size, flags); _X; })
 
 /*
