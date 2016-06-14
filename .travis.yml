@@ -100,7 +100,6 @@ matrix:
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=1 BUILD_TARGET=win32 BUILD_ARCH=x86_32
-    dist: trusty
     addons:
       sources:
         - debian-sid
@@ -117,6 +116,8 @@ matrix:
     os: linux
     env: BUILD_DEPLOY=1 BUILD_TARGET=win64 BUILD_ARCH=x86_64
     addons:
+      sources:
+        - debian-sid
       apt:
         packages:
         - flex
