@@ -867,7 +867,7 @@ endif
 # set in the environment
 # Also any assignments in arch/$(ARCH)/Makefile take precedence over
 # this default value
-export KBUILD_IMAGE ?= libarch
+#export KBUILD_IMAGE ?= libarch
 
 #
 # INSTALL_PATH specifies where to place the updated kernel and system map
@@ -1312,18 +1312,16 @@ help:
 	@echo  '  export_report   - List the usages of all exported symbols'
 	@echo  '  headers_check   - Sanity check on exported headers'
 	@echo  '  headerdep       - Detect inclusion cycles in headers'
-	@$(MAKE) -f $(srctree)/scripts/Makefile.help checker-help
+#@$(MAKE) -f $(srctree)/scripts/Makefile.help checker-help
 	@echo  ''
-	@echo  'Kernel selftest'
-	@echo  '  kselftest       - Build and run kernel selftest (run as root)'
-	@echo  '                    Build, install, and boot kernel before'
-	@echo  '                    running kselftest on it'
+	@echo  'selftest'
+	@echo  '  selftest        - Build and run package selftest'
 	@echo  ''
 	@echo  'Packaging:'
 	@$(MAKE) $(build)=$(package-dir) help
 	@echo  ''
 	@echo  'Documentation targets:'
-	@$(MAKE) -f $(srctree)/doc/DocBook/Makefile dochelp
+#@$(MAKE) -f $(srctree)/doc/DocBook/Makefile dochelp
 	@echo  ''
 	@echo  'Architecture specific targets ($(SRCARCH)):'
 	@$(if $(archhelp),$(archhelp),\
