@@ -429,7 +429,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes \
 		   -fno-strict-aliasing \
 		   -Wno-format-security \
 		   -D_GNU_SOURCE=1 \
-		   -std=c1x
+		   -std=gnu1x
 #		   -D_POSIX_SOURCE=1 \
 #		   -std=c1x
 

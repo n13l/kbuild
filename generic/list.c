@@ -16,15 +16,13 @@ __list_remove(struct node *node)
 	node->next = MM_ADDR_POISON1;
 	node->prev = MM_ADDR_POISON2;
 }
-}
 
 void
 __hlist_del(struct hnode *hnode)
 {
 	struct hnode *next = hnode->next;
 	struct hnode **prev = hnode->prev;
-	*prev = next;
-	if (next)
+	if ((*prev = next))
 		next->prev = prev;
 
 	hnode->next = (struct hnode * )MM_ADDR_POISON1;

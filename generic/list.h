@@ -284,8 +284,8 @@ hlist_add_after(struct hnode *hnode, struct hnode *next)
 }
 
 #ifdef CONFIG_DEBUG_LIST
-#ifndef hlist_next_hook(pos)
-#define hlist_next_hook(pos)
+#ifndef hlist_next_hook
+#define hlist_next_hook
 #endif
 # define hlist_first(node)     ({ (list)->head; )}
 # define hlist_next(node, pos) ({node = node->next; hlist_next_hook(pos) 1;})

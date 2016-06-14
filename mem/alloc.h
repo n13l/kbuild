@@ -129,7 +129,7 @@ extern struct mm_pool  *MM_POOL;
  * @size size of buffer
  */
 
-#define mm_alloc(... /* mm, size */) __extension__ \
+#define mm_alloc(... /* mm, size */) \
 	({ void *_X = mm_alloc_dispatch(__VA_ARGS__); _X; })
 
 #define mm_alloc_aligned(mm, size)
@@ -147,7 +147,7 @@ extern struct mm_pool  *MM_POOL;
 #define mm_memdup(mm, addr, size)
 
 #define mm_strdup(mm, str) \
-	__extension__({ char *_X = mm_strdup_dispatch(mm, str); _X; })
+	({ char *_X = mm_strdup_dispatch(mm, str); _X; })
 
 #define mm_strndup(mm, str, size)
 #define mm_strmem(mm, str, size)
@@ -181,12 +181,12 @@ extern struct mm_pool  *MM_POOL;
   *   const char *v = mm_printf(stack, "string=%s", "hi);
   */
 
-#define mm_printf(mm, ...) __extension__                                      \
+#define mm_printf(mm, ...) \
 ({                                                                            \
 	char *_X = mm_printf_dispatch(mm, __VA_ARGS__); _X;                  \
 })
 
-#define mm_vprintf(mm, fmt, args) __extension__  \
+#define mm_vprintf(mm, fmt, args) \
 ({                                                                            \
 	char *_X = mm_vprintf_dispatch(mm, fmt, args); _X;                  \
 })
