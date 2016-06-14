@@ -1,35 +1,3 @@
-config CC_OPTIMIZE
-	bool "Enable compiler optimizations"
-	default y if !DEBUG
-	help
-          Say Y if you want to enable debug functions, such as
-          sys_dbg.
-          If you say N here, those functions are not compiled.
-
-choice
-	prompt "Optimize "
-	depends on CC_OPTIMIZE
-
-config CC_OPTIMIZE_FOR_SPEED
-        bool "for speed"
-        depends on CC_OPTIMIZE
-        help                                                                    
-          Enabling this option will pass "-O2" instead of "-Os" to              
-          your compiler resulting in a faster code.
-                                                                                
-          If unsure, say N
-
-config CC_OPTIMIZE_FOR_SIZE
-	bool "for size"
-	depends on CC_OPTIMIZE
-	help
-	Enabling this option will pass "-Os" instead of "-O2" to
-	your compiler resulting in a smaller code.
-
-	If unsure, say N
-
-endchoice
-
 config CC_FEATURES
 	bool "Enable compiler features"
 	help
@@ -40,7 +8,7 @@ config CC_FEATURES
 config CC_PP_OUTPUT
 	bool "Enable pre-processing output" 
 	depends on CC_FEATURES
-	default y
+	default n
 	help
 	Say Y If you want to enable pre-processing output with extension .i
 
@@ -105,3 +73,38 @@ config CC_STACKPROTECTOR_STRONG
 	size by about 2%.                                                     
 	
 endchoice
+
+config CC_OPTIMIZE
+	bool "Enable compiler optimizations"
+	default y if !DEBUG
+	depends on CC_FEATURES
+	help
+          Say Y if you want to enable debug functions, such as
+          sys_dbg.
+          If you say N here, those functions are not compiled.
+
+choice
+	prompt "Optimize "
+	depends on CC_OPTIMIZE
+
+config CC_OPTIMIZE_FOR_SPEED
+        bool "for speed"
+        depends on CC_OPTIMIZE
+        help                                                                    
+          Enabling this option will pass "-O2" instead of "-Os" to              
+          your compiler resulting in a faster code.
+                                                                                
+          If unsure, say N
+
+config CC_OPTIMIZE_FOR_SIZE
+	bool "for size"
+	depends on CC_OPTIMIZE
+	help
+	Enabling this option will pass "-Os" instead of "-O2" to
+	your compiler resulting in a smaller code.
+
+	If unsure, say N
+
+endchoice
+
+
