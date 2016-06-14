@@ -955,14 +955,14 @@ export KBUILD_LDS          := arch/$(SRCARCH)/kernel/libarch.lds
 export LDFLAGS_libarch
 # used by scripts/pacmage/Makefile
 export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(package-dirs)) \
-                         arch posix include lib samples scripts tools modules net mem tools test)
+                         arch posix include lib scripts tools modules net mem tools test)
 
 ifdef CONFIG_HEADERS_CHECK
 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
 endif
-ifdef CONFIG_SAMPLES
-	$(Q)$(MAKE) $(build)=samples
-endif
+#ifdef CONFIG_SAMPLES
+#	$(Q)$(MAKE) $(build)=samples
+#endif
 ifdef CONFIG_BUILD_DOCSRC
 	$(Q)$(MAKE) $(build)=doc
 endif
@@ -1212,7 +1212,7 @@ MRPROPER_FILES += .config .config.old .version .old_version \
 #
 clean: rm-dirs  := $(CLEAN_DIRS)
 clean: rm-files := $(CLEAN_FILES)
-clean-dirs      := $(addprefix _clean_, . $(package-dirs) samples)
+#clean-dirs      := $(addprefix _clean_, . $(package-dirs) samples)
 
 PHONY += $(clean-dirs) clean archclean
 $(clean-dirs):

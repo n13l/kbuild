@@ -39,4 +39,4 @@ source "scripts/Kconfig.debug"
 source "scripts/Kconfig.bindings"
 endmenu
 
-source "package/Kconfig"
+source "scripts/package/Kconfig"
