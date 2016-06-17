@@ -50,3 +50,8 @@ linkmap_init(void)
 {
 	dl_iterate_phdr(linkmap_info, NULL);
 }
+
+void
+linkmap_fini(void)
+{
+}
