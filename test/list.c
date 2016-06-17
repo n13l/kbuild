@@ -38,7 +38,7 @@ test1_list(void)
 		struct person *p = container_of(n, struct person, node);
 		if (!strcasecmp(p->name, "Adam"))
 			list_del(&p->node);
-		debug("node=%p it=%p person=%p name=%s", n, it, p, p->name);
+		debug("node=%p person=%p name=%s it=%p", n, p, p->name, it);
 	}
 
 	/* iterate over all objects */
@@ -51,13 +51,13 @@ test1_list(void)
 	/* iterate over rest: starts at daniela node */
 	list_walk(n, list, &daniela.node) {
 		p = container_of(n, struct person, node);
-		debug("node=%p it=%p person=%p name=%s", n, it, p, p->name);
+		debug("node=%p person=%p name=%s it=%p", n, p, p->name, it);
 		break;
 	}
 	/* iterate over rest with del safety: starts at daniel node */
 	list_walk_delsafe(n, list, p->node.next, it) {
 		p = container_of(n, struct person, node);
-		debug("node=%p it=%p person=%p name=%s", n, it, p, p->name);
+		debug("node=%p person=%p name=%s it=%p", n, p, p->name, it);
 	}
 
 

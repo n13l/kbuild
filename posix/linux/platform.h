@@ -1,6 +1,11 @@
 #ifndef __SYS_PLATFORM_H__
 #define __SYS_PLATFORM_H__
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <sys/time.h>
 #include <time.h>
 
 #ifndef PATH_MAX

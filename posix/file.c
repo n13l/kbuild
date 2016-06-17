@@ -70,7 +70,7 @@ struct file {
 	struct file_operations op;
 };
 
-static inline int
+static int
 atomic_writev(int fd, const char *fmt, va_list args)
 {
 	va_list args2;
@@ -87,7 +87,7 @@ atomic_writev(int fd, const char *fmt, va_list args)
 		return -ENOSYS;
 }
 
-static inline int
+static int
 atomic_writef(int fd, const char *fmt, ...)
 {
 	va_list args;

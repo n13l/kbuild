@@ -11,7 +11,7 @@
 #include <mem/block.h>
 #include <mem/generic.h>
 
-#include <posix/time.h>
+#include <posix/timestamp.h>
 #include <posix/list.h>
 #include <inttypes.h>
 #include <assert.h>
