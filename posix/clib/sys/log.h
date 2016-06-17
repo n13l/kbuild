@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <time.h>
-#include <generic/timestamp.h>
+#include <posix/time.h>
 
 #ifndef CLOCK_REALTIME
 #define CLOCK_REALTIME 1
@@ -30,8 +30,8 @@
 	gmtime_r(&__tmt, &__tm); \
 	posix_clock_gettime(CLOCK_REALTIME, &ts); \
 	strftime(__tss, sizeof(__tss) - 1, "%m/%d/%Y %H:%M:%S", &__tm);
-#  define log_time_fmt "%s.%09ld "
-#  define log_time_arg __tss, ts.tv_nsec
+#  define log_time_fmt "%s.%09ld %-6s "
+#  define log_time_arg __tss, ts.tv_nsec, KBUILD_MODNAME ":"
 # endif
 #endif
 
@@ -80,17 +80,22 @@ static inline bool syscall_lint (long int arg){ return arg >= 0 ? false: true;}
 #define sys_err(fmt, ...) \
 	printf(fmt "\n", ## __VA_ARGS__)
 
-#ifdef CONFIG_LOGGING
-#define debug(fmt, ...) \
+/*
 do { \
 	log_timespec \
 	printf(log_fmt(fmt), log_arg,## __VA_ARGS__); \
 } while(0)
+*/
+
+#ifdef CONFIG_LOGGING
+#define debug(fmt, ...) \
+do { \
+	printf(fmt "\n", ## __VA_ARGS__); \
+} while(0)
 
 #define info(fmt, ...) \
 do { \
-	log_timespec \
-	printf(log_fmt(fmt), log_arg,## __VA_ARGS__); \
+	printf(fmt "\n", ## __VA_ARGS__); \
 } while(0)
 
 #define error(fmt, ...)

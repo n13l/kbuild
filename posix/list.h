@@ -30,6 +30,12 @@
 #include <sys/compiler.h>
 #include <mem/debug.h>
 
+#define DEFINE_LIST(name) struct list list_#name;
+#define DEFINE_NODE(name) struct node node_#name;
+
+#define DECLARE_LIST(name) struct list name = init_list(name)
+#define DECLARE_NODE(name) struct node name = init_node
+
 struct node {
 	struct node *next, *prev;
 };
@@ -54,53 +60,53 @@ struct hlist {
 	struct hnode *head;
 };
 
+#define init_node       { .next = NULL, .prev = NULL }
+#define init_list(name) {{(struct node *)&(name), (struct node *)&(name)}}
+
+#ifdef CONFIG_DEBUG_LIST
+void 
+__list_init(struct list *list); 
+#else 
 static inline void
-snode_init(struct snode *snode)
+__list_init(struct list *list)
 {
-	snode->next = NULL;
-}
-
-static inline void
-slist_add_after(struct snode *node, struct snode *after)
-{
-	after->next = node;
-}
-
-
-static inline void
-slist_remove(struct snode *node, struct snode *prev)
-{
-	if (prev)
-		prev->next = node->next;
-}
-
-#define slist_for_each_safe(item, member, it) \
-	for (; item && ({it = (__typeof__(item))item->member.next; 1;} ); \
-	       item = it)
-
-static inline void 
-list_init(struct list *l)
-{
-	struct node *head = &l->head;
+	struct node *head = &list->head;
 	head->next = head->prev = head;
 }
+#endif
+static inline void
+list_init(struct list *list)
+{
+	__list_init(list);
+}
+
+#ifdef CONFIG_DEBUG_LIST
+void *
+__list_head(struct list *list); 
+#else
+static inline void *
+__list_head(struct list *list)
+{
+	return (list->head.next != &list->head) ? list->head.next : NULL;
+}
+#endif
+static inline void *
+list_head(struct list *list)
+{
+	return __list_head(list);
+}
+
 
 static inline void *
-list_head(struct list *l)
+list_tail(struct list *list)
 {
-	return (l->head.next != &l->head) ? l->head.next : NULL;
+	return (list->head.prev != &list->head) ? list->head.prev : NULL;
 }
 
 static inline void *
-list_tail(struct list *l)
+list_next(struct list *list, struct node *node)
 {
-	return (l->head.prev != &l->head) ? l->head.prev : NULL;
-}
-
-static inline void *
-list_next(struct list *l, struct node *n)
-{
-	return (n->next != &l->head) ? (void *) n->next : NULL;
+	return (node->next != &list->head) ? (void *)node->next: NULL;
 }
 
 static inline void *
@@ -148,9 +154,9 @@ list_add_tail(struct list *list, struct node *node)
 }
 
 #ifdef CONFIG_DEBUG_LIST
-void __list_remove(struct node *node);
+void __list_del(struct node *node);
 #else
-static inline void __list_remove(struct node *node)
+static inline void __list_del(struct node *node)
 {
 	struct node *before = node->prev;
 	struct node *after  = node->next;
@@ -159,55 +165,49 @@ static inline void __list_remove(struct node *node)
 }
 #endif
 static inline void
-list_remove(struct node *node)
+list_del(struct node *node)
 {
-	__list_remove(node);
+	__list_del(node);
 }
 
-static inline void *
-list_remove_head(struct list *list)
+#define list_walk(n, list, obj) \
+	for (struct node *(n) = (obj); (n) != &list.head; (n) = (n)->next)
+
+#define list_walk_delsafe(n, list, obj, it) \
+	for (struct node *(n) = (obj); it = (n)->next, (n) != &list.head; \
+             (n) = it)
+
+#define list_for_each(n, list) \
+	for (struct node *(n) = (list).head.next;\
+	     (n) != &(list).head; (n) = (n)->next)
+
+#define list_for_each_delsafe(n, list, it) \
+	for (struct node *(n) = (list).head.next; \
+		(it) = (n)->next, (n) != &(list).head; (n) = it)
+
+static inline void
+snode_init(struct snode *snode)
 {
-	struct node *node = (struct node *)list_head(list);
-	if (node)
-		list_remove(node);
-	return node;
+	snode->next = NULL;
 }
 
-static inline void 
-list_insert_list_after(struct list *list, struct node *after)
+static inline void
+slist_add_after(struct snode *node, struct snode *after)
 {
-	if (list_empty(list))
-		return;
-
-	struct node *node = &list->head;
-	node->prev->next = after->next;
-	after->next->prev = node->prev;
-	node->next->prev = after;
-	after->next = node->next;
-	list_init(list);
+	after->next = node;
 }
 
-#define list_walk(n, list) \
-	for (n = (void*)(list).head.next;\
-		(struct node*)(n) != &(list).head;\
-		n = (void*)((struct node*)(n))->next)
 
-#define list_walk_safe(n, list, tmp) \
-	for (n = (void*)(list).head.next;\
-		tmp = (void*)((struct node*)(n))->next, \
-		(struct node*)(n) != &(list).head;\
-		n = (void*)tmp)
+static inline void
+slist_remove(struct snode *node, struct snode *prev)
+{
+	if (prev)
+		prev->next = node->next;
+}
 
-#define list_for_each(type, n, list) \
-	for (type n = (type)(list).head.next;\
-		(struct node*)(n) != &(list).head;\
-		n = (type)((struct node*)(n))->next)
-
-#define list_for_each_safe(type, n, list, tmp) \
-	for (type n = (void*)(list).head.next; \
-		tmp = (void*)((struct node*)(n))->next, \
-		(struct node*)(n) != &(list).head;\
-		n = (void*)tmp)
+#define slist_for_each_delsafe(item, member, it) \
+	for (; item && ({it = (__typeof__(item))item->member.next; 1;} ); \
+	       item = it)
 
 #define list_head_init(name) { &(name), &(name) }
 
@@ -216,7 +216,7 @@ list_insert_list_after(struct list *list, struct node *after)
 #define init_hlist(ptr) ((ptr)->head = NULL)
 
 static inline void
-init_hnode(struct hnode *hnode)
+hnode_init(struct hnode *hnode)
 {
 	hnode->next = NULL;
 	hnode->prev = NULL;
@@ -234,12 +234,6 @@ hlist_add_head(struct hnode *hnode, struct hlist *hlist)
 }
 
 static inline int
-hlist_unhashed(const struct hnode *hnode)
-{
-	return !hnode->prev;
-}
-
-static inline int
 hlist_empty(const struct hlist *hlist)
 {
 	return !hlist->head;
@@ -250,7 +244,7 @@ void __hlist_del(struct hnode *hnode);
 #else
 static inline void __hlist_del(struct hnode *hnode)
 {
-	struct hnode *next = hnode->next;
+	struct hnode *next  = hnode->next;
 	struct hnode **prev = hnode->prev;
 	*prev = next;
 	if (next)
@@ -297,7 +291,7 @@ hlist_add_after(struct hnode *hnode, struct hnode *next)
 #define hlist_for_each(node, list) \
 	for (node = hlist_first(list); node; node = item->next)
 
-#define hlist_for_each_safe(node, it, list) \
+#define hlist_for_each_delsafe(node, it, list) \
 	for (node = hlist_first(list); it && ({it = pos->next; 1;}); node = it)
 
 #endif

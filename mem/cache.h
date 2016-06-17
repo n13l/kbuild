@@ -37,7 +37,7 @@
 #include <assert.h>
 
 struct mm_cache {
-	struct savep savep;
+	int unused;
 };
 
 void *

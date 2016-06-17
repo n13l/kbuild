@@ -405,6 +405,7 @@ USERINCLUDE    := \
 		-I$(srctree)/arch/$(hdr-arch) \
                 -include $(srctree)/posix/$(PLATFORM)/platform.h \
 		-I$(srctree)/posix/$(PLATFORM) \
+		-I$(srctree)/posix/clib \
 		-I..
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
@@ -638,7 +639,7 @@ else
 include/config/auto.conf: ;
 endif # $(dot-config)
 
-objs-y += arch/$(SRCARCH) posix/$(PLATFORM) mem net generic crypto lib 
+objs-y += arch/$(SRCARCH) posix/$(PLATFORM) posix mem net crypto lib 
 # TODO: tests in objs-m does not look right
 objs-m += test
 
@@ -1174,7 +1175,9 @@ endif
 
 else # CONFIG_MODULES
 
-all: $(progs) modules
+all: $(progs) 
+
+#modules
 
 # Modules not configured
 # ---------------------------------------------------------------------------

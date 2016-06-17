@@ -4,8 +4,7 @@
 #include <sys/compiler.h>
 #include <sys/cpu.h>
 #include <sys/types.h>
-
-#include <generic/list.h>
+#include <posix/list.h>
 
 #define X86_PROLOGUE_MAX 64
 #define X86_EPILOGUE_MAX 64

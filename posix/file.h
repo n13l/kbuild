@@ -26,34 +26,41 @@
 #define __CLIB_FILE_H__
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdarg.h>
 
 /* A private structure containing the file object */
 struct file;
-struct pollfd;
 
 int
-sys_open(struct file *file, const char *name, int flags);
+file_write(struct file *file, const void *msg, size_t size);
+
+/* 
+ * POSIX.1-2008
+ *
+ * Atomic/non-atomic: A write is atomic if the whole amount written in one 
+ * operation is not interleaved with data from any other process. 
+ * This is useful when there are multiple writers sending data to a single 
+ * reader. Applications need to know how large a write request can be expected 
+ * to be performed atomically. This maximum is called {PIPE_BUF}. This volume 
+ * of POSIX.1-2008 does not say whether write requests for more than {PIPE_BUF}
+ * bytes are atomic, but requires that writes of {PIPE_BUF} or fewer bytes 
+ * shall be atomic.
+ *
+ * The value if PIPE_BUF is defined by each implementation, but the minimum is 
+ * 512 bytes (see limits.h).
+ */
 
 int
-sys_read(struct file *file, const byte *, size_t size);
+file_awrite(struct file *file, const void *msg, size_t size);
 
 int
-sys_write(struct file *file, const byte *, size_t size);
+file_awritef(struct file *file, const char *fmt, ...);
 
 int
-sys_seek(struct file *file, off_t pos, int whence);
-
-int
-sys_poll(struct file *file, struct pollfd *fds, int nfds, int timeout);
-
-int
-sys_socket(struct file *file, int domain, int type, int protocol);
-
-int
-sys_bind(struct file *file, struct sockaddr *addr, size_t size);
-
-void
-sys_close(struct file *file);
+file_awritev(struct file *file, const char *fmt, va_list args);
+	
+extern struct file *file_stdout;
+extern struct file *file_stderr;
 
 #endif/*__CLIB_FILE_LIB_H__*/

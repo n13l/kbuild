@@ -28,6 +28,11 @@ if &term=~'xterm'
 	hi LineNr term=bold ctermfg=grey guifg=grey gui=bold guifg=grey
 endif
 
+if &term=~'xterm-256color' 
+	colo ron
+	hi LineNr term=bold ctermfg=grey guifg=grey gui=bold guifg=grey
+endif
+
 
 if has("unix")                                                                  
 	let s:uname = system("uname")                                           
@@ -84,7 +89,7 @@ if has("unix")
 	let g:clang_use_library = 0
 	let s:uname = system("uname")
 	if s:uname == "Darwin\n"
-		colo default
+"		colo default
 		let g:clang_use_library = 0
 "		let g:clang_library_path = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
 	endif

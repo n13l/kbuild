@@ -27,7 +27,7 @@ testc_flags = -Wp,-MD,$(depfile) $(KBUILD_CFLAGS) $(KBUILD_CPPFLAGS) \
 
 testld_flags = 
 testld_builtin = arch/$(SRCARCH)/built-in.o posix/$(PLATFORM)/built-in.o \
-		 generic/built-in.o mem/built-in.o
+		 posix/built-in.o mem/built-in.o
 testld_libs = $(KBUILD_LIBS)
 
 # test-csingle -> executable

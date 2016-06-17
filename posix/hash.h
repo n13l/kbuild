@@ -27,7 +27,7 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
-#include <generic/list.h>
+#include <posix/list.h>
 #include <math.h>
 #include <limits.h>
 

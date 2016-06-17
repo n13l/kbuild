@@ -1,9 +1,9 @@
 /*
- * The MIT License (MIT)         Copyright (c) 2015 Daniel Kubec <niel@rtfm.cz>
+ * The MIT License (MIT)         Copyright (c) 2015 Daniel Kubec <niel@rtfm.cz> 
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
  * of this software and associated documentation files (the "Software"),to deal
- * in the Software without restriction, including without limitation the rights
+ * in the Software without restriction, including without limitation the rights 
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
@@ -20,25 +20,31 @@
  * THE SOFTWARE.
  */
 
-#ifndef __ARCH_CPU_H__
-#define __ARCH_CPU_H__
+#ifndef __CLIB_STRING_H__
+#define __CLIB_STRING_H__
 
-/* Hardware-accelerated implementation of CRC-32C (Castagnoli) */
-#define CPU_CAP_CRYPTO_CRC32C             1
+#include <stdlib.h>
+#include <stdarg.h>
 
-const char *
-cpu_vendor(void);
+/*
+#include "string/attr.h"
+#include "string/safe.h"
+*/
 
-int
-cpu_has_cap(int capability);
+char *                                                                          
+str_unesc(char *d, const char *s);
 
-int
-cpu_has_crc32c(void);
+size_t
+strvalx(const char *s);
 
-void
-cpu_dump_extension(void);
+static inline void
+strnonl(char *p)
+{
+	for(; *p; p++) if (*p == '\n' || *p == '\r')
+		*p = ' ';
+}
 
-size_t 
-arch_stack_avail(void);
+/* compatibility functions */
+char *__compat_strchrnul(const char *s, int in);
 
-#endif
+#endif/*__CLIB_STRING_LIB_H__*/

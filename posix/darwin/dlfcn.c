@@ -24,66 +24,40 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
+#include <sys/log.h>
 #include <mem/alloc.h>
-#include <mem/cache.h>
-#include <mem/page.h>
+#include <mem/pool.h>
 #include <posix/list.h>
-#include <posix/hash.h>
-
-DECLARE_HASHTABLE(person_name, 9);
-DECLARE_HASHTABLE(person_age,  9);
-
-struct person {
-	char *name;
-	unsigned int age;
-	struct hnode node_name;
-	struct hnode node_age;
-};
-
-static struct person *
-person(struct mm_pool *mp, char *name, unsigned int age)
-{
-	struct person *person = mm_alloc(mp, sizeof(*person));
-
-	person->name = mm_strdup(mp, name);
-	person->age  = age;
-
-	hnode_init(&person->node_name);
-	hnode_init(&person->node_age);
-	return person;
-}
+#include <link.h>
+#include <dlfcn.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <mach-o/dyld.h>
+#include <mach-o/loader.h>
+#include <mach-o/nlist.h>
 
 int
-main(void)
+dl_iterate_phdr(int (*cb)(struct dl_phdr_info *info, 
+                size_t size, void *data), void *data)
 {
-	struct mm_pool *mp = mm_create(MM_POOL, CPU_PAGE_SIZE, MM_FAST_ALIGN);
 
-	hash_init(person_name);
-	hash_init(person_age);
+	for (int i = 0; i < _dyld_image_count(); i++) {
+		const struct mach_header *hdr = _dyld_get_image_header(i);
+		/* hdr->magic MH_MAGIC: MH_MAGIC_64: */
+		intptr_t addr = _dyld_get_image_vmaddr_slide(i);
+		Dl_info dl_info;
+		if (!dladdr(hdr, &dl_info))
+			continue;
 
-	_unused struct person *myself = person(mp, "Daniel", 15);
+		struct dl_phdr_info info = { 
+			.dlpi_addr = (void *)addr,
+			.dlpi_name = dl_info.dli_fname,
+			.dlpi_phdr = hdr,
+		};
 
-	_unused u32 hash1 = hash_data(person_name, "daniel");
-	_unused u32 hash2 = hash_data(person_age, 15);
-
-	debug("hash data=%u", (unsigned int)hash1);
-
-	/*
-	for (int i = 0; i < 10; i++) {
-		_unused struct person *person = person(mp, "Daniel", 1979);
-		hash_add(htable, (u32)person->id, key);
+		cb(&info, 0, data);
 	}
 
-	// hash_for_each(object, name, "Daniel);
-*/
-	/*
-	hash_for_each(person_name, person, n_name, "Daniel") {
-		struct person *it = __container_of(node, n_name);
-	}
-*/
-	//hash_for_each_slot()
-	//hash_for_each_object()
-
-	mm_destroy(mp);
-	return 0;
+	return 1;
 }

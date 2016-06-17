@@ -1,5 +1,5 @@
 /*
- * The MIT License (MIT)
+ * The MIT License (MIT)                                                    ABI
  *                               Copyright (c) 2015 Daniel Kubec <niel@rtfm.cz> 
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
@@ -31,12 +31,67 @@
  * sequences, is called a secure one.
  */
 
-#ifndef __PLATFORM_LINKER_ABI_H__
-#define __PLATFORM_LINKER_ABI_H__
+#ifndef __PLATFORM_ABI_H__
+#define __PLATFORM_ABI_H__
 
-#define EXPORT(rv) __attribute__ ((visibility("default"))) rv
+#include <sys/compiler.h>
 
-void *
-dlopen_resolve(const char *file, int flags);
+enum abi_call_flags {
+	ABI_CALL_OPTIONAL = 1,
+	ABI_CALL_REQUIRE  = 2
+};
 
+struct abi_version {
+	byte major;
+	byte minor;
+	byte patch;
+	byte devel;
+};
+
+struct abi_class {
+	struct abi_version required;
+	struct abi_version version;
+};
+
+struct abi_sym {
+	char *name;                                                       
+	void *addr;                                                             
+	enum abi_call_flags require;
+};
+
+void
+arch_instrument(void);
+
+void
+arch_interpose(void);
+
+int
+arch_has_mechanism(void);
+
+int
+arch_has_cap(void);
+
+#define DEFINE_ABI_CALL(rv, fn, args...) \
+	rv ((*abi_##fn)(args)); \
+
+#define DEFINE_ABI(ns, rv, fn, args...) \
+	rv ((*sym_##fn)(args)); \
+
+#define DECLARE_ABI(ns, rv, fn, args...) \
+	_noinline rv abi_##ns##_##fn(args)
+
+#define DEFINE_ABI_link(dll, fn) \
+	sym_##fn = dlsym((void *)dll, #fn);
+
+#define DECLARE_ABI_SYM(fn, mode) \
+	{ stringify(fn), &sym_##fn, mode } 
+
+#define call_abi(ns, fn, args...) \
+	sym_##fn(args)
+	
+void
+linkmap_init(void);
+
+void
+linkmap_fini(void);
 #endif/*__PLATFORM_ABI_H__*/

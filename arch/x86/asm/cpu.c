@@ -26,7 +26,6 @@
 #include <sys/cpu.h>
 #include <sys/log.h>
 #include <elf/lib.h>
-#include <arch/cpu.h>
 #include <cpuid.h>
 #include <stdlib.h>
 #include <string.h>

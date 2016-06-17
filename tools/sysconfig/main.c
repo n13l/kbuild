@@ -23,11 +23,11 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
+#include <sys/abi.h>
 #include <mem/alloc.h>
 #include <mem/page.h>
 #include <mem/pool.h>
 #include <mem/stack.h>
-#include <arch/cpu.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,7 +36,7 @@
 #include <getopt.h>
 
 #undef KBUILD_MODNAME
-#define KBUILD_MODNAME KBUILD_STR(sysconfig)
+#define KBUILD_MODNAME KBUILD_STR(sys)
 
 _unused static struct option long_options[] = {
 	{"cpu-caps", no_argument, 0, 0  },
@@ -81,6 +81,11 @@ main(int argc, char *argv[])
 
 	info_cpu();
 	info_sys();
+
+	linkmap_init();
+
+
+	linkmap_fini();
 
 	return 0;
 }

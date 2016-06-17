@@ -22,10 +22,10 @@ config DEBUG_LIST
           Enable this to turn on extended checks in the linked-list
           walking routines.
 
-config DEBUG_HASH_TABLE
+config DEBUG_HASH
 	bool "Debug hash table manupulation"
 	default n
-	depends on DEBUG_INFO && DEBUG_LIST
+	depends on DEBUG_INFO
 	help
 	  Enable this to turn on extended checks in the hash table warlking
           routines

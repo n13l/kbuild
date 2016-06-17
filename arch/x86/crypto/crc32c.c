@@ -1,2 +1,2 @@
 #include <sys/compiler.h>
-#include <arch/cpu.h>
+#include <sys/cpu.h>

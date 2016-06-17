@@ -1,1 +1,1 @@
-obj-y := proc.o stack.o
+obj-y := proc.o

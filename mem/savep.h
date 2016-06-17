@@ -29,7 +29,7 @@
 #include <sys/cpu.h>
 #include <sys/log.h>
 #include <mem/debug.h>
-#include <generic/list.h>
+#include <posix/list.h>
 
 struct mm_savep {
 	size_t avail[2];

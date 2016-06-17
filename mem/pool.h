@@ -4,12 +4,15 @@
 #include <sys/compiler.h>
 #include <sys/cpu.h>
 #include <sys/log.h>
+
 #include <mem/debug.h>
 #include <mem/alloc.h>
 #include <mem/savep.h>
 #include <mem/block.h>
 #include <mem/generic.h>
-#include <generic/list.h>
+
+#include <posix/time.h>
+#include <posix/list.h>
 #include <inttypes.h>
 #include <assert.h>
 
@@ -126,18 +129,18 @@ static inline void
 mm_pool_destroy(struct mm_pool *pool)
 {
 	struct mm_vblock *it, *block;
-	mem_dbg("pool %p destroyed", pool);
+	mem_dbg("mm pool %p destroyed", pool);
 
 	block = pool->save.final[1];
-	slist_for_each_safe(block, node, it)
+	slist_for_each_delsafe(block, node, it)
 		vm_vblock_free(block);
 
 	block = pool->avail;
-	slist_for_each_safe(block, node, it)
+	slist_for_each_delsafe(block, node, it)
 		vm_vblock_free(block);
 
 	block = pool->save.final[0];
-	slist_for_each_safe(block, node, it)
+	slist_for_each_delsafe(block, node, it)
 		vm_vblock_free(block);
 
 }
@@ -148,11 +151,11 @@ mm_pool_flush(struct mm_pool *pool)
 	struct mm_vblock *it, *block;
 
 	block = pool->save.final[1];
-	slist_for_each_safe(block, node, it)
+	slist_for_each_delsafe(block, node, it)
 		vm_vblock_free(block);
 
 	block = pool->save.final[0];
-	slist_for_each_safe(block, node, it) {
+	slist_for_each_delsafe(block, node, it) {
 		if ((void *)block - block->size == pool)
 			break;
 		slist_add_after(pool->avail, &block->node);
@@ -193,7 +196,7 @@ mm_pool_create(struct mm_pool *object, size_t blocksize, int flags)
 	block = vm_vblock_alloc(size);
 	struct mm_pool *pool = (void *)block - size;
 
-	mem_dbg("pool %p created with %" PRIuMAX " bytes", 
+	mem_dbg("mm pool %p created with %" PRIuMAX " bytes", 
 	        pool, (uintmax_t)blocksize);
 
 	pool->save.avail[0] = size - sizeof(*pool);

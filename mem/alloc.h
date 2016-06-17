@@ -30,13 +30,17 @@
 #include <sys/compiler.h>
 #include <sys/cpu.h>
 #include <sys/log.h>
+
 #include <mem/debug.h>
 #include <mem/savep.h>
 #include <mem/stack.h>
 #include <mem/pool.h>
 #include <mem/debug.h>
 #include <mem/generic.h>
-#include <generic/list.h>
+
+#include <posix/time.h>
+#include <posix/list.h>
+
 #include <assert.h>
 
 /* The memory operations will not call die() for fatal errors. */

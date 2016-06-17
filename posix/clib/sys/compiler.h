@@ -193,6 +193,12 @@ typedef u32 __bitwise __wsum;
 	(type *)((byte *)ptr - offsetof(type, member)); \
 })
 
+#define container_of(ptr, type, member) \
+({ \
+	(type *)((byte *)ptr - offsetof(type, member)); \
+})
+
+
 #define __container_of_safe(ptr, type, member) \
 ({ \
 	typeof(ptr) ____ptr = (ptr); \
