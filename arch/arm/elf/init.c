@@ -2,7 +2,7 @@
 #include <sys/cpu.h>
 #include <sys/log.h>
 #include <elf/lib.h>
-#include <generic/list.h>
+#include <posix/list.h>
 
 #include <stdlib.h>
 #include <stdio.h>
