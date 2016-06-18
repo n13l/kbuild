@@ -170,11 +170,11 @@ list_del(struct node *node)
 	__list_del(node);
 }
 
-#define list_walk(n, list, obj) \
-	for (struct node *(n) = (obj); (n) != &list.head; (n) = (n)->next)
+#define list_walk(start, n, list) \
+	for (struct node *(n) = (start); (n) != &list.head; (n) = (n)->next)
 
-#define list_walk_delsafe(n, list, obj, it) \
-	for (struct node *(n) = (obj); it = (n)->next, (n) != &list.head; \
+#define list_walk_delsafe(start, n, list, it) \
+	for (struct node *(n) = (start); it = (n)->next, (n) != &list.head; \
              (n) = it)
 
 #define list_for_each(n, list) \

@@ -405,7 +405,6 @@ USERINCLUDE    := \
 		-I$(srctree)/arch/$(hdr-arch) \
                 -include $(srctree)/posix/$(PLATFORM)/platform.h \
 		-I$(srctree)/posix/$(PLATFORM) \
-		-I$(srctree)/posix/clib \
 		-I..
 
 # Use LINUXINCLUDE when you must reference the include/ directory.

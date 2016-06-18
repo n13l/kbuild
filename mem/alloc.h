@@ -136,9 +136,8 @@ extern struct mm_pool  *MM_POOL;
 #define mm_alloc(... /* mm, size */) \
 	({ void *_X = mm_alloc_dispatch(__VA_ARGS__); _X; })
 
-#define mm_alloc_aligned(mm, size)
-#define mm_zalloc_aligned(mm, size)
-#define mm_alloc_array(mm, size, elems)
+#define mm_alloc_aligned(mm, size, align)
+#define mm_zalloc_aligned(mm, size, align)
 #define mm_calloc(mm, size, elems)
 #define mm_zalloc(mm, size)
 

@@ -47,17 +47,18 @@ test1_list(void)
 		debug("node=%p person=%p name=%s", n, p, p->name);
 	}
 
-	struct person *p = NULL;
+	struct node *cursor = &daniela.node;
 	/* iterate over rest: starts at daniela node */
-	list_walk(n, list, &daniela.node) {
-		p = container_of(n, struct person, node);
+	list_walk(cursor, n, list) {
+		struct person *p = container_of(n, struct person, node);
 		debug("node=%p person=%p name=%s it=%p", n, p, p->name, it);
 		break;
 	}
 	/* iterate over rest with del safety: starts at daniel node */
-	list_walk_delsafe(n, list, p->node.next, it) {
-		p = container_of(n, struct person, node);
+	list_walk_delsafe(cursor, n, list, it) {
+		struct person *p = container_of(n, struct person, node);
 		debug("node=%p person=%p name=%s it=%p", n, p, p->name, it);
+		list_del(&p->node);
 	}
 
 
