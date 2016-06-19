@@ -36,14 +36,16 @@
 #include <mem/generic.h>
 #include <assert.h>
 
+struct page;
+
 struct mm_cache {
 	int unused;
 };
 
-void *
+struct page *
 mm_cache_alloc(struct mm_cache *cache, size_t size, int flags);
 
 void
-mm_cache_expires(void *addr);
+mm_cache_expires(struct page *page);
 
 #endif

@@ -63,12 +63,13 @@
 #define MM_LOCK_ALIGN  (1 << 9)  /* Aligned to CPU_CACHE_LINE                */
 #define MM_PAGE_ALIGN  (1 << 9)  /* Aligned to CPU_PAGE_SIZE                 */
 
+/*
 struct mm_pool;
 struct mm_slab;
 struct mm_heap;
 struct mm_cache;
 struct mm_stack;
-
+*/
 //EXPORT_SYMBOL(MM_STACK);
 extern struct mm_stack *MM_STACK;
 extern struct mm_heap  *MM_HEAP;

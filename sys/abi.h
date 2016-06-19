@@ -34,6 +34,9 @@
 #ifndef __PLATFORM_ABI_H__
 #define __PLATFORM_ABI_H__
 
+#define ARCH_INTERPOSE_DLBIND 0x01
+#define ARCH_INTERPOSE_DLTRAM 0x02
+
 #include <sys/compiler.h>
 
 enum abi_call_flags {
@@ -70,6 +73,9 @@ arch_has_mechanism(void);
 
 int
 arch_has_cap(void);
+
+#define DEFINE_INTERFACE(name) 
+#define DEFINE_INTERFACE_SYMBOL(name)
 
 #define DEFINE_ABI_CALL(rv, fn, args...) \
 	rv ((*abi_##fn)(args)); \
