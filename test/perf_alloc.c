@@ -8,7 +8,7 @@
 #include <mem/alloc.h>
 #include <mem/safe.h>
 
-#include <posix/timestamp.h>
+#include <posix/timespec.h>
 
 #define OP_LIBC_ALLOC_HEAP       1
 #define OP_MM_ALLOC_STACK      2

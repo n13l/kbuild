@@ -7,7 +7,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include <posix/timestamp.h>
+#include <posix/timespec.h>
 
 #ifndef CLOCK_REALTIME
 #define CLOCK_REALTIME 1

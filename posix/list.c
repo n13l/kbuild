@@ -2,12 +2,10 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
+#include <mem/alloc.h>
 #include <stdlib.h>
 #include <time.h>
-#include <sys/time.h>
-#include <posix/time.h>
-
-#include <mem/alloc.h>
+#include <posix/timespec.h>
 #include <posix/list.h>
 
 #define list_debug(fmt, ...) \
