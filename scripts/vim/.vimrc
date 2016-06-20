@@ -86,7 +86,7 @@ let g:clang_snippets = 1
 let g:clang_snippets_engine = 'clang_complete'
 
 if has("unix")
-	let g:clang_use_library = 0
+	let g:clang_use_library = 1
 	let s:uname = system("uname")
 	if s:uname == "Darwin\n"
 "		colo default
