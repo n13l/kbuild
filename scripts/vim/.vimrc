@@ -90,8 +90,8 @@ if has("unix")
 	let s:uname = system("uname")
 	if s:uname == "Darwin\n"
 "		colo default
-		let g:clang_use_library = 0
-"		let g:clang_library_path = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
+		let g:clang_use_library = 1
+		let g:clang_library_path = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
 	endif
 endif
 

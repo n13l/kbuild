@@ -2,6 +2,13 @@
 #include <sys/cpu.h>
 //#include <sys/abi.h>
 #include <mem/alloc.h>
+#include <posix/list.h>
+
+struct interface {
+	int version;
+	const char *name;
+	void *symbols[];
+};
 
 #define DEFINE_INTERFACE(name)
 
