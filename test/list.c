@@ -33,12 +33,11 @@ test1_list(void)
 	}
 
 	/* iterate and unlink adam */
-	struct node *it;
-	list_for_each_delsafe(n, list, it) {
+	list_for_each_delsafe(n, list) {
 		struct person *p = container_of(n, struct person, node);
 		if (!strcasecmp(p->name, "Adam"))
 			list_del(&p->node);
-		debug("node=%p person=%p name=%s it=%p", n, p, p->name, it);
+		debug("node=%p person=%p name=%s", n, p, p->name);
 	}
 
 	/* iterate over all objects */
@@ -51,13 +50,13 @@ test1_list(void)
 	/* iterate over rest: starts at daniela node */
 	list_walk(cursor, n, list) {
 		struct person *p = container_of(n, struct person, node);
-		debug("node=%p person=%p name=%s it=%p", n, p, p->name, it);
+		debug("node=%p person=%p name=%s", n, p, p->name);
 		break;
 	}
 	/* iterate over rest with del safety: starts at daniel node */
-	list_walk_delsafe(cursor, n, list, it) {
+	list_walk_delsafe(cursor, n, list) {
 		struct person *p = container_of(n, struct person, node);
-		debug("node=%p person=%p name=%s it=%p", n, p, p->name, it);
+		debug("node=%p person=%p name=%s", n, p, p->name);
 		list_del(&p->node);
 	}
 
@@ -67,7 +66,24 @@ test1_list(void)
 static void
 test2_list(void)
 {
-	_unused DECLARE_LIST(list);
+	DEFINE_LIST(list);
+	list_init(&list);
+
+	struct person daniel  = { .name = "Daniel",  .node = init_node };
+	struct person daniela = { .name = "Daniela", .node = init_node };
+	struct person adam    = { .name = "Adam",    .node = init_node };
+	struct person eve     = { .name = "Eve",     .node = init_node };
+	struct person robot   = { .name = "Robot",   .node = init_node };
+
+	list_add_tail(&list, &daniel.node);
+	list_add_tail(&list, &daniela.node);
+	list_add_tail(&list, &adam.node);
+	list_add_tail(&list, &eve.node);
+	list_add_tail(&list, &robot.node);
+
+	list_for_each_delsafe(n, list)
+		list_del(n);
+
 }
 
 

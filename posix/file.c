@@ -39,30 +39,29 @@
 #endif
 
 int
-file_awritev(struct file *file, const char *fmt, va_list args);
+file_writev(struct file *file, const char *fmt, va_list args);
 
 int
-file_awritef(struct file *file, const char *fmt, ...);
+file_writef(struct file *file, const char *fmt, ...);
 
 int
-file_awrite(struct file *file, const void *msg, size_t size);
+file_write(struct file *file, const void *msg, size_t size, int flags);
 
 /* File object operations */
 struct file_operations {
 	int  (*open)(struct file *file, const char *name, int flags);
 	int  (*read)(struct file *file, const void *msg, size_t size);
-	int  (*write)(struct file *file, const void *msg, size_t size);
-	int  (*awrite)(struct file *file, const void *msg, size_t size);
-	int  (*awritef)(struct file *file, const char *fmt, ...);
-	int  (*awritev)(struct file *file, const char *fmt, va_list args);
+	int  (*write)(struct file *file, const void *msg, size_t size, int f);
+	int  (*writef)(struct file *file, const char *fmt, ...);
+	int  (*writev)(struct file *file, const char *fmt, va_list args);
 	int  (*seek)(struct file *file, off_t pos, int whence);
 	void (*close)(struct file *file);
 };
 
 struct file_operations posix_ops = {
-	.awrite     = file_awrite,
-	.awritef    = file_awritef,
-	.awritev    = file_awritev
+	.write     = file_write,
+	.writef    = file_writef,
+	.writev    = file_writev
 };
 
 struct file {
@@ -108,13 +107,13 @@ atomic_write(int fd, const void *msg, size_t size)
 }
 
 int
-file_awritev(struct file *file, const char *fmt, va_list args)
+file_writev(struct file *file, const char *fmt, va_list args)
 {
 	return atomic_writev(file->fd, fmt, args);
 }
 
 int
-file_awritef(struct file *file, const char *fmt, ...)
+file_writef(struct file *file, const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
@@ -124,9 +123,12 @@ file_awritef(struct file *file, const char *fmt, ...)
 }
 
 int
-file_awrite(struct file *file, const void *msg, size_t size)
+file_write(struct file *file, const void *msg, size_t size, int flags)
 {
-	return atomic_write(file->fd, msg, size);
+	if (flags & FILE_WRITE_ATOMIC)
+		return atomic_write(file->fd, msg, size);
+
+	return atomic_write(file->fd, msg, size);	
 }
 
 struct file *file_stdout = NULL;

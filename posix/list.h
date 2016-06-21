@@ -30,8 +30,8 @@
 #include <sys/compiler.h>
 #include <mem/debug.h>
 
-#define DEFINE_LIST(name) struct list list_#name;
-#define DEFINE_NODE(name) struct node node_#name;
+#define DEFINE_LIST(name) struct list name;
+#define DEFINE_NODE(name) struct node name;
 
 #define DECLARE_LIST(name) struct list name = init_list(name)
 #define DECLARE_NODE(name) struct node name = init_node
@@ -61,7 +61,11 @@ struct hlist {
 };
 
 #define init_node       { .next = NULL, .prev = NULL }
+#ifdef CONFIG_DEBUG_LIST
 #define init_list(name) {{(struct node *)&(name), (struct node *)&(name)}}
+#else
+#define init_list(name) {{(struct node *)&(name), (struct node *)&(name)}}
+#endif
 
 #ifdef CONFIG_DEBUG_LIST
 void 
@@ -173,16 +177,16 @@ list_del(struct node *node)
 #define list_walk(start, n, list) \
 	for (struct node *(n) = (start); (n) != &list.head; (n) = (n)->next)
 
-#define list_walk_delsafe(start, n, list, it) \
-	for (struct node *(n) = (start); it = (n)->next, (n) != &list.head; \
-             (n) = it)
+#define list_walk_delsafe(start, n, list) \
+	for (struct node *it, *(n) = (start); it = (n)->next, \
+	     (n) != &list.head; (n) = it)
 
 #define list_for_each(n, list) \
 	for (struct node *(n) = (list).head.next;\
 	     (n) != &(list).head; (n) = (n)->next)
 
-#define list_for_each_delsafe(n, list, it) \
-	for (struct node *(n) = (list).head.next; \
+#define list_for_each_delsafe(n, list) \
+	for (struct node *it, *(n) = (list).head.next; \
 		(it) = (n)->next, (n) != &(list).head; (n) = it)
 
 static inline void

@@ -29,12 +29,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-/* A private structure containing the file object */
-struct file;
-
-int
-file_write(struct file *file, const void *msg, size_t size);
-
 /* 
  * POSIX.1-2008
  *
@@ -51,15 +45,14 @@ file_write(struct file *file, const void *msg, size_t size);
  * 512 bytes (see limits.h).
  */
 
-int
-file_awrite(struct file *file, const void *msg, size_t size);
+#define FILE_WRITE_ATOMIC  0x01
+
+/* A private structure containing the file object */
+struct file;
 
 int
-file_awritef(struct file *file, const char *fmt, ...);
+file_write(struct file *file, const void *msg, size_t size, int flags);
 
-int
-file_awritev(struct file *file, const char *fmt, va_list args);
-	
 extern struct file *file_stdout;
 extern struct file *file_stderr;
 

@@ -53,7 +53,7 @@
 #define hash_long(val, bits) hash_u64((u64)val, bits)
 #define HASH_RATIO_PRIME HASH_RATIO_PRIME_64
 #else
-#error Wordsize not 32 or 64
+#error not supported architecture
 #endif
 
 static inline u64
