@@ -16,7 +16,7 @@ config DEBUG_SECTION_MISMATCH
 
 config DEBUG_LIST                                                               
         bool "Debug linked list manipulation"
-	default n
+	default y
 	depends on DEBUG_INFO
         help
           Enable this to turn on extended checks in the linked-list
@@ -24,7 +24,7 @@ config DEBUG_LIST
 
 config DEBUG_HASH
 	bool "Debug hash table manupulation"
-	default n
+	default y
 	depends on DEBUG_INFO
 	help
 	  Enable this to turn on extended checks in the hash table warlking
