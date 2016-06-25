@@ -92,7 +92,7 @@ hash_string(const char *str)
 	return(v);
 }
 
-#define DECLARE_HASHTABLE(name, bits) \
+#define DEFINE_HASHTABLE(name, bits) \
 	struct hlist name[1 << (bits)]
 
 #ifdef CONFIG_DEBUG_HASH_TABLE
@@ -166,8 +166,11 @@ hash_string(const char *str)
 #define hash_for_each(name, obj, member, key) \
 	hlist_for_each(obj, &name[hash_data(key, hash_bits(name))],member)
 
-#define hash_for_each_safe(name, obj, it, member, key)	\
-	hlist_for_each_safe(obj, it, \
+#define hash_for_each_delsafe(name, obj, it, member, key)	\
+	hlist_for_each_delsafe(obj, it, \
 	                    &name[hash_data(key, hash_bits(name))], member)
+
+#define slot_for_each(table)
+#define slot_for_each_delsafe()
 
 #endif

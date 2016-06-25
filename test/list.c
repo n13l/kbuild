@@ -40,12 +40,6 @@ test1_list(void)
 		debug("node=%p person=%p name=%s", n, p, p->name);
 	}
 
-	/* iterate over all objects */
-	list_for_each(n, list) {
-		struct person *p = container_of(n, struct person, node);
-		debug("node=%p person=%p name=%s", n, p, p->name);
-	}
-
 	struct node *cursor = &daniela.node;
 	/* iterate over rest: starts at daniela node */
 	list_walk(cursor, n, list) {

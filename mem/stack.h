@@ -179,7 +179,6 @@ sp_vprintfz(const char *fmt, va_list args)
 {
 	char *string = alloca(MM_STACK_BLOCK_SIZE);
 	unsigned int avail  = MM_STACK_BLOCK_SIZE;
-
 	va_list args2;
 
 stack_avail:
@@ -203,7 +202,6 @@ sp_vprintfz_safe(struct mm_stack *sp, const char *fmt, va_list args)
 {
 	char *string = alloca(MM_STACK_BLOCK_SIZE);
 	unsigned int avail  = MM_STACK_BLOCK_SIZE;
-
 	va_list args2;
 
 stack_avail:

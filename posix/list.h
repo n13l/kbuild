@@ -60,7 +60,7 @@ struct hlist {
 	struct hnode *head;
 };
 
-#define init_node       { .next = NULL, .prev = NULL }
+#define init_node       (struct node ){ .next = NULL, .prev = NULL }
 #ifdef CONFIG_DEBUG_LIST
 #define init_list(name) {{(struct node *)&(name), (struct node *)&(name)}}
 #else
@@ -218,6 +218,7 @@ slist_remove(struct snode *node, struct snode *prev)
 #define hlist_init { .head = NULL }
 #define hlist(name) struct hlist name = {  .head = NULL }
 #define init_hlist(ptr) ((ptr)->head = NULL)
+#define init_hnode (struct hnode) {.next = NULL, .prev = NULL}
 
 static inline void
 hnode_init(struct hnode *hnode)
@@ -293,7 +294,7 @@ hlist_add_after(struct hnode *hnode, struct hnode *next)
 #endif
 
 #define hlist_for_each(node, list) \
-	for (node = hlist_first(list); node; node = item->next)
+	for (node = hlist_first(list); node; node = node->next)
 
 #define hlist_for_each_delsafe(node, it, list) \
 	for (node = hlist_first(list); it && ({it = pos->next; 1;}); node = it)

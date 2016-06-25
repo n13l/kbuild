@@ -4,8 +4,27 @@
 #include <mem/alloc.h>
 #include <posix/list.h>
 
+enum abi_call_flags {
+	SYM_OPT = 1,
+	SYM_REQ = 2
+};
+
+struct version {
+	byte major;
+	byte minor;
+	byte patch;
+	byte devel;
+};
+
+struct symbol {
+	char *name;                                                       
+	void *addr;                                                             
+	enum abi_call_flags require;
+};
+
+
 struct interface {
-	int version;
+	struct version version;
 	const char *name;
 	void *symbols[];
 };

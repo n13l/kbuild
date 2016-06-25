@@ -108,6 +108,7 @@ let g:clang_hl_errors=0
 let g:clang_user_options='|| exit 0'
 let g:clang_complete_auto = 0
 let g:clang_complete_copen = 0
+let g:clang_complete_macros = 1
 set conceallevel=2
 set concealcursor=vin
 "let g:SuperTabDefaultCompletionType='<c-x><c-u><c-p>'
