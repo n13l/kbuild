@@ -1,6 +1,5 @@
 config PAGE_SIZE
         int
-        default 4096
 config MMU
 	def_bool y
 
@@ -155,11 +154,6 @@ config S390
 
 config SCHED_OMIT_FRAME_POINTER
 	def_bool y
-
-config PGTABLE_LEVELS
-	int
-	default 4 if 64BIT
-	default 2
 
 menu "Processor type and features"
 
@@ -353,19 +347,6 @@ config SMP
 	  <http://www.tldp.org/docs.html#howto>.
 
 	  Even if you don't know what to do here, say Y.
-
-config NR_CPUS
-	int "Maximum number of CPUs (2-512)"
-	range 2 512
-	depends on SMP
-	default "64"
-	help
-	  This allows you to specify the maximum number of CPUs which this
-	  kernel will support. The maximum supported value is 512 and the
-	  minimum value which makes sense is 2.
-
-	  This is purely to save memory - each supported CPU adds
-	  approximately sixteen kilobytes to the kernel image.
 
 config HOTPLUG_CPU
 	def_bool y

@@ -1,0 +1,13 @@
+#!/bin/sh -k
+opts=""
+lopts=""
+
+for arg in $* ; do
+  case $arg in
+    -r) ;;
+    *)
+    opts="$opts $arg"
+    ;;
+  esac
+done
+ld $opts

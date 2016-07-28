@@ -2,7 +2,7 @@
 #include <sys/cpu.h>
 #include <sys/log.h>
 #include <elf/lib.h>
-#include <generic/list.h>
+#include <posix/list.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,7 +18,8 @@ void
 elf_init(void)
 {
 }
-	
+
+/*
 int
 linkmap_info(struct dl_phdr_info *dl, size_t size, void *data)
 {
@@ -40,13 +41,11 @@ linkmap_info(struct dl_phdr_info *dl, size_t size, void *data)
 
 	}
 
-	//void *hdr == info->dlpi_addr + info->dlpi_phdr[x].p_vaddr;
-
 	return 0;
 }
-
+*/
 void
 linkmap_init(void)
 {
-	dl_iterate_phdr(linkmap_info, NULL);
+	//dl_iterate_phdr(linkmap_info, NULL);
 }

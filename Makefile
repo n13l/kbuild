@@ -403,7 +403,7 @@ USERINCLUDE    := \
 		-I$(srctree)/lib \
 		-Ilib -I$(srctree)/arch \
 		-I$(srctree)/arch/$(hdr-arch) \
-                -include $(srctree)/posix/$(PLATFORM)/platform.h \
+		-include $(srctree)/posix/$(PLATFORM)/platform.h \
 		-I$(srctree)/posix/$(PLATFORM) \
 		-I..
 

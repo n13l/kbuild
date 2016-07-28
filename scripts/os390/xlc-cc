@@ -1,6 +1,6 @@
 #!/bin/sh -k
 # -DNO_INTPTR_T
-S390_CFLAGS="-D_XOPEN_SOURCE_EXTENDED=1 -DBENDIAN=1 -Daligned=__aligned__ -DNI_MAXHOST=1025 -DNI_MAXSERV=32 -DPATH_MAX=1024 -DNO_SYS_POLL_H -DNO_INTTYPES_H"
+S390_CFLAGS="-D_XOPEN_SOURCE_EXTENDED=1 -DBENDIAN=1 -Daligned=__aligned__ -DNI_MAXHOST=1025 -DNI_MAXSERV=32 -DPATH_MAX=1024 -DNO_SYS_POLL_H -DNO_INTTYPES_H -D__bool_=1 -qkeyword=typeof -qsuppress=CCN4108"
 S390_TARGET="c99"
 
 # std mapping
@@ -11,6 +11,7 @@ opts=""
 lopts=""
 temp2=""
 mkdeps=""
+nospacearg=" "
 
 for arg in $* ; do
   case $arg in
@@ -21,11 +22,15 @@ for arg in $* ; do
       ;;
     -Wmissing-prototypes) ;;
     -Wall) ;;
+    -fno-strict-aliasing) ;;
+    -Wundef) ;;
     -std=gnu89) opts="$opts -qlanglvl=extc89" ;;
     -std=gnu99) opts="$opts -qlanglvl=extc99" ;;
+    -std=gnu1x) opts="$opts -qlanglvl=extc1x" ;;
     -include) 
-     temp2=$(echo "$arg" | sed -e 's/-include/-qinclude/')
+     temp2=$(echo "$arg" | sed -e 's/-include/-qinclude=/')
      opts="$opts $temp2"
+     nospacearg=""
     ;;
     -fomit-frame-pointer) ;;
     -Wno-format-security) ;;
@@ -45,14 +50,16 @@ for arg in $* ; do
      ;;
     *) 
 #    temp2=$(echo "$arg" | sed -e 's/-Wp,-MD,[^[:space:]]*[:space:].d//')
-    opts="$opts $arg" ;;
+    opts="$opts$nospacearg$arg" 
+    nospacearg=" "
+    ;;
   esac
 done
 
 if [ ! -z "$mkdeps" ]; then
-  S390_CFLAGS="-qmakedep=gcc $S390_CFLAGS"
+  S390_CFLAGS="-qmakedep=gcc -I../posix/os390 $S390_CFLAGS"
 fi
 
-printf "c99 $S390_CFLAGS $lopts $opts\n"
+#printf "c99 $S390_CFLAGS $lopts $opts\n"
 
 c99 $S390_CFLAGS $lopts $opts
