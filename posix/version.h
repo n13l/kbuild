@@ -1,5 +1,5 @@
 /*
- * The MIT License (MIT)                             Generic tracing facilities
+ * The MIT License (MIT)
  *
  * Copyright (c) 2013 Daniel Kubec <niel@rtfm.cz>
  *
@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  **/
 
-#ifndef __GENERIC_TRACE_H__
-#define __GENERIC_TRACE_H__
+#ifndef __GENERIC_VERSION_H__
+#define __GENERIC_VERSION_H__
 
 #include <sys/compiler.h>
 #include <stdlib.h>
@@ -32,30 +32,30 @@
 #include <stdbool.h>
 #include <errno.h>
 
-#define __syscall_error(fn, args)                                             \
-do { printf("%s: %s %s %s\n", __func__, fn, args, strerror(errno)); } while(0)
+#define VERSION_NULL {.major = 0, .minor = 0, .patch = 0, .devel = 0}
+#define VERSION_CODE(a, b, c) (s32)( ((a) << 16) + ((b) << 8) + (c) )
 
-static inline bool
-syscall_voidp(void *arg) { return arg ? false: true;}
+#define VERSION_DECL(code) { \
+	.major = (code >> 28) & 0xFF; .minor = (code >> 20) & 0xFF;\
+	.patch = (code >> 12) & 0XFF; .devel = (code >> 4 ) & 0XFF;\
+}
 
-static inline bool 
-syscall_filep(FILE *arg) { return arg ? false: true;}
+#define DECLARE_VERSION(NAME, MAJOR, MINOR, PATCH, DEVEL) \
+	struct version NAME = { \
+		.major = MAJOR, .minor = MINOR, .patch = PATCH, .devel = DEVEL\
+	}
 
-static inline bool 
-syscall_int  (int arg)   { return arg >= 0 ? false: true;}
+#define MAKE_VERSION(MAJOR, MINOR, PATCH) \
+	{ .major = MAJOR, .minor = MINOR, .patch = PATCH, .devel = 0 }
 
-static inline bool 
-syscall_lint (long int arg){ return arg >= 0 ? false: true;}
+#define MAKE_VERSION_PATCH(MAJOR, MINOR, PATCH, DEVEL) \
+	{ .major = MAJOR, .minor = MINOR, .patch = PATCH, .devel = DEVEL }
 
-#define __syscall_die(fn, args...) \
-({ \
-	__typeof__(fn args) __v = fn args; \
- 	if (unlikely(_generic((__v), int     : syscall_int, \
-	                             long int: syscall_lint, \
-	                             void *  : syscall_voidp, \
-	                             FILE *  : syscall_filep)(__v))) \
-		{ __syscall_error(#fn, #args); exit(errno);} \
-	__v; \
-})
+struct version {
+	byte major;
+	byte minor;
+	byte patch;
+	byte devel;
+};
 
 #endif

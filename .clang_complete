@@ -14,7 +14,7 @@
 -I./net/eth
 -I./sys
 -I./crypto
--I./clib
+-I./posix
 -I./net/sctp
 -I./modules/pkcs11
 -Imodules/pkcs11

@@ -1,53 +1,66 @@
 #include <sys/compiler.h>
 #include <sys/cpu.h>
-//#include <sys/abi.h>
+#include <sys/abi.h>
 #include <mem/alloc.h>
 #include <posix/list.h>
+#include <posix/version.h>
 
-enum abi_call_flags {
-	SYM_OPT = 1,
-	SYM_REQ = 2
-};
+#define DEFINE_SYMBOL(ns, rv, fn, args...) \
+	rv ((* ns##_##fn)(args))
 
-struct version {
-	byte major;
-	byte minor;
-	byte patch;
-	byte devel;
-};
+#define DECLARE_SYMBOL(ns, rv, fn, args...) \
+	_noinline rv ns##_##fn(args)
+
+#define INTERFACE_SYMBOL(ns, fn, mode) \
+	(struct symbol) \
+	{ .name = stringify(fn), .addr = & ns##_##fn, .flags = mode } 
 
 struct symbol {
-	char *name;                                                       
-	void *addr;                                                             
-	enum abi_call_flags require;
+	char *name;
+	void *addr;
+	void *user;
+	int flags;
 };
-
 
 struct interface {
-	struct version version;
 	const char *name;
-	void *symbols[];
+	struct version version;
+	struct symbol symbols[];
 };
 
-#define DEFINE_INTERFACE(name)
+DEFINE_SYMBOL(libc, int, system, const char *);
 
-DEFINE_INTERFACE(system);
+#define INTERFACE_PROLOGUE(cname, cversion) \
+	struct interface cname = { \
+		.name = stringify(cname), .version = cversion , \
+		.symbols = { 
+	
+#define INTERFACE_EPILOGUE \
+			(struct symbol) { NULL }, \
+		} \
+	}
 
-/*
-DEFINE_INTERFACE(system) {
-};
+#define INTERFACE_VERSION(cversion) \
+	 .version = cversion
 
-DECLARE_INTERFACE(system);
+#define DEFINE_INTERFACE(cname, cversion, csymbols) \
+	struct interface cname = { \
+		.name = stringify(cname), .version = cversion, \
+		.symbols = { \
+			(struct symbol) { .name = "test1" }, \
+			(struct symbol) { NULL }, \
+		} \
+	}
 
-DECLARE_INTERFACE_VERSION(0.0.1) \
-*/
-
-int
-hihack_system(const char *command);
+INTERFACE_PROLOGUE(libc, MAKE_VERSION(0,0,0))
+	INTERFACE_SYMBOL(libc, system, I_REQUIRE), 
+INTERFACE_EPILOGUE;
 
 int 
 main(int argc, char *argv[]) 
 {
+	debug("interface: %s", libc.name);
+
 	//linkmap_add_interface();
 	//linkmap_del_interface();
 	return 0;

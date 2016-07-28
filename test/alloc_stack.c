@@ -11,7 +11,7 @@ main(int argc, char *argv[])
 	/* implicit stack allocation */
 	_unused void *addr2 = mm_alloc(1024);
 
-	_unused const char *v = mm_printf(MM_STACK, "hi");
+	_unused const char *v = mm_printf("hi");
 
 	debug("Testing log");
 	debug("Some arg=%s-%d", "Test1", 2);
