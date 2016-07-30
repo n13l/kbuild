@@ -1,11 +1,12 @@
 #!/bin/sh -k
 # -DNO_INTPTR_T
-S390_CFLAGS="-D_XOPEN_SOURCE_EXTENDED=1 -DBENDIAN=1 -Daligned=__aligned__ -DNI_MAXHOST=1025 -DNI_MAXSERV=32 -DPATH_MAX=1024 -DNO_SYS_POLL_H -DNO_INTTYPES_H -D__bool_=1 -qkeyword=typeof -qsuppress=CCN4108"
+S390_CFLAGS="-D_XOPEN_SOURCE_EXTENDED=1 -DBENDIAN=1 -Daligned=__aligned__ -DNI_MAXHOST=1025 -DNI_MAXSERV=32 -DPATH_MAX=1024 -DNO_SYS_POLL_H -DNO_INTTYPES_H -D__bool_=1 -qkeyword=typeof -qsuppress=CCN4108 -qsuppress=CCN4105" 
 S390_TARGET="c99"
 
 # std mapping
 # -std=gnu89 -qlanglvl=extc89
 # -std=gnu89 -qlanglvl=extc99
+# -D"KBUILD_STR(s)=#s"
 
 opts=""
 lopts=""
@@ -20,6 +21,7 @@ for arg in $* ; do
       printf "$cc_version\n"
       exit 
       ;;
+    -D"KBUILD_STR(s)=#s") ;;
     -Wmissing-prototypes) ;;
     -Wall) ;;
     -fno-strict-aliasing) ;;
