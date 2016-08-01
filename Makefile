@@ -233,7 +233,7 @@ include scripts/Makefile.target
 # then ARCH is assigned, getting whatever value it gets normally, and
 # SUBARCH is subsequently ignored.
 
-SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+SUBARCH ?= $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
 				  -e s/sun4u/sparc64/ \
 				  -e s/arm.*/arm/ -e s/sa110/arm/ \
 				  -e s/s390x*/s390/ -e s/parisc64/parisc/ \
@@ -420,6 +420,7 @@ LINUXINCLUDE    := \
 KBUILD_CPPFLAGS := -D"CONFIG_PLATFORM=KBUILD_STR($(PLATFORM))" \
                    -D"CONFIG_SRCARCH=KBUILD_STR($(SRCARCH))" \
 		   -D"CONFIG_ARCH=KBUILD_STR($(ARCH))" \
+                   -D"CONFIG_SUBARCH=KBUILD_STR($(SUBARCH))" \
 		   -D"PACKAGE_VERSION=KBUILD_STR($(PACKAGE_VERSION))"\
                    -DCONFIG_$(PLAT)=1 \
 
@@ -447,7 +448,7 @@ PACKAGERELEASE = $(shell cat include/config/package.release 2> /dev/null)
 PACKAGEVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
 
 export VERSION PATCHLEVEL SUBLEVEL PACKAGERELEASE PACKAGEVERSION
-export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+export ARCH SUBARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
 export CPP AR NM STRIP OBJCOPY OBJDUMP
 export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
 export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
@@ -642,7 +643,7 @@ objs-y += arch/$(SRCARCH) posix/$(PLATFORM) posix mem net crypto lib
 # TODO: tests in objs-m does not look right
 objs-m += test
 
-#include arch/$(SRCARCH)/Makefile                                                
+include arch/$(SRCARCH)/Makefile                                                
 -include modules/Makefile                                                        
 -include tools/Makefile
 
@@ -675,6 +676,14 @@ endif
 
 ifdef CONFIG_SUPPORT_LANGUAGE
 -include scripts/Makefile.bindings
+endif
+
+ifdef CONFIG_64BIT
+#KBUILD_CFLAGS += -m64
+endif
+
+ifdef CONFIG_64BIT
+#export S390_ARCH=-q64
 endif
 
 # Tell gcc to never replace conditional load with a non-conditional one

@@ -45,7 +45,7 @@ $(test-cobjs): $(obj)/%.o: $(src)/%.c FORCE
 
 # Link an executable based on list of .o files
 quiet_cmd_test-cmulti	= LD      $@
-      cmd_test-cmulti	= $(CC) $(testld_flags) -o $@ \
+      cmd_test-cmulti	= $(LD) $(testld_flags) -o $@ \
 			  $(addprefix $(obj)/,$($(@F)-y)) $(testld_builtin) \
       			  $(testld_libs)
 $(test-cmulti): $(obj)/%: $(test-cobjs) FORCE

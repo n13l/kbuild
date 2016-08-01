@@ -12,7 +12,7 @@
 	debug("%s() " fmt, __func__, __VA_ARGS__)
 
 void
-__list_init(struct list *list)
+debug_list_init(struct list *list)
 {
 	struct node *head = &list->head;
 	head->next = head->prev = head;

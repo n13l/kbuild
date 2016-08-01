@@ -22,12 +22,13 @@ OS390_LDFLAGS = -bdynam=dll -bcase=mixed -breus=rent -bstorenx=yes \
 
 OS390_LDFLAGS += $(addprefix -S, $(OS390_LIBS))
 
-HOSTCC := $(PWD)/scripts/os390/xlc-cc
-HOSTLD := $(PWD)/scripts/os390/xlc-cc
-CC := $(PWD)/scripts/os390/xlc-cc
-LD := $(PWD)/scripts/os390/xlc-ld $(OS390_LDFLAGS)
-OBJDUMP := $(PWD)/scripts/os390/objdump
-export ARCH HOSTCC HOSTLD CC LD OBJDUMP
+HOSTCC := $(srctree)/scripts/os390/xlc-cc
+HOSTLD := $(srctree)/scripts/os390/xlc-cc
+CC := $(srctree)/scripts/os390/xlc-cc $(OS390_CFLAGS)
+LD := $(srctree)/scripts/os390/xlc-ld $(OS390_LDFLAGS)
+OBJDUMP := $(srctree)/scripts/os390/objdump
+so := so
+export ARCH HOSTCC HOSTLD CC LD OBJDUMP so
 endif
 
 TARGET ?= $(shell $(CC) -dumpmachine 2>&1)
@@ -41,6 +42,11 @@ PLAT:=$(shell echo "$(PLATFORM)" | tr '[:lower:]' '[:upper:]')
 ifeq ($(PLATFOWM),win32)
 SHLIB_EX=dll
 EXEC_EX=exe
+endif
+
+ifeq ($(PLATFOWM),os390)
+SHLIB_EX=so
+EXEC_EX=
 endif
 
 ifeq ($(PLATFORM),linux)

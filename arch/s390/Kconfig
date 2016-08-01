@@ -307,8 +307,12 @@ config TUNE_Z13
 
 endchoice
 
-config 64BIT
-	def_bool y
+config 64BIT                                                                    
+        bool "64-bit package" 
+        default SUBARCH != "s390x"                                                  
+         ---help---                                                              
+           Say yes to build a 64-bit - formerly known as s390x
+           Say no to build a 32-bit  - formerly known as s390
 
 config COMPAT
 	def_bool y
