@@ -1,13 +1,30 @@
 #!/bin/sh -k
 opts=""
 lopts=""
+builtin=0
+args=$*
+
+case "$args" in 
+  *-r*)
+    buildint=1
+    ;;
+esac
+
+#printf "builtin enabled=$builtin\n"
 
 for arg in $* ; do
-  case $arg in
-    -r) ;;
-    *)
-    opts="$opts $arg"
-    ;;
-  esac
+	case $arg in
+	-r) 
+	;;
+	*)
+	opts="$opts $arg"
+	;;
+	esac
 done
-ld $opts
+
+if [[ $buildint -eq 0 ]]; then
+	ld $opts
+elsE
+	c89 $opts
+fi
+
