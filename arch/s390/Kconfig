@@ -308,11 +308,21 @@ config TUNE_Z13
 endchoice
 
 config 64BIT                                                                    
-        bool "64-bit package" 
+        bool "IBM s390x architecture" 
         default SUBARCH != "s390x"                                                  
          ---help---                                                              
            Say yes to build a 64-bit - formerly known as s390x
            Say no to build a 32-bit  - formerly known as s390
+
+config CICS
+	bool "IBM Customer Information Control System"
+	default n
+	---help---
+	IBM CICS is a family of mixed language application servers that provide 
+	industrial-strength, online transaction management and connectivity for 
+	mission-critical applications.
+
+        Say yes to build package with CICS support
 
 config COMPAT
 	def_bool y

@@ -34,7 +34,7 @@
 #include <mem/debug.h>
 #include <assert.h>
 
-/* Runtime zero-overhead metaprogramming in C language :) */
+/* Runtime zero-overhead metaprogramming in C language */
 #define mm_create_dispatch(mm, size, flags) \
 ({ \
 	__build_bug_on(!(compatible_ptr(mm, const struct mm_pool *) || \

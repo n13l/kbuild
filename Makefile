@@ -352,9 +352,9 @@ export KBUILD_CHECKSRC KBUILD_SRC KBUILD_EXTMOD
 
 ifneq ($(CC),)
 ifeq ($(shell $(CC) -v 2>&1 | grep -c "clang version"), 1)
-COMPILER := clang
+COMPILER ?= clang
 else
-COMPILER := gcc
+COMPILER ?= gcc
 endif
 export COMPILER
 endif

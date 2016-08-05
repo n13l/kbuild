@@ -1,7 +1,10 @@
 #ifndef __OS390_GETOPT_H
 #define __OS390_GETOPT_H
 
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 
+#endif
+
 #include <stdio.h>
 int getopt(int argc, char *const argv[], const char *optsting);
 

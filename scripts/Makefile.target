@@ -27,8 +27,9 @@ HOSTLD := $(srctree)/scripts/os390/xlc-cc
 CC := $(srctree)/scripts/os390/xlc-cc $(OS390_CFLAGS)
 LD := $(srctree)/scripts/os390/xlc-ld $(OS390_LDFLAGS)
 OBJDUMP := $(srctree)/scripts/os390/objdump
+COMPILER := xlc
 so := so
-export ARCH HOSTCC HOSTLD CC LD OBJDUMP so
+export COMPILER ARCH HOSTCC HOSTLD CC LD OBJDUMP so
 endif
 
 TARGET ?= $(shell $(CC) -dumpmachine 2>&1)
