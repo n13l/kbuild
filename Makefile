@@ -403,8 +403,8 @@ USERINCLUDE    := \
 		-I$(srctree)/lib \
 		-Ilib -I$(srctree)/arch \
 		-I$(srctree)/arch/$(hdr-arch) \
-		-include $(srctree)/posix/$(PLATFORM)/platform.h \
-		-I$(srctree)/posix/$(PLATFORM) \
+		-include $(srctree)/sys/$(PLATFORM)/platform.h \
+		-I$(srctree)/sys/$(PLATFORM) \
 		-I..
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
@@ -639,7 +639,7 @@ else
 include/config/auto.conf: ;
 endif # $(dot-config)
 
-objs-y += arch/$(SRCARCH) posix/$(PLATFORM) posix mem net crypto lib 
+objs-y += arch/$(SRCARCH) sys posix mem net crypto lib 
 # TODO: tests in objs-m does not look right
 objs-m += test
 
@@ -964,7 +964,7 @@ export KBUILD_LDS          := arch/$(SRCARCH)/kernel/libarch.lds
 export LDFLAGS_libarch
 # used by scripts/pacmage/Makefile
 export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(package-dirs)) \
-                         arch posix include lib scripts tools modules net mem tools test)
+                         arch sys posix include lib scripts tools modules net mem tools test)
 
 ifdef CONFIG_HEADERS_CHECK
 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check

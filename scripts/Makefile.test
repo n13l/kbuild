@@ -23,10 +23,10 @@ test-cobjs   := $(addprefix $(obj)/,$(test-cobjs))
 # Options to testcc.
 testc_flags = -Wp,-MD,$(depfile) $(KBUILD_CFLAGS) $(KBUILD_CPPFLAGS) \
 	      $(USERINCLUDE) $(TEST_CFLAGS) -I. -I../ \
-	      -include $(srctree)/posix/$(PLATFORM)/platform.h
+	      -include $(srctree)/sys/$(PLATFORM)/platform.h
 
 testld_flags = 
-testld_builtin = arch/$(SRCARCH)/built-in.o posix/$(PLATFORM)/built-in.o \
+testld_builtin = arch/$(SRCARCH)/built-in.o sys/built-in.o \
 		 posix/built-in.o mem/built-in.o
 testld_libs = $(KBUILD_LIBS)
 
