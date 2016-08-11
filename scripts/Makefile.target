@@ -35,6 +35,7 @@ endif
 TARGET ?= $(shell $(CC) -dumpmachine 2>&1)
 ARCH ?= $(shell echo $(TARGET) | sed -e s/i.86.*/i386/ -e s/x86_64.*/x86_64/ \
                                      -e s/.390.*/s390/ \
+				     -e s/powerpc64.*/powerpc/ \
                                      -e s/aarch64.*/arm/ -e s/arm.*/arm/)
 
 PLATFORM ?= $(shell $(src)/scripts/host_from_sys.sh $(TARGET))
