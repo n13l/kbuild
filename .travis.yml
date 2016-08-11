@@ -138,7 +138,7 @@ matrix:
     env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=1 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
     osx_image: xcode7.3
   - compiler: clang
     os: osx
@@ -161,6 +161,14 @@ matrix:
     env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
     osx_image: beta-xcode6.2
   allow_failures:
+  - compiler: clang
+    os: osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
+    osx_image: xcode7.3
+  - compiler: clang
+    os: osx
+    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
+    osx_image: xcode7.2
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=s390x
