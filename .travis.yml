@@ -63,6 +63,28 @@ matrix:
         - qemu-user-static
         - binfmt-support
   - compiler: gcc
+    dist: trusty
+    os: linux
+    env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=powerpc64
+    addons:
+      apt:
+        sources:
+        - debian-sid              
+        packages: &armv7_unknown_linux_gnueabihf
+        - flex
+        - bison
+        - gperf
+        - pkg-config
+        # Cross compiler and cross compiled C libraries
+        - gcc-powerpc64-linux-gnu
+        - binutils-powerpc64-linux-gnu
+        - linux-libc-dev-powerpc64-cross
+        - libc6-powerpc64-cross 
+        - libc6-dev-powerpc64-cross          
+        # Transparent emulation
+        - qemu-user-static
+        - binfmt-support
+  - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=1 BUILD_TARGET=linux BUILD_ARCH=arm32
     addons:
@@ -138,14 +160,6 @@ matrix:
     env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
   - compiler: clang
     os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
-    osx_image: xcode7.3
-  - compiler: clang
-    os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
-    osx_image: xcode7.2
-  - compiler: clang
-    os: osx
     env: BUILD_DEPLOY=1 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.10"
     osx_image: xcode7.1
   - compiler: clang
@@ -161,14 +175,6 @@ matrix:
     env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.9"
     osx_image: beta-xcode6.2
   allow_failures:
-  - compiler: clang
-    os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
-    osx_image: xcode7.3
-  - compiler: clang
-    os: osx
-    env: BUILD_DEPLOY=0 BUILD_TARGET=osx BUILD_ARCH=x86_64 OS_VERSION="10.11"
-    osx_image: xcode7.2
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=s390x
