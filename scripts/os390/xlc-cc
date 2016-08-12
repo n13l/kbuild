@@ -73,7 +73,7 @@ for arg in $* ; do
 done
 
 if [ ! -z "$mkdeps" ]; then
-  S390_CFLAGS="-qmakedep=gcc -I../posix/os390 $S390_CFLAGS"
+  S390_CFLAGS="-qmakedep=gcc -I../sys/os390 $S390_CFLAGS"
 fi
 
 c99 $S390_CFLAGS $os390x $lopts $opts 
