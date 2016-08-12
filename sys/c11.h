@@ -14,4 +14,6 @@ long long int: "long long int", unsigned long long int: "unsigned long long int"
        void *: "pointer to void",                int *: "pointer to int",         \
       default: "other")
 
+#define is_compatible(x, T) _Generic((x), T:1, default: 0)a
+
 #endif

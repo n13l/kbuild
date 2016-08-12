@@ -1,6 +1,3 @@
-/*                                                  Daniel Kubec <niel@rtfm.cz>
- */
-
 #ifndef __SYS_COMPILER_H__
 #define __SYS_COMPILER_H__
 
@@ -65,8 +62,10 @@ typedef u32 __bitwise __wsum;
 /** Define constructor with a given priority **/
 #define _constructor_with_priority(p) __attribute__((constructor(p)))
 
+/*
 #define compatible_ptr(ptr, type) \
 	__builtin_types_compatible_p(__typeof__(ptr), type)
+*/
 
 /* branch prediction */ 
 #define likely(x)      __builtin_expect (!!(x), 1)
@@ -151,8 +150,6 @@ typedef u32 __bitwise __wsum;
 #define unaligned_part(ptr, type) (((uintptr_t) (ptr)) % sizeof(type))
 #define aligned_part(size, align) (size & ~(size_t)(align - 1))
 
-#define __barrier()   __asm__ __volatile__ ("" : : : "memory")
-
 /*
  * Instruct the compiler to perform only a single access to a variable
  * (prohibits merging and refetching). The compiler is also forbidden to reorder
@@ -220,11 +217,11 @@ typedef u32 __bitwise __wsum;
 #define __build_bug_on_zero(e) (sizeof(struct { int:-!!(e); }))
 #define __build_bug_on_null(e) ((void *)sizeof(struct { int:-!!(e); }))
 
-#define VA_N_ARGS(...) VA_N_ARGS_IMPL(__VA_ARGS__, 5,4,3,2,1)
-#define VA_N_ARGS_IMPL(_1,_2,_3,_4,_5,N,...) N
+#define macro_va_n_args(...) macro_va_n_args_impl(__VA_ARGS__, 5,4,3,2,1)
+#define macro_va_n_args_impl(_1,_2,_3,_4,_5,N,...) N
 
 #define macro_dispatcher(func, ...) \
-	macro_dispatcher_(func, VA_N_ARGS(__VA_ARGS__))
+	macro_dispatcher_(func, macro_va_n_args(__VA_ARGS__))
 #define macro_dispatcher_(func, nargs) \
 	macro_dispatcher__(func, nargs)
 #define macro_dispatcher__(func, nargs) \
