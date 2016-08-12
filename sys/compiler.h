@@ -204,14 +204,39 @@ typedef u32 __bitwise __wsum;
 
 
 #if __STDC_VERSION__ >= 201112L
-#if defined(HAVE_STATIC_ASSERT)
-#define _static_assert(expr) \
-	_Static_assert((expr), #expr)
+#define instance_of(X, T) \
+	_Generic((X), T: 1, const T: 1, default: 0)
+#define pointer_of(X, T) \
+	_Generic((X), T*: 1, const T*: 1, default: 0)
+#define array_of(X, T) \
+	_Generic((X), const T[sizeof(X)]: 1, T[sizeof(X)]: 1, default: 0)
+#define aryptr_of(X, T) \
+	_Generic((X), T *: 1, const T*: 1, const T[sizeof(X)]: 1, \
+	              T[sizeof(X)]: 1, default: 0)
+
 #else
-#define _static_assert(expr) \
-	do { (void) sizeof(char [1 - 2*!(expr)]); } while(0)
+
+#define instance_of(X, T) \
+	__builtin_types_compatible_p(typeof(X), T) || \
+	__builtin_types_compatible_p(typeof(X), const T) ? 1 : 0
+
+#define pointer_of(X, T) \
+	__builtin_types_compatible_p(typeof(X), T*) || \
+	__builtin_types_compatible_p(typeof(X), const T*) ? 1 : 0
+
+#define array_of(X, T) \
+	__builtin_types_compatible_p(typeof(X), T*) || \
+	__builtin_types_compatible_p(typeof(X), const T*) ? 1 : 0
+
+#define aryptr_of(X, T) \
+	__builtin_types_compatible_p(typeof(X), T*)       || \
+	__builtin_types_compatible_p(typeof(X), const T*) || \
+	__builtin_types_compatible_p(typeof(X), T[sizeof(X)] )       || \
+	__builtin_types_compatible_p(typeof(X), const T[sizeof(X)]) ? 1 : 0
+
 #endif
-#endif
+
+#define if_pointer_of(X, T) if(pointer_of(X,T))
 
 #define __build_bug_on(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
 #define __build_bug_on_zero(e) (sizeof(struct { int:-!!(e); }))

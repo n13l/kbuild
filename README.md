@@ -8,6 +8,6 @@
 
 | Supported Matrix | Status                                                   |
 |------------------|----------------------------------------------------------|
-| Architecture     | x86_32, x86_64, arm32, arm64, os390 (experimental), os390x (experimental) |
-| Platform         | Linux, Windows, MacOS, iOS (experimental) Android, Z/OS                   |
-| Compiler         | GCC, CLANG, XLC (experimental)                           |
+| Architecture     | x86_32, x86_64, arm32, arm64, ppc64, os390 , os390x      |
+| Platform         | Linux, Windows, MacOS, iOS, Android, IBM AIX, IBM Z/OS   |
+| Compiler         | GCC, CLANG, XLC                                          |

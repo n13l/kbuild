@@ -432,7 +432,6 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes \
 		   -D_GNU_SOURCE=1 \
 		   -std=gnu1x
 #		   -D_POSIX_SOURCE=1 \
-#		   -std=c1x
 
 -include scripts/Makefile.shared
 

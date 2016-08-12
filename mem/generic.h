@@ -34,21 +34,6 @@
 #include <mem/debug.h>
 #include <assert.h>
 
-#define instance_of(X, T) \
-	_Generic((X), T: 1, const T: 1, default: 0)
-
-#define pointer_of(X, T) \
-	_Generic((X), T*: 1, const T*: 1, default: 0)
-
-#define array_of(X, T) \
-	_Generic((X), const T[sizeof(X)]: 1, T[sizeof(X)]: 1, default: 0)
-
-#define aryptr_of(X, T) \
-	_Generic((X), T *: 1, const T*: 1, const T[sizeof(X)]: 1, \
-	              T[sizeof(X)]: 1, default: 0)
-
-#define if_pointer_of(X, T) if(pointer_of(X,T))
-
 /* Runtime zero-overhead metaprogramming in C language */
 #define mm_create_dispatch(mm, size, flags) \
 ({ \

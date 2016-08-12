@@ -4,9 +4,9 @@
 #
 mainmenu "$PACKAGE_NAME/$SRCARCH $ARCH $D Configuration on $PLATFORM"
 
-config ARCH
-        string
-        option env="ARCH"
+config ARCH 
+	string 
+	option env="ARCH"
 config SRCARCH
 	string
 	option env="SRCARCH"
