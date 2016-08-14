@@ -8,8 +8,7 @@
 #include <string.h>
 
 #define VM_PAGE_PROT (PROT_READ | PROT_WRITE)
-//#define VM_PAGE_MODE (MAP_PRIVATE | MAP_ANON)
-#define VM_PAGE_MODE (MAP_PRIVATE)
+#define VM_PAGE_MODE (MAP_PRIVATE | MAP_ANON)
 
 void *
 vm_page_reserve(void)
