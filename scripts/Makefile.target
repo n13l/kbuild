@@ -52,6 +52,7 @@ EXEC_EX=
 endif
 
 ifeq ($(PLATFORM),linux)
+KBUILD_CFLAGS += -D_GNU_SOURCE=1
 KBUILD_LIBS += -lrt -lm
 endif
 
