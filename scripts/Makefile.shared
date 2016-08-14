@@ -21,6 +21,7 @@ SHLIB_LDFLAGS         := -dynamiclib
 export SHLIB_LDFLAGS so
 endif
 ifeq ($(PLATFORM),linux)
+KBUILD_CFLAGS          += -D_GNU_SOURCE=1
 #KBUILD_LIBS           += -lm
 ifdef CONFIG_MODULES
 #KBUILD_CFLAGS         += -fPIC
