@@ -429,9 +429,7 @@ KBUILD_CPPFLAGS := -D"CONFIG_PLATFORM=KBUILD_STR($(PLATFORM))" \
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes \
 		   -fno-strict-aliasing \
 		   -Wno-format-security \
-		   -D_GNU_SOURCE=1 \
-		   -std=gnu1x
-#		   -D_POSIX_SOURCE=1 \
+                   -std=gnu1x
 
 -include scripts/Makefile.shared
 

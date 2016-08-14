@@ -62,11 +62,6 @@ typedef u32 __bitwise __wsum;
 /** Define constructor with a given priority **/
 #define _constructor_with_priority(p) __attribute__((constructor(p)))
 
-/*
-#define compatible_ptr(ptr, type) \
-	__builtin_types_compatible_p(__typeof__(ptr), type)
-*/
-
 /* branch prediction */ 
 #define likely(x)      __builtin_expect (!!(x), 1)
 #define unlikely(x)    __builtin_expect (!!(x), 0)

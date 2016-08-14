@@ -22,11 +22,17 @@
  * THE SOFTWARE.
  */
 
-#include <time.h>
+#include <sys/time.h>
 #include <errno.h>
 
 int
 posix_clock_gettime(int clock_id, struct timespec *ts)
 {
+	struct timeval timer_usec; 
+	gettimeofday(&timer_usec, NULL);
+
+	ts->tv_nsec = timer_usec.tv_usec * 1000;
+	ts->tv_sec  = timer_usec.tv_sec;
+
 	return 0;
 }

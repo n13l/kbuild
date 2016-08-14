@@ -7,33 +7,24 @@
 #include <errno.h>
 #include <string.h>
 
-#define VM_PAGE_PROT (PROT_READ | PROT_WRITE)
-//#define VM_PAGE_MODE (MAP_PRIVATE | MAP_ANON)
-#define VM_PAGE_MODE (MAP_PRIVATE)
-
 void *
 vm_page_reserve(void)
 {
-	void *page = mmap(NULL, 0, VM_PAGE_PROT, VM_PAGE_MODE, -1, 0);
-	if (page == (void*)MAP_FAILED)
-		die("Cannot mmap reserve virtual memory: %s\n", strerror(errno));
+	void *page = NULL;
 	return page;
 }
 
 void *
 vm_page_alloc(u64 size)
 {
-	void *page = mmap(NULL, size, VM_PAGE_PROT, VM_PAGE_MODE, -1, 0);
-	if (page == (void*) MAP_FAILED)
-		die("Cannot mmap %llu bytes of memory: %s\n", 
-		    (unsigned long long)size, strerror(errno));
+	void *page = malloc(align_page(size));
 	return page;
 }
 
 void
 vm_page_free(void *page, u64 size)
 {
-	munmap(page, size);
+	free(page);
 }
 
 void *

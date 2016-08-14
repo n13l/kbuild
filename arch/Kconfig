@@ -93,3 +93,9 @@ config HAVE_CMPXCHG_LOCAL
                                                                                 
 config HAVE_CMPXCHG_DOUBLE                                                      
         bool
+
+config USE_EFFICIENT_MMAP
+	def_bool !ARCH_SUPPORTS_PAGEALLOC
+
+config ARCH_SUPPORTS_PAGEALLOC
+	def_bool n

@@ -7,7 +7,7 @@ case "$args" in
     ;;
 esac
 
-S390_CFLAGS="-D_XOPEN_SOURCE_EXTENDED=1 -DBENDIAN=1 -Daligned=__aligned__ -DNI_MAXHOST=1025 -DNI_MAXSERV=32 -DPATH_MAX=1024 -DNO_SYS_POLL_H -DNO_INTTYPES_H -D__bool_=1 -qkeyword=typeof -qsuppress=CCN4108 -qsuppress=CCN4105 -Dinline=__inline__ -Dalloca=__alloca -qkeyword=typeof -D__typeof__=typeof" 
+S390_CFLAGS="-D_XOPEN_SOURCE_EXTENDED=1 -DBENDIAN=1 -Daligned=__aligned__ -DNI_MAXHOST=1025 -DNI_MAXSERV=32 -DPATH_MAX=1024 -DNO_SYS_POLL_H -DNO_INTTYPES_H -D__bool_=1 -qkeyword=typeof -qsuppress=CCN4108 -qsuppress=CCN4105 -Dinline=__inline__ -Dalloca=__alloca -qkeyword=typeof -D__typeof__=typeof -D_LARGE_TIME_API" 
 S390_TARGET="c99"
 
 opts=""
@@ -43,6 +43,7 @@ for arg in $* ; do
     -std=gnu89) opts="$opts -qlanglvl=extc89" ;;
     -std=gnu99) opts="$opts -qlanglvl=extc99" ;;
     -std=gnu1x) opts="$opts -qlanglvl=extc1x" ;;
+    -std=gnu11) opts="$opts -qlanglvl=extended1y" ;;
     -include) 
      temp2=$(echo "$arg" | sed -e 's/-include/-qinclude=/')
      opts="$opts $temp2"
@@ -73,7 +74,7 @@ for arg in $* ; do
 done
 
 if [ ! -z "$mkdeps" ]; then
-  S390_CFLAGS="-qmakedep=gcc -I../sys/os390 $S390_CFLAGS"
+  S390_CFLAGS="-qmakedep=gcc -qlanglvl=extended -I../sys/os390 $S390_CFLAGS"
 fi
 
 c99 $S390_CFLAGS $os390x $lopts $opts 
