@@ -4,7 +4,8 @@
 #include <sys/compiler.h>
 #include <sys/xlc.h>
 
-#define MAP_ANON MAP_PRIVATE
+#define MAP_ANON MAP_ANONYMOUS
+#define MAP_ANONYMOUS 0
 #define MAP_FAILED -1
 
 #ifndef CLOCK_REALTIME

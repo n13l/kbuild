@@ -3,6 +3,12 @@ config PAGE_SIZE
 config MMU
 	def_bool y
 
+config HAVE_ARCH_ALLOC_PAGE
+	def_bool y
+
+config HAVE_ARCH_FREE_PAGE
+	def_bool y
+
 config ARCH_SUPPORTS_PAGEALLOC
 	def_bool y
 

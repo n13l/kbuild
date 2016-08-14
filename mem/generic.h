@@ -66,7 +66,7 @@ do { \
 ({ \
 	void *_X; \
 	if_pointer_of(mm, struct mm_pool) \
-		_X = mm_pool_alloc(mm, size); \
+		_X = mm_pool_alloc((struct mm_pool *)mm, size); \
 	if_pointer_of(mm, struct mm_stack) \
 		_X = sp_alloc(size); \
 	_X; \

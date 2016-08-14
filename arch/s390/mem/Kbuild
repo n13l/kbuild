@@ -1,1 +1,2 @@
-obj-y := vm.o
+obj-$(CONFIG_ARCH_SUPPORTS_PAGEALLOC) += vm.o
+obj-y += page.o

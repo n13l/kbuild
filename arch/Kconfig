@@ -71,6 +71,12 @@ config SUBARCH
 config ARCH_ENABLE_MEMORY_POOL
 	def_bool n
 
+config HAVE_ARCH_ALLOC_PAGE
+	def_bool n
+
+config HAVE_ARCH_FREE_PAGE
+	def_bool n
+
 config MEMORY_HOTPLUG
 	def_bool n
 config MEMORY_HOTREMOVE
