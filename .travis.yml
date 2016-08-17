@@ -48,21 +48,6 @@ matrix:
     dist: trusty
     os: linux
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=powerpc64
-    addons:
-      apt:
-        sources:
-        - debian-sid
-        packages:
-        - flex
-        - bison
-        - gperf
-        - pkg-config
-        # Cross compiler and cross compiled C libraries
-        - gcc-powerpc64-linux-gnu
-        - binutils-powerpc64-linux-gnu
-        # Transparent emulation
-        - qemu-user-static
-        - binfmt-support
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=1 BUILD_TARGET=linux BUILD_ARCH=arm32
