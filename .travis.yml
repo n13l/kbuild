@@ -48,20 +48,6 @@ matrix:
       apt:
         sources:
         - debian-sid
-        packages: 
-        - flex
-        - bison
-        - gperf
-        - pkg-config
-        # Cross compiler and cross compiled C libraries
-        - gcc-s390x-linux-gnu
-        - binutils-s390x-linux-gnu
-        - linux-libc-dev-s390x-cross
-        - libc6-s390x-cross 
-        - libc6-dev-s390x-cross
-        # Transparent emulation
-        - qemu-user-static
-        - binfmt-support
   - compiler: gcc
     dist: trusty
     os: linux
