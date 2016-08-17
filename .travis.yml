@@ -47,8 +47,8 @@ matrix:
     addons:
       apt:
         sources:
-        - debian-sid              
-        packages: &armv7_unknown_linux_gnueabihf
+        - debian-sid
+        packages: 
         - flex
         - bison
         - gperf
@@ -58,7 +58,7 @@ matrix:
         - binutils-s390x-linux-gnu
         - linux-libc-dev-s390x-cross
         - libc6-s390x-cross 
-        - libc6-dev-s390x-cross          
+        - libc6-dev-s390x-cross
         # Transparent emulation
         - qemu-user-static
         - binfmt-support
@@ -69,7 +69,7 @@ matrix:
     addons:
       apt:
         sources:
-        - debian-sid              
+        - debian-sid
         packages: &armv7_unknown_linux_gnueabihf
         - flex
         - bison
