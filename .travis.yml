@@ -44,10 +44,6 @@ matrix:
     dist: trusty
     os: linux
     env: BUILD_DEPLOY=0 BUILD_TARGET=linux BUILD_ARCH=s390x
-    addons:
-      apt:
-        sources:
-        - debian-sid
   - compiler: gcc
     dist: trusty
     os: linux
@@ -56,7 +52,7 @@ matrix:
       apt:
         sources:
         - debian-sid
-        packages: &armv7_unknown_linux_gnueabihf
+        packages:
         - flex
         - bison
         - gperf
