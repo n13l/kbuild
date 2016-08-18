@@ -76,7 +76,7 @@ fi
 if [ "$BUILD_ARCH" == "powerpc64" ]; then
   echo "deb http://ftp.de.debian.org/debian sid main contrib non-free" | sudo tee -a /etc/apt/sources.list
   sudo apt-get update -qq
-  sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes -o Dpkg::Options::="--force-overwrite" install flex bison gperf pkg-config gcc-powerpc64-linux-gnu binutils-powerpc64-linux-gnu qemu-user-static binfmt-support libc6-dev-powerpc-cross libc6-dev-ppc64-powerpc-cross libc6-dev
+  sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes -o Dpkg::Options::="--force-overwrite" install flex bison gperf pkg-config gcc-multilib-powerpc64-linux-gnu binutils-powerpc64-linux-gnu qemu-user-static binfmt-support 
   unset CC
   export CROSS_COMPILE=powerpc64-linux-gnu-
   export OS_EXEC="echo"
