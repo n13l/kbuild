@@ -166,6 +166,7 @@ before_install:
 script:
 - uname -a
 - make defconfig
+- ls -la /usr/
 - cat ./obj/.config
 - make
 - file ./obj/sysconfig
