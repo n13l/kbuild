@@ -73,14 +73,14 @@ if [ "$BUILD_ARCH" == "s390x" ]; then
   export OS_EXEC=$(/bin/sh scripts/travis/s390x-ld.sh)
   echo "OS_EXEC=$OS_EXEC"
 fi
-if [ "$BUILD_ARCH" == "pc64" ]; then
+if [ "$BUILD_ARCH" == "powerpc64" ]; then
   echo "deb http://ftp.de.debian.org/debian sid main contrib non-free" | sudo tee -a /etc/apt/sources.list
   sudo apt-get update -qq
   sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes -o Dpkg::Options::="--force-overwrite" install flex bison gperf pkg-config gcc-powerpc64-linux-gnu binutils-powerpc64-linux-gnu qemu-user-static binfmt-support
   unset CC
   export CROSS_COMPILE=powerpc64-linux-gnu-
   export OS_EXEC="echo"
-  export BUILD_OS_ARCH="ppc64"
+  export BUILD_OS_ARCH="powerpc64"
   export OS_EXEC=$(/bin/sh scripts/travis/ppc64-ld.sh)
   echo "OS_EXEC=$OS_EXEC"
 fi
