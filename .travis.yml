@@ -165,8 +165,8 @@ before_install:
   - source ./scripts/travis/before_install.sh
 script:
 - uname -a
-- make defconfig
 - ls -la /usr/
+- make defconfig
 - cat ./obj/.config
 - make
 - file ./obj/sysconfig
