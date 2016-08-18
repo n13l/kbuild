@@ -166,7 +166,6 @@ before_install:
 script:
 - uname -a
 - ls -la /usr/
-- find /usr/bin -type f | grep powerpc64
 - make defconfig
 - cat ./obj/.config
 - make
