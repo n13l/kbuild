@@ -74,7 +74,6 @@ if [ "$BUILD_ARCH" == "s390x" ]; then
   echo "OS_EXEC=$OS_EXEC"
 fi
 if [ "$BUILD_ARCH" == "powerpc64" ]; then
-  echo "deb http://ftp.de.debian.org/debian sid main contrib non-free" | sudo tee -a /etc/apt/sources.list
   sudo apt-get update -qq
   sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes -o Dpkg::Options::="--force-overwrite" install flex bison gperf pkg-config gcc-powerpc64-linux-gnu binutils-powerpc64-linux-gnu qemu-user-static binfmt-support
   unset CC
