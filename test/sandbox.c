@@ -51,17 +51,17 @@ DEFINE_SYMBOL(libc, int, system, const char *);
 			(struct symbol) { NULL }, \
 		} \
 	}
-/*
+
 INTERFACE_PROLOGUE(libc, MAKE_VERSION(0,0,0))
 	INTERFACE_SYMBOL(libc, system, I_REQUIRE), 
 INTERFACE_EPILOGUE;
-*/
+
 int 
 main(int argc, char *argv[]) 
 {
-//	debug("interface: %s", libc.name);
+	debug("interface: %s", libc.name);
 
-	//linkmap_add_interface();
-	//linkmap_del_interface();
+//	linkmap_add_interface();
+//	linkmap_del_interface();
 	return 0;
 }
