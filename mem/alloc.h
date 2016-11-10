@@ -152,27 +152,28 @@ extern struct mm_pool  *MM_POOL;
 #define mm_describe(mm, addr)
 
 /*
-  * mm_printf - sends formatted output string to memory management container
-  * @mm: memory management object: 
-  *   struct mm_pool *, struct mm_stack *, struct mm_heap *
-  *
-  * note: @mm argument is optional. MM_STACK is used implicitly in that case
-  *
-  * Pool based allocation with savepoint support:
-  *
-  *   struct mm_pool *p = mm_create(mm_pool, CPU_PAGE_SIZE, MM_NO_DIE);
-  *   const char *v = mm_printf(p, "string=%s, id=%d, "string1", 1);
-  *   ...
-  *   mm_destroy(p);
-  *
-  * Explicit and implicit stack based allocation without savepoints:
-  *   const char *v = mm_printf("string=%s", "string1"); 
-  *   const char *v = mm_printf(MM_STACK, "string=%s, "string1");
-  *
-  * Stack based allocation with savepoint support:
-  *   struct mm_stack *stack = mm_create(MM_STACK, CPU_PAGE_SIZE, MM_NO_GROW);
-  *   const char *v = mm_printf(stack, "string=%s", "hi);
-  */
+ * mm_printf - sends formatted output string to memory management container
+ *
+ * @mm: memory management object: 
+ *   struct mm_pool *, struct mm_stack *, struct mm_heap *
+ *
+ * note: @mm argument is optional. MM_STACK is used implicitly in that case
+ *
+ * Pool based allocation with savepoint support:
+ *
+ *   struct mm_pool *p = mm_create(mm_pool, CPU_PAGE_SIZE, MM_NO_DIE);
+ *   const char *v = mm_printf(p, "string=%s, id=%d, "string1", 1);
+ *   ...
+ *   mm_destroy(p);
+ *
+ * Explicit and implicit stack based allocation without savepoints:
+ *   const char *v = mm_printf("string=%s", "string1"); 
+ *   const char *v = mm_printf(MM_STACK, "string=%s, "string1");
+ *
+ * Stack based allocation with savepoint support:
+ *   struct mm_stack *stack = mm_create(MM_STACK, CPU_PAGE_SIZE, MM_NO_GROW);
+ *   const char *v = mm_printf(stack, "string=%s", "hi);
+ */
 
 #define mm_printf(mm, ...) \
 ({                                                                            \
