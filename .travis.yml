@@ -141,12 +141,12 @@ matrix:
   - compiler: gcc
     os: linux
     env: BUILD_DEPLOY=1 BUILD_TARGET=linux BUILD_ARCH=arm64
-  - compiler: gcc
-    os: linux
-    env: BUILD_DEPLOY=1 BUILD_TARGET=win32 BUILD_ARCH=x86_32
-  - compiler: gcc
-    os: linux
-    env: BUILD_DEPLOY=1 BUILD_TARGET=win64 BUILD_ARCH=x86_64
+#  - compiler: gcc
+#    os: linux
+#    env: BUILD_DEPLOY=1 BUILD_TARGET=win32 BUILD_ARCH=x86_32
+#  - compiler: gcc
+#    os: linux
+#    env: BUILD_DEPLOY=1 BUILD_TARGET=win64 BUILD_ARCH=x86_64
  
 before_deploy:
 - export BUILD_ARCHIVE=kbuild-$BUILD_MAJOR.$BUILD_MINOR.$BUILD_REVISION-$BUILD_OS_NAME-$BUILD_OS_ARCH-$BUILD_OS_RELEASE.tar.gz
