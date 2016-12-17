@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <sys/win32/sigbits.h>
+
 #define SHLIB_EX           "dll"
 
 #define HAVE_STRING_H

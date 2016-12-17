@@ -9,10 +9,11 @@ EXTRAVERSION =
 endif
 
 export PACKAGE_VERSION="$(VERSION).$(PATCHLEVEL).$(SUBLEVEL)"
-export PACKAGE_NAME=Kbuild
-NAME = Kbuild
+export PACKAGE_NAME=openaaa
+NAME = openaaa
 SO=so
 export SO
+export KBUILD_OUTPUT
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
@@ -401,6 +402,8 @@ USERINCLUDE    := \
 		-Iinclude/generated/uapi \
 		-include include/generated/autoconf.h \
 		-I$(srctree)/lib \
+		-I$(srctree)/sys \
+		-I$(srctree)/sys/unix \
 		-Ilib -I$(srctree)/arch \
 		-I$(srctree)/arch/$(hdr-arch) \
 		-include $(srctree)/sys/$(PLATFORM)/platform.h \
@@ -441,8 +444,9 @@ KBUILD_CFLAGS_MODULE  := -DMODULE
 KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
 
 # Read PACKAGERELEASE from include/config/package.release (if it exists)
-PACKAGERELEASE = $(shell cat include/config/package.release 2> /dev/null)
+#PACKAGERELEASE = $(shell cat include/config/package.release 2> /dev/null)
 PACKAGEVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+PACKAGERELEASE = openaaa
 
 export VERSION PATCHLEVEL SUBLEVEL PACKAGERELEASE PACKAGEVERSION
 export ARCH SUBARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
@@ -519,7 +523,7 @@ asm-generic:
 # Detect when mixed targets is specified, and make a second invocation
 # of make so .config is not included in this case either (for *config).
 
-version_h := include/generated/uapi/version.h
+version_h := include/generated/version.h
 old_version_h := include/version.h
 
 no-dot-config-targets := clean mrproper distclean \
@@ -636,13 +640,13 @@ else
 include/config/auto.conf: ;
 endif # $(dot-config)
 
-objs-y += arch/$(SRCARCH) sys posix mem net crypto lib 
+objs-y += arch/$(SRCARCH) sys mem net crypto lib 
 # TODO: tests in objs-m does not look right
-objs-m += test
+objs-m += test tools
 
 include arch/$(SRCARCH)/Makefile                                                
 -include modules/Makefile                                                        
--include tools/Makefile
+#-include tools/Makefile
 
 package-dirs  := $(objs-y) $(libs-y) $(objs-m) 
 package-objs  := $(patsubst %,%/built-in.o, $(objs-y))
@@ -652,11 +656,9 @@ package-all   := $(package-objs) $(package-libs)
 package: $(package-all)
 $(sort $(package-all)): $(package-dirs) ;
 
-
 PHONY += $(package-dirs)                                                        
 $(package-dirs): scripts_basic
 	$(Q)$(MAKE) $(build)=$@
-
 
 #KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
 
@@ -673,14 +675,6 @@ endif
 
 ifdef CONFIG_SUPPORT_LANGUAGE
 -include scripts/Makefile.bindings
-endif
-
-ifdef CONFIG_64BIT
-#KBUILD_CFLAGS += -m64
-endif
-
-ifdef CONFIG_64BIT
-#export S390_ARCH=-q64
 endif
 
 # Tell gcc to never replace conditional load with a non-conditional one
@@ -878,7 +872,15 @@ endif
 #
 # INSTALL_PATH specifies where to place the updated kernel and system map
 # images. Default is /boot, but you can set it to other values
-export	INSTALL_PATH ?= /usr/local
+export INSTALL_PATH ?= /usr
+
+ifneq "$(wildcard $(INSTALL_PATH)/lib64 )" ""
+export INSTALL_MOD_PATH ?= $(INSTALL_PATH)/lib64
+endif
+
+ifneq "$(wildcard $(INSTALL_PATH)/lib )" ""
+export INSTALL_MOD_PATH ?= $(INSTALL_PATH)/lib
+endif
 
 #
 # INSTALL_DTBS_PATH specifies a prefix for relocations required by build roots.
@@ -893,7 +895,7 @@ export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(PACKAGERELEASE)
 # makefile but the argument can be passed to make if needed.
 #
 
-MODLIB	= $(INSTALL_MOD_PATH)/lib/modules/$(PACKAGERELEASE)
+MODLIB = $(INSTALL_MOD_PATH)/$(PACKAGERELEASE)
 export MODLIB
 
 #
@@ -957,11 +959,11 @@ ifeq ($(KBUILD_EXTMOD),)
 # Externally visible symbols (used by link-libarch.sh)
 export KBUILD_libarch_INIT := $(head-y) $(init-y)
 export KBUILD_libarch_MAIN := $(core-y) $(libs-y) $(drivers-y) $(net-y)
-export KBUILD_LDS          := arch/$(SRCARCH)/kernel/libarch.lds
+#export KBUILD_LDS          := arch/$(SRCARCH)/kernel/libarch.lds
 export LDFLAGS_libarch
 # used by scripts/pacmage/Makefile
 export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(package-dirs)) \
-                         arch sys posix include lib scripts tools modules net mem tools test)
+                         arch sys include lib scripts tools modules net mem tools test)
 
 ifdef CONFIG_HEADERS_CHECK
 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
@@ -999,7 +1001,7 @@ PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
 # 1) Check that make has not been executed in the kernel src $(srctree)
 prepare3: include/config/package.release
 ifneq ($(KBUILD_SRC),)
-	@$(kecho) '  Using $(srctree) as source for kernel'
+#	@$(kecho) '  Using $(srctree) as source for build'
 	$(Q)if [ -f $(srctree)/.config -o -d $(srctree)/include/config ]; then \
 		echo >&2 "  $(srctree) is not clean, please run 'make mrproper'"; \
 		echo >&2 "  in the '$(srctree)' directory.";\
@@ -1010,7 +1012,7 @@ endif
 # prepare2 creates a makefile if using a separate output directory
 prepare2: prepare3 outputmakefile asm-generic
 
-prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
+prepare1: prepare2 $(version_h) include/generated/release.h \
                    include/config/auto.conf
 	$(cmd_crmodverdir)
 
@@ -1029,12 +1031,12 @@ prepare: prepare0
 # needs to be updated, so this check is forced on all builds
 
 uts_len := 64
-define filechk_utsrelease.h
+define filechk_release.h
 	if [ `echo -n "$(PACKAGERELEASE)" | wc -c ` -gt $(uts_len) ]; then \
 	  echo '"$(PACKAGERELEASE)" exceeds $(uts_len) characters' >&2;    \
 	  exit 1;                                                         \
 	fi;                                                               \
-	(echo \#define UTS_RELEASE \"$(PACKAGERELEASE)\";)
+	(echo \#define PACKAGE_RELEASE \"$(PACKAGERELEASE)\";)
 endef
 
 define filechk_version.h
@@ -1047,8 +1049,8 @@ $(version_h): $(srctree)/Makefile FORCE
 	$(call filechk,version.h)
 	$(Q)rm -f $(old_version_h)
 
-include/generated/utsrelease.h: include/config/package.release FORCE
-	$(call filechk,utsrelease.h)
+include/generated/release.h: include/config/package.release FORCE
+	$(call filechk,release.h)
 
 PHONY += headerdep
 headerdep:
@@ -1121,7 +1123,7 @@ endif
 
 # By default, build modules as well
 
-all: $(progs) modules
+all: prepare $(progs) modules
 
 # Build modules
 #
@@ -1147,14 +1149,14 @@ PHONY += modules_prepare
 modules_prepare: prepare scripts
 
 # Target to install modules
-PHONY += modules_install
+PHONY += modules_install 
 modules_install: _modinst_ _modinst_post
 
 PHONY += _modinst_
 _modinst_:
 	@rm -rf $(MODLIB)/kernel
 	@rm -f $(MODLIB)/source
-	@mkdir -p $(MODLIB)/kernel
+	@mkdir -p $(MODLIB)
 	@ln -s `cd $(srctree) && /bin/pwd` $(MODLIB)/source
 	@if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
 		rm -f $(MODLIB)/build ; \
@@ -1169,7 +1171,7 @@ _modinst_:
 # boot script depmod is the master version.
 PHONY += _modinst_post
 _modinst_post: _modinst_
-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modinst
+#	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modinst
 	$(call cmd,depmod)
 
 ifeq ($(CONFIG_MODULE_SIG), y)
@@ -1423,7 +1425,7 @@ modules: $(module-dirs)
 	@$(kecho) '  Building modules, stage 2.';
 #	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
 
-PHONY += modules_install
+PHONY += modules_install 
 modules_install: _emodinst_ _emodinst_post
 
 install-dir := $(if $(INSTALL_MOD_DIR),$(INSTALL_MOD_DIR),extra)

@@ -1,6 +1,3 @@
-testprogs-y += alloc
+subdir-y := crypto/ perf/ mem/
 testprogs-y += sandbox
-testprogs-y += perf_alloc
 testprogs-y += hash
-#testprogs-y += list
-#testprogs-y += timespec

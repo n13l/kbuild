@@ -1,7 +1,6 @@
 /*
+ *                                                  Daniel Kubec <niel@rtfm.cz>
  * The MIT License (MIT)
- *
- * Copyright (c) 2013 Daniel Kubec <niel@rtfm.cz>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"),to deal
@@ -24,40 +23,64 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
-#include <sys/log.h>
+#include <sys/abi.h>
 #include <mem/alloc.h>
+#include <mem/page.h>
 #include <mem/pool.h>
-#include <unix/list.h>
-#include <link.h>
-#include <dlfcn.h>
+#include <mem/stack.h>
+
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include <sys/types.h>
-#include <mach-o/dyld.h>
-#include <mach-o/loader.h>
-#include <mach-o/nlist.h>
+#include <unistd.h>
+#include <getopt.h>
+
+#define KBUILD_STR(s) #s
+
+#undef KBUILD_MODNAME
+#define KBUILD_MODNAME KBUILD_STR(sys)
+
+_unused static struct option long_options[] = {
+	{"cpu-caps", no_argument, 0, 0  },
+	{"cpu-info", no_argument, 0, 0  },
+	{"sys-info", no_argument, 0, 0  },
+	{"mem-test", no_argument, 0, 0  },
+	{"version",  no_argument, 0, 'v'},
+	{0,          0,           0,  0 }
+};
+
+static void 
+info_cpu(void)
+{
+	_unused const char *vendor = cpu_vendor();
+	cpu_dump_extension();
+
+}
+
+static void 
+info_sys(void)
+{
+	info("sys.platform=%s", CONFIG_PLATFORM);
+	info("sys.stack.avail=%d", 0);
+	info("sys.sizeof int=%d", (int)sizeof(int));
+	info("sys.sizeof long=%d", (int)sizeof(long));
+	info("sys.sizeof long long int=%d", (int)sizeof(long long int));
+	info("sys.sizeof ptr=%d", (int)sizeof(void *));
+}
 
 int
-dl_iterate_phdr(int (*cb)(struct dl_phdr_info *info, 
-                size_t size, void *data), void *data)
+main(int argc, char *argv[])
 {
 
-	for (int i = 0; i < _dyld_image_count(); i++) {
-		const struct mach_header *hdr = _dyld_get_image_header(i);
-		/* hdr->magic MH_MAGIC: MH_MAGIC_64: */
-		intptr_t addr = _dyld_get_image_vmaddr_slide(i);
-		Dl_info dl_info;
-		if (!dladdr(hdr, &dl_info))
-			continue;
+	printf("sysconfig v%s %s/%s %s " __TIME__ " " __DATE__  "\n", 
+	       PACKAGE_VERSION, CONFIG_PLATFORM, CONFIG_SRCARCH, CONFIG_ARCH);
 
-		struct dl_phdr_info info = { 
-			.dlpi_addr = (void *)addr,
-			.dlpi_name = dl_info.dli_fname,
-			.dlpi_phdr = hdr,
-		};
 
-		cb(&info, 0, data);
-	}
+	info_cpu();
+	info_sys();
 
-	return 1;
+	linkmap_init();
+	linkmap_fini();
+
+	return 0;
 }
