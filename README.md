@@ -18,7 +18,7 @@
 
 ## Directory structure
 
-| Directory               | Description                                          |
+
 |-------------------------|------------------------------------------------------|
 | Makefile                | The top Makefile.                                    |
 | .config                 | The package configuration file.                      |
