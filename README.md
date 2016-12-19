@@ -19,16 +19,16 @@
 - Clear dependency between features and capabilities
 - Help docs in Kconfig rather than a README
 
-## Directory structure
-
-- Makefile                The top Makefile.
-- .config                 The package configuration file.
-- arch/$(ARCH)/Makefile   The Architecture layer
-- sys/$(PLATFORM)/Kbuild  The Platform layer
-- sys/unix/Kbuild         System interfaces compatible with Unix and extensions
-- mem/Kbuild              High performance and lockfree Memory Management
-- scripts/Makefile        Common rules etc. for all kbuild Makefiles.
-- kbuild Makefiles        Custom Makfiles
+| Directory structure     | Description
+|-------------------------|---------------------------------------------------
+| Makefile                | The top Makefile.
+| .config                 | The package configuration file.
+| arch/$(ARCH)/Makefile   | The Architecture layer
+| sys/$(PLATFORM)/Kbuild  | The Platform layer
+| sys/unix/Kbuild         | System interfaces compatible with Unix and extensions
+| mem/Kbuild              | High performance and lockfree Memory Management
+| scripts/Makefile        | Common rules etc. for all kbuild Makefiles.
+| kbuild Makefiles        | Custom Makfiles
 
 | Supported Matrix | Status                                                   |
 |------------------|----------------------------------------------------------|
