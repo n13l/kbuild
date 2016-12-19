@@ -10,7 +10,7 @@
 - Simple makefiles without the glue code that are hard to read and maintain
 - Reduce the burden of module dependency management from module writers 
 - Reduce dependency management complexity that inevitable becomes unmanageble after some point in project growth
-- Easy and efficient way to manage all compilation and configuration options with dependency on top of architecture and platform capabilities
+- Easy and efficient way to manage all compilation and configuration options on top of architecture and platform capabilities
 - Readable log
 - Precise dependency tracking
 
