@@ -7,8 +7,8 @@
 | master     | [![Build Status](https://travis-ci.org/n13l/kbuild.png?branch=master)](https://travis-ci.org/n13l/kbuild) [![Build Status](https://snap-ci.com/n13l/kbuild/branch/master/build_image)](https://snap-ci.com/n13l/kbuild/branch/master) | [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://github.com/n13l/kbuild/releases/latest) | [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://packagecloud.io/n13l/openaaa) |
 
 ## Kbuild 
-- Flexibility
-- Simple Makefiles, simple maintance
+- Simple and flexible Makefiles with simple maintance
+- Reduce the burden of module dependency management from module writers
 - Simple conditional builds reducing required ifdefs
 - Easy and efficient way to manage all compilation and configuration options
 - Readable log
