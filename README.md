@@ -24,7 +24,7 @@
 | sys/$(PLATFORM)/        | The Platform layer
 | sys/unix/               | System interfaces compatible with Unix and extensions
 | mem/                    | High performance and lockfree Memory Management
-| scripts/                | Common rules and scripts for all kbuild Makefiles.
+| scripts/                | Common rules, scripts and tools for the build system
 | kbuild Makefiles        | Custom Makfiles
 
 | Supported Matrix | Status                                                   |
