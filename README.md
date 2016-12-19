@@ -1,15 +1,15 @@
 
-# Linux Kernel's build system for userland 
+# Linux Kernel's build system template repository for userland development
 
-## Kbuild
-– Simple Makefiles
-– Readable log
-– Precise dependency tracking
+## Kbuild 
+- Simple Makefiles
+- Readable log
+- Precise dependency tracking
 
 ## Kconfig
-– Easy to change/browse configuration
-– Clear dependency between features and/or capabilities
-– Help docs in Kconfig rather than a README
+- Easy to change/browse configuration
+- Clear dependency between features and/or capabilities
+- Help docs in Kconfig rather than a README
 
 | Branch     | Status             | Binaries                 | Packages       |
 |------------|--------------------|--------------------------|----------------|
