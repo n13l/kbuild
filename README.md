@@ -1,19 +1,23 @@
 
-# Linux Kernel's build system template repository for userland development
+# Linux Kernel's build system template for userland development
+> The same code base is used for a different range of computing systems, from supercomputers to very tiny embedded devices on top of supported platforms. 
+
+| Branch     | Status             | Binaries                 | Packages       |
+|------------|--------------------|--------------------------|----------------|
+| master     | [![Build Status](https://travis-ci.org/n13l/kbuild.png?branch=master)](https://travis-ci.org/n13l/kbuild) [![Build Status](https://snap-ci.com/n13l/kbuild/branch/master/build_image)](https://snap-ci.com/n13l/kbuild/branch/master) | [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://github.com/n13l/kbuild/releases/latest) | [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://packagecloud.io/n13l/openaaa) |
 
 ## Kbuild 
-- Simple Makefiles
+- Flexibility
+- Simple Makefiles, simple maintance
+- Simple conditional builds reducing required ifdefs
+- Easy and efficient way to manage all compilation and configuration options
 - Readable log
 - Precise dependency tracking
 
 ## Kconfig
 - Easy to change/browse configuration
-- Clear dependency between features and/or capabilities
+- Clear dependency between features and capabilities
 - Help docs in Kconfig rather than a README
-
-| Branch     | Status             | Binaries                 | Packages       |
-|------------|--------------------|--------------------------|----------------|
-| master     | [![Build Status](https://travis-ci.org/n13l/kbuild.png?branch=master)](https://travis-ci.org/n13l/kbuild) [![Build Status](https://snap-ci.com/n13l/kbuild/branch/master/build_image)](https://snap-ci.com/n13l/kbuild/branch/master) [![Coverage Status](https://coveralls.io/repos/github/n13l/kbuild/badge.svg?branch=master)](https://coveralls.io/github/n13l/kbuild?branch=master) | [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://github.com/n13l/kbuild/releases/latest) | [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://packagecloud.io/n13l/openaaa) |
 
 | Supported Matrix | Status                                                   |
 |------------------|----------------------------------------------------------|
