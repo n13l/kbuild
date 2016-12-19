@@ -14,7 +14,7 @@ ccflags-$(CONFIG_JNI) += -DBUILD_JNI=1
 swopt                 := 
 swopt4j               := -package com.dummy -I$(src) -I./java -java
 
-libdummy-dirs           := mem net crypto lib/dummy sys arch/$(SRCARCH)
+libdummy-dirs           := mem lib/dummy sys arch/$(SRCARCH)
 libdummy-objs           := $(patsubst %,%/built-in.o, $(libdummy-dirs))
 libdummy-libs           := $(patsubst %,%/lib.a, $(libs-y))
 libdummy-all            := $(libdummy-objs) $(libdummy-libs) $(KBUILD_LIBS)
