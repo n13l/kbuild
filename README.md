@@ -1,10 +1,7 @@
 
 # Kbuild repository template for userland development
 > The same code base is used for a different range of computing systems, from supercomputers to very tiny devices.
-
-| Branch     | Status             | Binaries                 | Packages       |
-|------------|--------------------|--------------------------|----------------|
-| master     | [![Build Status](https://travis-ci.org/n13l/kbuild.png?branch=master)](https://travis-ci.org/n13l/kbuild) [![Build Status](https://snap-ci.com/n13l/kbuild/branch/master/build_image)](https://snap-ci.com/n13l/kbuild/branch/master) | [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://github.com/n13l/kbuild/releases/latest) | [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://packagecloud.io/n13l/openaaa) |
+> [![Build Status](https://travis-ci.org/n13l/kbuild.png?branch=master)](https://travis-ci.org/n13l/kbuild) [![Build Status](https://snap-ci.com/n13l/kbuild/branch/master/build_image)](https://snap-ci.com/n13l/kbuild/branch/master) [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://packagecloud.io/n13l/openaaa) 
 
 ## Kbuild 
 - Simple makefiles without the glue code that are hard to read and maintain
