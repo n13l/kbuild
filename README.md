@@ -1,6 +1,6 @@
 
-Kbuild derivate for userland 
----------------------------------------
+(Kbuild) Linux Kernel's build system for userland
+-------------------------------------------------------------------------------
 
 | Branch     | Status             | Binaries                 | Packages       |
 |------------|--------------------|--------------------------|----------------|
@@ -13,3 +13,12 @@ Kbuild derivate for userland
 | Platform         | Linux, Windows, MacOS, iOS, Android, IBM AIX, IBM Z/OS   |
 | Compiler         | GCC, CLANG, XLC                                          |
 
+Kbuild
+– Simple Makefiles
+– Readable log
+– Precise dependency tracking
+
+Kconfig
+– Easy to change/browse configuration
+– Clear dependency between CONFIGs
+– Help docs in Kconfig rather than a README
