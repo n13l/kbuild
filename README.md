@@ -22,7 +22,7 @@
 | .config                 | The package configuration file.                      |
 | arch/$(ARCH)/           | The Architecture layer                               |
 | sys/$(PLATFORM)/        | The Platform layer                                   |
-| sys/unix/               | System interfaces compatible with Unix and extensions|
+| sys/unix/               | System interfaces compatible with Unix and Linux extensions|
 | mem/                    | Generic, high performance and lock-free Memory Management      |
 | scripts/                | Common rules, scripts and tools for the build system |
 | kbuild Makefiles        | Custom Makfiles                                      |
