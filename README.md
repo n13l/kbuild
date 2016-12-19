@@ -1,12 +1,12 @@
 
 # Linux Kernel's build system for userland 
 
-Kbuild
+## Kbuild
 – Simple Makefiles
 – Readable log
 – Precise dependency tracking
 
-Kconfig
+## Kconfig
 – Easy to change/browse configuration
 – Clear dependency between features and/or capabilities
 – Help docs in Kconfig rather than a README
