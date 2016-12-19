@@ -1,6 +1,6 @@
 
 # Linux Kernel's build template for userland development
-> The same code base is used for a different range of computing systems, from supercomputers to very tiny embedded devices on top of supported platforms. 
+> The same code base is used for a different range of computing systems, from supercomputers to very tiny embedded devices.
 
 | Branch     | Status             | Binaries                 | Packages       |
 |------------|--------------------|--------------------------|----------------|
