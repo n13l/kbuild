@@ -16,8 +16,8 @@
 - Clear dependency between features and capabilities
 - Help docs in Kconfig rather than a README
 
-[Directory structure]
-| Directory               | Description                                         ||
+
+| Directory structure     | Description                                          |
 |-------------------------|------------------------------------------------------|
 | Makefile                | The top Makefile.                                    |
 | .config                 | The package configuration file.                      |
