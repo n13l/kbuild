@@ -1,6 +1,6 @@
 
 # Linux Kernel's build template for userland development
-> The same code base is used for a different range of computing systems, from supercomputers to very tiny embedded devices.
+> The same code base is used for a different range of computing systems, from supercomputers to very tiny devices.
 
 | Branch     | Status             | Binaries                 | Packages       |
 |------------|--------------------|--------------------------|----------------|
@@ -18,6 +18,17 @@
 - Easy to change/browse configuration
 - Clear dependency between features and capabilities
 - Help docs in Kconfig rather than a README
+
+## Directory structure
+
+- Makefile                The top Makefile.
+- .config                 The package configuration file.
+- arch/$(ARCH)/Makefile   The Architecture layer
+- sys/$(PLATFORM)/Kbuild  The Platform layer
+- sys/unix/Kbuild         System interfaces compatible with Unix and extensions
+- mem/Kbuild              High performance and lockfree Memory Management
+- scripts/Makefile        Common rules etc. for all kbuild Makefiles.
+- kbuild Makefiles        Custom Makfiles
 
 | Supported Matrix | Status                                                   |
 |------------------|----------------------------------------------------------|
