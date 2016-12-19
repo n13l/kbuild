@@ -4,7 +4,7 @@
 > [![Build Status](https://travis-ci.org/n13l/kbuild.png?branch=master)](https://travis-ci.org/n13l/kbuild) [![Build Status](https://snap-ci.com/n13l/kbuild/branch/master/build_image)](https://snap-ci.com/n13l/kbuild/branch/master) [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://packagecloud.io/n13l/openaaa) 
 
 ## Kbuild 
-- Simple makefiles without the glue code that are hard to read and maintain
+- Much simpler makefiles without the glue code that are hard to read and maintain
 - Reduce the burden of dependency management from developers
 - Take the responsibility of ever increasing code dependency management that ultimately becomes unmanageble using traditional build system after some point.
 - Easy and efficient way to manage all compilation and configuration options on top of architecture and platform capabilities
@@ -24,7 +24,7 @@
 | arch/$(ARCH)/           | The Architecture layer                               |
 | sys/$(PLATFORM)/        | The Platform layer                                   |
 | sys/unix/               | System interfaces compatible with Unix and extensions|
-| mem/                    | High performance and lockfree Memory Management      |
+| mem/                    | Generic, high performance and lock-free Memory Management      |
 | scripts/                | Common rules, scripts and tools for the build system |
 | kbuild Makefiles        | Custom Makfiles                                      |
 
