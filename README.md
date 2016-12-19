@@ -8,7 +8,8 @@
 
 ## Kbuild 
 - Simple makefiles without the glue code that are hard to read and maintain
-- Reduce the burden of module dependency management from module writers because as the project grows managing code dependencies in makefiles will ultimately become unmanageble
+- Reduce the burden of module dependency management from module writers 
+- Solves the problem of ever increasing complexity of code dependency management that inevitable becomes unmanageble after some point
 - Easy and efficient way to manage all compilation and configuration options with dependency on top of architecture and platform capabilities
 - Readable log
 - Precise dependency tracking
