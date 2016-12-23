@@ -134,7 +134,7 @@ endif
 
 # That's our default target when none is given on the command line
 PHONY := _all
-_all:
+_all: $(progs)
 
 # Cancel implicit rules on top Makefile
 $(CURDIR)/Makefile Makefile: ;
@@ -930,19 +930,6 @@ ifdef CONFIG_MODULE_COMPRESS
 endif # CONFIG_MODULE_COMPRESS
 export mod_compress_cmd
 
-# Select initial ramdisk compression format, default is gzip(1).
-# This shall be used by the dracut(8) tool while creating an initramfs image.
-#
-INITRD_COMPRESS-y                  := gzip
-INITRD_COMPRESS-$(CONFIG_RD_BZIP2) := bzip2
-INITRD_COMPRESS-$(CONFIG_RD_LZMA)  := lzma
-INITRD_COMPRESS-$(CONFIG_RD_XZ)    := xz
-INITRD_COMPRESS-$(CONFIG_RD_LZO)   := lzo
-INITRD_COMPRESS-$(CONFIG_RD_LZ4)   := lz4
-# do not export INITRD_COMPRESS, since we didn't actually
-# choose a sane default compression above.
-# export INITRD_COMPRESS := $(INITRD_COMPRESS-y)
-
 ifdef CONFIG_MODULE_SIG_ALL
 MODSECKEY = ./signing_key.priv
 MODPUBKEY = ./signing_key.x509
@@ -1182,20 +1169,21 @@ endif
 
 else # CONFIG_MODULES
 
-all: $(progs) 
+all: $(progs)
 
 #modules
 
 # Modules not configured
 # ---------------------------------------------------------------------------
 
-#modules modules_install: FORCE
-#	@echo >&2
-#	@echo >&2 "The present kernel configuration has modules disabled."
-#	@echo >&2 "Type 'make config' and enable loadable module support."
-#	@echo >&2 "Then build a kernel with module support enabled."
-#	@echo >&2
-#	@exit 1
+#modules 
+modules_install: FORCE
+	@echo >&2
+	@echo >&2 "The present package configuration has modules disabled."
+	@echo >&2 "Type 'make config' and enable loadable module support."
+	@echo >&2 "Then build a package with module support enabled."
+	@echo >&2
+	@exit 1
 
 endif # CONFIG_MODULES
 
@@ -1296,7 +1284,6 @@ help:
 	@echo  ''
 	@echo  'Other generic targets:'
 	@echo  '  all		  - Build all targets marked with [*]'
-	@echo  '* libarch	  - Build the bare package'
 	@echo  '* modules	  - Build all modules'
 	@echo  '  modules_install - Install all modules to INSTALL_MOD_PATH (default: /)'
 	@echo  '  dir/            - Build all files in dir and below'
