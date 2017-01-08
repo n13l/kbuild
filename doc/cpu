@@ -1,6 +1,8 @@
 x86 Instruction Set Reference
 http://x86.renejeschke.de/html/file_module_x86_id_45.html
 
+http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
+
 /* The Intel SGX Memory Encryption (EXPERIMENTAL) */
 /*
  * https://www.phoronix.com/scan.php?page=news_item&px=Intel-SGX-Secure-Guard-Linux 

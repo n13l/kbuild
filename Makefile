@@ -606,7 +606,7 @@ include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
 else
 # external modules needs include/generated/autoconf.h and include/config/auto.conf
 # but do not care if they are up-to-date. Use auto.conf to trigger the test
-PHONY += include/config/auto.conf include/config/dirs.conf
+PHONY += include/config/auto.conf include/config/package.config
 
 include/config/auto.conf:
 	$(Q)test -e include/generated/autoconf.h -a -e $@ || (		\
@@ -624,7 +624,7 @@ else
 include/config/auto.conf: ;
 endif # $(dot-config)
 
--include include/config/dirs.conf
+-include include/config/package.config
 export BUILD_DIRS
 
 objs-y += arch/$(SRCARCH) sys mem $(BUILD_DIRS)
@@ -947,12 +947,12 @@ endef
 include/config/package.release: include/config/auto.conf FORCE
 	$(call filechk,package.release)
 
-define filechk_dirs.conf
+define filechk_package.config
 	echo "$$($(CONFIG_SHELL) $(srctree)/scripts/setdirs.sh $(srctree) $(PACKAGE_NAME))"
 endef
 
-include/config/dirs.conf: .config
-	$(call filechk,dirs.conf)
+include/config/package.config: .config
+	$(call filechk,package.config)
 
 
 # Things we need to do before we recursively start building the kernel
@@ -981,7 +981,7 @@ endif
 prepare2: prepare3 outputmakefile asm-generic
 
 prepare1: prepare2 $(version_h) include/generated/release.h \
-                   include/config/auto.conf include/config/dirs.conf
+                   include/config/auto.conf include/config/package.config
 	$(cmd_crmodverdir)
 
 archprepare: archheaders archscripts prepare1 scripts_basic
