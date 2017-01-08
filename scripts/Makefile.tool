@@ -30,29 +30,26 @@ toolc_flags = -Wp,-MD,$(depfile) $(KBUILD_CFLAGS) $(KBUILD_CPPFLAGS) \
 	      -include $(srctree)/sys/$(PLATFORM)/platform.h
 
 toolld_flags = 
-toolld_builtin = sys/built-in.o mem/built-in.o arch/$(SRCARCH)/built-in.o
+toolld_builtin = arch/$(SRCARCH)/built-in.o sys/$(PLATFORM)/built-in.o sys/unix/built-in.o
 toolld_libs = $(KBUILD_LIBS)
 
 # tool-csingle -> executable
-quiet_cmd_tool-csingle = CC      $@
+quiet_cmd_tool-csingle = CC      $@ 
       cmd_tool-csingle = $(CC) $(toolc_flags) -o $@ $< $(toolld_builtin) \
                                $(toolld_libs)
-#$(tool-csingle): $(obj)/%: $(src)/%.c FORCE
-#	echo "tool-csingle: $@ $< $@.c $*"
-#	$(call if_changed_dep,tool-csingle)
 
-$(tool-csingle): $(__obj_fixed)/%: $(__src_fixed)/%.c FORCE
+$(tool-csingle): $(__obj_fixed)/%: $(__src_fixed)/%.c $(toolld_builtin) FORCE
 	$(call if_changed_dep,tool-csingle)
 
 # tool-cobjs -> .o
-quiet_cmd_tool-cobjs	= CC      $@
+quiet_cmd_tool-cobjs	= CC      $@ 
       cmd_tool-cobjs	= $(CC) $(EXE_LDFLAGS) $(toolc_flags) -c -o $@ $< 
 
-$(tool-cobjs): $(__obj_fixed)/%.o: $(__src_fixed)/%.c FORCE
+$(tool-cobjs): $(__obj_fixed)/%.o: $(__src_fixed)/%.c $(toolld_builtin) FORCE
 	$(call if_changed_dep,tool-cobjs)
 
 # Link an executable based on list of .o files
-quiet_cmd_tool-cmulti	= CC      $@
+quiet_cmd_tool-cmulti	= CC      $@ 
       cmd_tool-cmulti	= $(CC) $(EXE_LDFLAGS) $(toolld_flags) -o $@ \
 			  $(addprefix $(obj)/,$($(@F)-y)) $(toolld_builtin) \
       			  $(toolld_libs)

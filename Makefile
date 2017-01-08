@@ -627,7 +627,8 @@ endif # $(dot-config)
 -include include/config/package.config
 export BUILD_DIRS
 
-objs-y += arch/$(SRCARCH) sys mem $(BUILD_DIRS)
+objs-y += arch/$(SRCARCH) sys/$(PLATFORM) sys/unix mem sys/test sys/tools \
+          $(BUILD_DIRS)
 
 include arch/$(SRCARCH)/Makefile                                                
 -include modules/Makefile                                                        
@@ -643,6 +644,8 @@ $(sort $(package-all)): $(package-dirs) ;
 PHONY += $(package-dirs)                                                        
 $(package-dirs): scripts_basic
 	$(Q)$(MAKE) $(build)=$@
+
+export package-objs
 
 #KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
 
@@ -927,7 +930,8 @@ export mod_sign_cmd
 ifeq ($(KBUILD_EXTMOD),)
 # used by scripts/pacmage/Makefile
 export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(package-dirs)) \
-                         arch sys mem scripts modules $(BUILD_DIRS))
+                         arch sys/$(PLATFORM) sys/unix mem sys/test sys/tools \
+			 scripts modules $(BUILD_DIRS))
 
 ifdef CONFIG_HEADERS_CHECK
 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
@@ -1191,7 +1195,7 @@ clean: archclean libarchclean
 #
 mrproper: rm-dirs  := $(wildcard $(MRPROPER_DIRS))
 mrproper: rm-files := $(wildcard $(MRPROPER_FILES))
-mrproper-dirs      := $(addprefix _mrproper_,doc/DocBook scripts)
+mrproper-dirs      := $(addprefix _mrproper_,scripts/doc/DocBook scripts)
 
 PHONY += $(mrproper-dirs) mrproper archmrproper
 $(mrproper-dirs):
@@ -1285,7 +1289,7 @@ help:
 	@$(MAKE) $(build)=$(package-dir) help
 	@echo  ''
 	@echo  'Documentation targets:'
-#@$(MAKE) -f $(srctree)/doc/DocBook/Makefile dochelp
+#@$(MAKE) -f $(srctree)/scripts/doc/DocBook/Makefile dochelp
 	@echo  ''
 	@echo  'Architecture specific targets ($(SRCARCH)):'
 	@$(if $(archhelp),$(archhelp),\
@@ -1335,7 +1339,7 @@ $(help-board-dirs): help-%:
 # ---------------------------------------------------------------------------
 %docs: scripts_basic FORCE
 	$(Q)$(MAKE) $(build)=scripts build_docproc
-	$(Q)$(MAKE) $(build)=doc/DocBook $@
+	$(Q)$(MAKE) $(build)=scripts/doc/DocBook $@
 
 else # KBUILD_EXTMOD
 

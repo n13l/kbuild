@@ -1,4 +1,3 @@
-#subdir-y := perf/ mem/
-testprogs-y += sandbox
-testprogs-y += hash1
-hash1-y = hash.o 
+testprogs-y := sandbox
+testprogs-y += hash
+subdir-y := perf/ mem/
