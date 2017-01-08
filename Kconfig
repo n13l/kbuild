@@ -32,6 +32,10 @@ config PACKAGE_NAME
 	string
 	option env="PACKAGE_NAME"
 
+config SRCTREE
+	string 
+	option env="srctree"
+
 menu "Build Options"
 
 menu "Architecture options"
