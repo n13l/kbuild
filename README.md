@@ -8,8 +8,10 @@
 - Much simpler makefiles without the glue code that are hard to read and maintain
 - Reduce the burden of code dependency management from developers
 - Easy and efficient way to manage all compilation and configuration options on top of platform capabilities
-- Readable log
-- Precise dependency tracking
+- Precise dependency tracking and strong support of parallelism
+- Tasks are split up and run simultaneously on multiple processors with different input in order to obtain results faster.
+- Build versioning in continuous delivery
+- Readable and configurable log
 
 ## Kconfig
 - Easy to change/browse configuration
