@@ -158,9 +158,9 @@ script:
 - make defconfig
 - cat ./obj/.config
 - make
-- file ./obj/tools/sysconfig/sysconfig
-- $OS_EXEC ./obj/tools/sysconfig/sysconfig
-- $OS_EXEC ./obj/test/perf/alloc
+- file ./obj/sys/sysconfig
+- $OS_EXEC ./obj/sys/sysconfig
+# - $OS_EXEC ./obj/test/perf/alloc
 notifications:
   on_success: never
   on_failure: never

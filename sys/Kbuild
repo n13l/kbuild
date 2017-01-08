@@ -1,2 +1,4 @@
 obj-y += $(PLATFORM)/
 obj-y += unix/
+subdir-y += test
+testprogs-y := sysconfig

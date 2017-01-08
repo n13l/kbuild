@@ -1,0 +1,1 @@
+testprogs-y += alloc pool $(src)/sys/$PLATFORM/built-in.o

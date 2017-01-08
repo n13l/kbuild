@@ -54,7 +54,6 @@ info_cpu(void)
 {
 	_unused const char *vendor = cpu_vendor();
 	cpu_dump_extension();
-
 }
 
 static void 
@@ -74,7 +73,6 @@ main(int argc, char *argv[])
 
 	printf("sysconfig v%s %s/%s %s " __TIME__ " " __DATE__  "\n", 
 	       PACKAGE_VERSION, CONFIG_PLATFORM, CONFIG_SRCARCH, CONFIG_ARCH);
-
 
 	info_cpu();
 	info_sys();
