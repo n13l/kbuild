@@ -22,11 +22,11 @@ OS390_LDFLAGS = -bdynam=dll -bcase=mixed -breus=rent -bstorenx=yes \
 
 OS390_LDFLAGS += $(addprefix -S, $(OS390_LIBS))
 
-HOSTCC := $(srctree)/scripts/os390/xlc-cc
-HOSTLD := $(srctree)/scripts/os390/xlc-cc
-CC := $(srctree)/scripts/os390/xlc-cc $(OS390_CFLAGS)
-LD := $(srctree)/scripts/os390/xlc-ld $(OS390_LDFLAGS)
-OBJDUMP := $(srctree)/scripts/os390/objdump
+HOSTCC := $(srctree)/scripts/xlc/xlc-cc
+HOSTLD := $(srctree)/scripts/xlc/xlc-cc
+CC := $(srctree)/scripts/xlc/xlc-cc $(OS390_CFLAGS)
+LD := $(srctree)/scripts/xlc/xlc-ld $(OS390_LDFLAGS)
+OBJDUMP := $(srctree)/scripts/xlc/objdump
 COMPILER := xlc
 so := so
 export COMPILER ARCH HOSTCC HOSTLD CC LD OBJDUMP so
