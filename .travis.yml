@@ -154,13 +154,14 @@ before_deploy:
 before_install:
   - source ./scripts/travis/before_install.sh
 script:
+- shell_session_update() { :; } # workarround mac os build bug
 - uname -a
 - make defconfig
 - cat ./obj/.config
 - make
 - file ./obj/sys/tools/sysconfig
-- $OS_EXEC ./obj/sys/tools/sysconfig
-- $OS_EXEC ./obj/sys/test/perf/alloc
+  #- $OS_EXEC ./obj/sys/tools/sysconfig
+  #- $OS_EXEC ./obj/sys/test/perf/alloc
 notifications:
   on_success: never
   on_failure: never
