@@ -7,6 +7,7 @@
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
+#include <sys/log.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,8 +18,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-
-//#include <sys/missing.h>
 #include <mem/page.h>
 
 #ifndef PAGE_SIZE
@@ -47,6 +46,33 @@ vm_area_file_trunc(int fd, unsigned long size)
 }
 */
 
+void *
+mmap_file(const char *name, int flags, mode_t mode, int prot, size_t *rsize)
+{
+	void *addr = MAP_FAILED;
+	int fd = -1;
+
+	if ((fd = open(name, mode, flags)) == -1)
+		goto failed;
+
+        struct stat st;
+        if (fstat(fd, &st))
+		goto failed;
+        if (!S_ISREG(st.st_mode))
+		goto failed;
+
+	*rsize = align_to(st.st_size, CPU_PAGE_SIZE);
+        if ((addr = mmap(NULL, *rsize, prot, mode, fd, 0)) == MAP_FAILED)
+		goto failed;
+
+failed:
+	if (fd > 0)
+        	close(fd);
+
+	return addr;
+}
+
+
 static inline u64
 vm_area_size(u32 shift, u32 total)
 {
@@ -74,7 +100,7 @@ vm_area_open(const char *name, int mode)
         if (fstat(fd, &st))
 		goto failed;
 
-        if ((map = mmap(NULL,st.st_size, PAGE_PROT, mode, fd, 0)) == MAP_FAILED)
+        if ((map = mmap(NULL, st.st_size, PAGE_PROT, mode, fd, 0)) == MAP_FAILED)
 		goto failed;
 
 	if (vm_area_validate(map, st.st_size))
@@ -103,23 +129,24 @@ static inline struct pagemap *
 vm_area_init(const char *name, int mode, u32 shift, u32 total)
 {
 	struct pagemap *map = MAP_FAILED;
-	int fd;
+	int fd = -1;
 
+	if (name) {
 	if ((fd = open(name, O_RDWR | O_CREAT | O_NOATIME, 0600)) == -1)
 		goto failed;
+	}
 
         u64 size = vm_area_size(shift, total);
-
         struct stat st;
-/*	
-        if (fstat(fd, &st))
-		goto failed;
-*/
-        if (!S_ISREG(st.st_mode))
-		goto failed;
+	if (fd != -1 && name) {
+	        if (fstat(fd, &st))
+			goto failed;
+	        if (!S_ISREG(st.st_mode))
+			goto failed;
+        	if (st.st_size != size && ftruncate(fd, size) == -1)
+			goto failed;
+	}
 
-        if (st.st_size != size && ftruncate(fd, size) == -1)
-		goto failed;
 /*
         if (fstat(fd, &st) || st.st_size != size)
 		goto failed;
@@ -127,7 +154,8 @@ vm_area_init(const char *name, int mode, u32 shift, u32 total)
         if ((map = mmap(NULL, size, PAGE_PROT, mode, fd, 0)) == MAP_FAILED)
 		goto failed;
 
-        close(fd);
+	if (fd > 0)
+        	close(fd);
 
 	(*map) = (struct pagemap) {
 		.size  = size,
@@ -169,8 +197,10 @@ mmap_open(const char *name, int mode, u32 shift, u32 total)
 {
 	struct pagemap *map;
 
-	if ((map = vm_area_open(name, mode)))
-		return (void *)map;
+	if (name) {
+		if ((map = vm_area_open(name, mode)))
+			return (void *)map;
+	}
 
 	if ((map = vm_area_init(name, mode, shift, total)))
 		return (void *)map;

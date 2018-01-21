@@ -1,34 +1,33 @@
-/*
-  The MIT License (MIT)          Copyright (c) 2015 Daniel Kubec <niel@rtfm.cz>
-
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in
-  all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-  THE SOFTWARE.
+/*                                                                              
+ * The MIT License (MIT)                       Memory Management debug facility
+ *
+ * Copyright (c) 2012-2018                            OpenAAA <openaaa@rtfm.cz>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * of this software and associated documentation files (the "Software"),to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in   
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING FROM, 
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
-
+ 
 #ifndef __MEM_PAGE_H__
 #define __MEM_PAGE_H__
 
-#include <stdbool.h>
-#include <string.h>
-#include <errno.h>
-
 #include <sys/compiler.h>
 #include <sys/cpu.h>
+#include <sys/decls.h>
 #include <sys/mman.h>
 #include <mem/alloc.h>
 
@@ -37,6 +36,8 @@
 #define PAGE_HDR_MAGIC 0x40000000
 #define PAGE_HDR_FREE  0xffffffff
 #define PAGE_HDR_PART  0x80000000 /* bit mask for page parts */
+
+__BEGIN_DECLS
 
 struct page;
 
@@ -74,7 +75,6 @@ get_page_size(struct pagemap *map)
 {
 	return 1 << map->shift;
 }
-
 
 static inline struct page *
 get_page(struct pagemap *map, unsigned int index)
@@ -120,38 +120,6 @@ page_alloc(struct pagemap *map)
 }
 
 static inline struct page *
-page_alloc_rcu(struct pagemap *map)
-{
-	struct page *page = get_page(map, map->list);
-	page->hdr = (u32)0U;
-	map->list = page->avail;
-	map->avail--;
-	return page;
-}
-
-static inline struct page *
-page_alloc_safe_rcu(struct pagemap *map)
-{
-	struct page *page;
-	if ((page = get_page_safe(map, map->list)) == NULL)
-		return page;
-
-	page->hdr = (u32)0U;
-	map->list = page->avail;
-	map->avail--;
-	return page;
-}
-
-static inline void
-page_free_rcu(struct pagemap *map, struct page *page)
-{
-	page->hdr = (u32)~0U;
-	page->avail = map->list;
-	map->list = page_index(map, page);
-	map->avail++;
-}
-
-static inline struct page *
 page_alloc_safe(struct pagemap *map)
 {
 	struct page *page;
@@ -171,16 +139,6 @@ page_free(struct pagemap *map, struct page *page)
 	page->avail = map->list;
 	map->list = page_index(map, page);
 	map->avail++;
-}
-
-static inline void
-page_lock(struct page *page)
-{
-}
-
-static inline void
-page_unlock(struct page *page)
-{
 }
 
 static inline void
@@ -229,6 +187,13 @@ pages2mb(uint32_t shift, unsigned long pages)
 }
 
 _unused static unsigned long
+pages2b(uint32_t shift, unsigned long pages)
+{
+	return (pages * (1 << shift));
+}
+
+
+_unused static unsigned long
 mb2pages(uint32_t shift, unsigned long mb)
 {
 	return (mb << (20 - shift));
@@ -240,5 +205,7 @@ mb2pages(uint32_t shift, unsigned long mb)
 	for (type p   = (type)get_page(map, 0), \
 	       *__x   = (type)get_page(map, map->total); \
 	    p < __x;p = (type)((byte*)p + (1U << map->shift)))
+
+__END_DECLS
 
 #endif/*__MEM_PAGE_H__*/

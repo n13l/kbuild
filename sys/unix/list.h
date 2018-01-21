@@ -3,7 +3,7 @@
  *
  * The MIT License (MIT)         
  *
- * Copyright (c) 2013 Daniel Kubec <niel@rtfm.cz>
+ * Copyright (c) 2013 - 2019                        Daniel Kubec <niel@rtfm.cz>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"),to deal
@@ -24,67 +24,71 @@
  * THE SOFTWARE.
  **/
 
-#ifndef __GENERIC_SDC_LIST_H__
-#define __GENERIC_SDC_LIST_H__
+#ifndef __GENERIC_LIST_H__
+#define __GENERIC_LIST_H__
 
 #include <sys/compiler.h>
-#include <mem/debug.h>
+#include <sys/decls.h>
 
-struct node  { struct node *next, *prev; };
+__BEGIN_DECLS
+
+#define DECLARE_LIST(name)   struct list name = INIT_LIST(name)
+#define DECLARE_NODE(name)   struct node name = INIT_NODE
+#define DEFINE_LIST(name)    struct list name
+#define DECLARE_ITEM(type1, node, ...) \
+({ \
+	type1 __o = (type1) { .node = INIT_NODE, ## __VA_ARGS__ }; \
+	& __o.node; \
+})
+
+#define LIST_ITEM(item, node) &(item.node)
+#define INIT_NODE            { .next = NULL, .prev = NULL } 
+#define INIT_LIST(name)      {{(struct node *)&(name), (struct node *)&(name)}}
+
+struct node  { struct node  *next, *prev; };
 struct snode { struct snode *next; };
 struct hnode { struct hnode *next, **prev; };
-struct list  { struct node head; };
+struct list  { struct node   head; };
 struct slist { struct snode *head; };
-struct hlist { struct hnode *head;};
+struct hlist { struct hnode *head; };
 
-#define DEFINE_LIST(name)          struct list name;
-#define DEFINE_NODE(name)          struct node name;
-
-#define DECLARE_LIST(name)         struct list name = DECLARE_INIT_LIST(name)
-#define DECLARE_NODE(name)         struct node name = DECLARE_INIT_NODE
-#define DECLARE_INIT_NODE         (struct node ){ .next = NULL, .prev = NULL }
-#define DECLARE_INIT_LIST(name) {{(struct node *)&(name), \
-                                  (struct node *)&(name)}}
-
-#ifdef CONFIG_DEBUG_LIST
-void 
-__list_init(struct list *list); 
-#else 
 static inline void
-__list_init(struct list *list)
+node_init(struct node *node)
+{
+	node->next = node->prev = NULL;
+}
+
+static inline void
+list_init(struct list *list)
 {
 	struct node *head = &list->head;
 	head->next = head->prev = head;
 }
-#endif
-static inline void
-list_init(struct list *list)
-{
-	__list_init(list);
-}
 
-#ifdef CONFIG_DEBUG_LIST
-void *
-__list_head(struct list *list); 
-#else
-static inline void *
-__list_head(struct list *list)
-{
-	return (list->head.next != &list->head) ? list->head.next : NULL;
-}
-#endif
 static inline void *
 list_head(struct list *list)
 {
-	return __list_head(list);
+	return (list->head.next != &list->head) ? list->head.next : NULL;
 }
 
+static inline void *
+list_first(struct list *list)
+{
+	return (list->head.next != &list->head) ? list->head.next : NULL;
+}
 
 static inline void *
 list_tail(struct list *list)
 {
 	return (list->head.prev != &list->head) ? list->head.prev : NULL;
 }
+
+static inline void *
+list_last(struct list *list)
+{
+	return (list->head.prev != &list->head) ? list->head.prev : NULL;
+}
+
 
 static inline void *
 list_next(struct list *list, struct node *node)
@@ -136,49 +140,62 @@ list_add_tail(struct list *list, struct node *node)
 	list_add_before(node, &list->head);
 }
 
-#ifdef CONFIG_DEBUG_LIST
-void __list_del(struct node *node);
-#else
-static inline void __list_del(struct node *node)
+static inline void
+list_add(struct list *list, struct node *node)
+{
+	list_add_before(node, &list->head);
+}
+
+static inline void 
+list_del(struct node *node)
 {
 	struct node *before = node->prev;
 	struct node *after  = node->next;
 	before->next = after;
 	after->prev = before;
 }
-#endif
-static inline void
-list_del(struct node *node)
-{
-	__list_del(node);
-}
 
-#ifdef CONFIG_DEBUG_LIST
-struct node *__list_walk_first(struct node *node);
-struct node *__list_walk_next(struct node *node);
-struct node *__list_walk_first_delsafe(struct node *node);
-struct node *__list_walk_next_delsafe(struct node *node);
-#else
 #define __list_walk_first(N) (N)
 #define __list_walk_next(N) (N)
 #define __list_walk_first_delsafe(N) (N)
 #define __list_walk_next_delsafe(N) (N)
-#endif
 
-#define list_walk(start, n, list) \
-	for (struct node *(n) = (start); (n) != &list.head; (n) = (n)->next)
+#define list_for_first(__list) (__list).head.next
+#define list_for_head(list) &(list).head
+#define list_for_last(list, node) &(it->node) != &(list).head
 
-#define list_walk_delsafe(start, n, list) \
-	for (struct node *it, *(n) = (start); it = (n)->next, \
-	     (n) != &list.head; (n) = it)
+#define list_walk(__list, __node, __it) \
+	for (struct node *(__it) = (__node); (__it) != &__list.head; \
+	     (__it) = (__it)->next)
 
-#define list_for_each(n, list) \
-	for (struct node *(n) = (list).head.next;\
-	     (n) != &(list).head; (n) = (n)->next)
+#define list_walk_delsafe(list, __node, __it) \
+	for (struct node *it, *(__it) = (__node); it = (__it)->next, \
+	     (__it) != &list.head; (__it) = it)
 
-#define list_for_each_delsafe(n, list) \
+#define list_for_each(list, n) \
+	for (struct node *(n) = (list).head.next; (n) != &(list).head; (n) = (n)->next)
+
+#define list_for_each_delsafe(list, n) \
 	for (struct node *it, *(n) = (list).head.next; \
 		(it) = (n)->next, (n) != &(list).head; (n) = it)
+
+#define list_for_each_item(__list, __it, __node) \
+	for ((__it) = __container_of(list_for_first(__list), typeof(*__it), __node); \
+	     &(__it->__node) != &(__list).head; \
+	     (__it) = __container_of(__it->__node.next, typeof(*__it), __node))
+
+#define list_sort(__list, __comp_fn) 
+
+static inline unsigned int
+list_size(struct list *list)
+{
+	unsigned int size = 0;
+	list_for_each((*list), node)
+		size++;
+
+	return size;
+}
+
 
 static inline void
 snode_init(struct snode *snode)
@@ -187,28 +204,32 @@ snode_init(struct snode *snode)
 }
 
 static inline void
-slist_add_after(struct snode *node, struct snode *after)
+slist_add(struct snode *node, struct snode *after)
 {
 	after->next = node;
 }
 
 static inline void
-slist_remove(struct snode *node, struct snode *prev)
+slist_del(struct snode *node, struct snode *prev)
 {
-	if (prev)
-		prev->next = node->next;
+	if (!prev)
+		return;
+	prev->next = node->next;
 }
+
+#define slist_for_each(item, member, it) \
+	for (; item ; item = it)
 
 #define slist_for_each_delsafe(item, member, it) \
 	for (; item && ({it = (__typeof__(item))item->member.next; 1;} ); \
 	       item = it)
 
-#define list_head_init(name) { &(name), &(name) }
-
-#define hlist_init { .head = NULL }
-#define hlist(name) struct hlist name = {  .head = NULL }
-#define init_hlist(ptr) ((ptr)->head = NULL)
-#define init_hnode (struct hnode) {.next = NULL, .prev = NULL}
+#define DEFINE_HLIST(name)    struct hlist name;
+#define DECLARE_HLIST(name)   struct hlist name = {  .head = NULL }
+#define INIT_HLIST            { .head = NULL }
+#define INIT_HLIST_PTR(ptr)   ((ptr)->head = NULL)
+#define INIT_HLIST_HEAD(name) { &(name), &(name) }
+#define INIT_HNODE            (struct hnode) {.next = NULL, .prev = NULL}
 
 static inline void
 hnode_init(struct hnode *hnode)
@@ -217,8 +238,14 @@ hnode_init(struct hnode *hnode)
 	hnode->prev = NULL;
 }
 
+static inline int 
+hnode_unhashed(struct hnode *h)
+{
+	return !h->prev;
+}
+
 static inline void 
-hlist_add_head(struct hnode *hnode, struct hlist *hlist)
+hlist_add(struct hlist *hlist, struct hnode *hnode)
 {
 	struct hnode *head = hlist->head;
 	hnode->next = head;
@@ -234,10 +261,8 @@ hlist_empty(const struct hlist *hlist)
 	return !hlist->head;
 }
 
-#ifdef CONFIG_DEBUG_LIST
-void __hlist_del(struct hnode *hnode);
-#else
-static inline void __hlist_del(struct hnode *hnode)
+static inline void 
+hlist_del(struct hnode *hnode)
 {
 	struct hnode *next  = hnode->next;
 	struct hnode **prev = hnode->prev;
@@ -245,11 +270,14 @@ static inline void __hlist_del(struct hnode *hnode)
 	if (next)
 		next->prev = prev;
 }
-#endif
+
 static inline void
-hlist_del(struct hnode *hnode)
+hlist_del_init(struct hnode *n)
 {
-	__hlist_del(hnode);
+	if (hnode_unhashed(n))
+		return;
+	hlist_del(n);
+	hnode_init(n);
 }
 
 static inline void
@@ -272,21 +300,23 @@ hlist_add_after(struct hnode *hnode, struct hnode *next)
 		next->next->prev  = &next->next;
 }
 
-#ifdef CONFIG_DEBUG_LIST
-#ifndef hlist_next_hook
-#define hlist_next_hook
-#endif
-# define hlist_first(node)     ({ (list)->head; )}
-# define hlist_next(node, pos) ({node = node->next; hlist_next_hook(pos) 1;})
-#else
-# define hlist_first(node)     ({ (list)->head; })
-# define hlist_next(node, pos) ({node = pos->next; 1;})
-#endif
+#define hlist_for_first(___list) ({ ___list->head; })
+#define hlist_for_next(___node)  ({ ___node->next; })
 
-#define hlist_for_each(node, list) \
-	for (node = hlist_first(list); node; node = node->next)
+#define hlist_for_each(__list, __node) \
+	for (struct hnode * __node = hlist_for_first((__list)); __node; \
+	     __node = hlist_for_next(__node))
 
-#define hlist_for_each_delsafe(node, it, list) \
-	for (node = hlist_first(list); it && ({it = pos->next; 1;}); node = it)
+#define hlist_for_each_delsafe(__list, __node) \
+	for (struct hnode *(__node) = hlist_for_first((__list)), *__it; \
+	     (__node) && ({__it = (__node)->next;1;}); \
+	     (__node) = __it)
 
-#endif
+#define hlist_for_each_item_delsafe(item, n, list, member)                 \
+	for (item = __container_of_safe((list)->head, typeof(*item), member);\
+	     item && ({ n = item->member.next; 1; });                     \
+	     item = __container_of_safe(n, typeof(*item), member))
+
+__END_DECLS
+
+#endif/*__GENERIC_LIST_H__*/

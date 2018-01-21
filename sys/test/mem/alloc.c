@@ -22,10 +22,11 @@
 int 
 main(int argc, char *argv[]) 
 {
-	_unused struct mm_pool *mp = mm_pool_create(NULL, CPU_PAGE_SIZE, 0);
+	_unused struct mm_pool *mp = mm_pool_create(CPU_PAGE_SIZE, 0);
+	struct mm *mm = mm_pool(mp);
 
 	/* explicit stack allocation */
-	_unused void *addr1 = mm_alloc(mp, 1024);
+	_unused void *addr1 = mm_alloc(mm, 1024);
 	/* implicit stack allocation */
 	//_unused void *addr2 = mm_alloc(1024);
 

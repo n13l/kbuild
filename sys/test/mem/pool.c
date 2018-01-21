@@ -5,13 +5,14 @@
 
 #include <sys/compiler.h>
 #include <mem/alloc.h>
+#include <mem/pool.h>
 #include <mem/stack.h>
 
 int 
 main(int argc, char *argv[]) 
 {
-	struct mm_pool *mp = mm_create(MM_POOL, CPU_PAGE_SIZE, 0);
+	struct mm_pool *mp = mm_pool_create(CPU_PAGE_SIZE, 0);
 
-	mm_destroy(mp);
+	mm_pool_destroy(mp);
 	return 0;
 }

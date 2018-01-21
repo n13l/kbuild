@@ -52,6 +52,8 @@
 #define CPU_SIMD_ALIGN 16
 #endif
 
+#define CPU_ADDR_ALIGN CPU_ARCH_BITS
+
 #ifdef CONFIG_LITTLE_ENDIAN
 #define CPU_LITTLE_ENDIAN y
 #endif
@@ -115,6 +117,6 @@ int
 cpu_has_crc32c(void);
 
 void
-cpu_dump_extension(void);
+cpu_info(void);
 
 #endif/*__CPU_H__*/
