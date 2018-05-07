@@ -4,6 +4,7 @@
 #include <asm/instr.h>
 
 /* static __thread unsigned __branch[1024]; */
+/*
 static long __branch[1024];
 
 _noinline long
@@ -23,3 +24,4 @@ bsect_dec(long id)
 	__asm__ volatile ("decl\t%0" : "+m" (*p));
 	return *p;
 }
+*/

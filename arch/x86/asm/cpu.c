@@ -208,7 +208,7 @@ _unused static const char * const x86_hypervisor_names[] = {
 const char *
 cpu_vendor(void)
 {
-	u32 eax, ebx, ecx, edx;
+	u32 eax = 0, ebx = 0, ecx = 0, edx = 0;
 	__get_cpuid(0, &eax, &ebx, &ecx, &edx);
 
 	for (int i = 0; i < array_size(x86_vendor); i++) {
