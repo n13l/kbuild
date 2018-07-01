@@ -27,7 +27,7 @@ linkmap_info(struct dl_phdr_info *dl, size_t size, void *data)
 	if (name && !strstr(name, "ssl"))
 		return 0;
 
-	sys_dbg("object addr=%p name=%s", (void *)dl->dlpi_addr, dl->dlpi_name);
+	debug2("object addr=%p name=%s", (void *)dl->dlpi_addr, dl->dlpi_name);
 	for (int i = 0; i < dl->dlpi_phnum; i++) {
 		struct elf64_phdr *phdr = (struct elf64_phdr *)&dl->dlpi_phdr[i];
 
@@ -35,7 +35,7 @@ linkmap_info(struct dl_phdr_info *dl, size_t size, void *data)
 		if (!type)
 			continue;
 
-		sys_dbg("hdr[%d] paddr=%p, vaddr=%p type=%s", 
+		debug2("hdr[%d] paddr=%p, vaddr=%p type=%s", 
 		        i, (void *)phdr->paddr, (void *)phdr->vaddr, type);
 
 	}
