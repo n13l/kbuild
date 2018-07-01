@@ -1,221 +1,125 @@
-#ifndef __GENERIC_MEM_POOL_H__
-#define __GENERIC_MEM_POOL_H__
+/*
+ * High performance, generic and type-safe memory management
+ *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2012-2018                            OpenAAA <openaaa@rtfm.cz>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy 
+ * of this software and associated documentation files (the "Software"),to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in   
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING FROM, 
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+#ifndef __MM_POOL_H__
+#define __MM_POOL_H__
 
 #include <sys/compiler.h>
 #include <sys/cpu.h>
 #include <sys/log.h>
-
-#include <mem/debug.h>
+#include <sys/decls.h>
 #include <mem/alloc.h>
 #include <mem/savep.h>
 #include <mem/block.h>
 #include <mem/generic.h>
-
-#include <unix/timespec.h>
-#include <unix/list.h>
+#include <cex/list.h>
 #include <inttypes.h>
 #include <assert.h>
+#include <string.h>
 
 /* 
- * Allows deterministic behavior on real-time systems avoiding the out of 
- * memory errors.
+ * Allows deterministic behavior on real-time systems 
  *
  * Variable-size block memory pools do need to store allocation metadata for 
  * each allocation, describing characteristics like the size of the allocated
  * block.
  */
 
+struct mm;
 struct mm_pool {
-	struct mm_pool *parent;
+	struct mm mm;
 	struct mm_savep save;
 	void *avail, *final;
 	unsigned int blocksize;
-	unsigned int threshold;
 	unsigned int index;
 	unsigned int flags;
-	size_t aligned;
-	size_t total_bytes, useful_bytes;
+	unsigned int aligned;
+	size_t total_bytes;
+	size_t useful_bytes;
 #ifdef CONFIG_DEBUG_MEMPOOL
+	size_t exhausted_bytes;
+	size_t amortized_bytes;
 	size_t frag_bytes;
 	size_t frag_count;
+	size_t blocks_total;
+	size_t blocks_used;
+	size_t blocks_free;
 #endif	
 };
 
-#ifdef ARCH_ENABLE_MEMORY_POOL
-#endif
+extern struct mm mm_pool_ops;
 
-static inline void *
-__pool_alloc_threashold(struct mm_pool *pool, size_t size)
-{
-	struct mm_vblock *block;
+__BEGIN_DECLS
+struct mm *mm_pool(struct mm_pool *);
 
-	pool->index = 0;
-	if (pool->avail) {
-		block = pool->avail;
-		pool->avail = block->node.next;
-	} else 
-		block = vm_vblock_alloc(pool->blocksize);
-
-	slist_add_after(pool->save.final[0], &block->node);
-
-	pool->save.final[0] = block;
-	pool->save.avail[0] = pool->blocksize - size;
-
-	return (void *)((u8*)block - pool->blocksize);
-}
-
-static inline void *
-__pool_alloc_aligned_block(struct mm_pool *pool, size_t size, size_t align)
-{
-	struct mm_vblock *block;
-	size_t aligned = align_to(size, align);
-
-	block = vm_vblock_alloc(aligned);
-	slist_add_after((struct snode *)pool->save.final[1], &block->node);
-
-	pool->index = 1;
-	pool->save.final[1] = block;
-	pool->save.avail[1] = aligned - size;
-	return pool->final = (void *)((u8*)block - aligned);
-}
-
-static inline void *
-__pool_alloc_avail(struct mm_pool *pool, size_t size, size_t avail)
-{
-	pool->save.avail[0] = avail - size;
-	return (u8*)pool->save.final[0] - avail;
-}
-
-#ifdef CONFIG_DEBUG_MEMPOOL
 void *
-__pool_alloc_aligned(struct mm_pool *pool, size_t size, size_t align);
-#else
-static inline void *
-__pool_alloc_aligned(struct mm_pool *pool, size_t size, size_t align)
-{                                                                               
-	size_t avail = aligned_part(pool->save.avail[0], align);
+mm_pool_alloc(struct mm_pool *pool, size_t size);
 
-	if (size <= avail)
-		return __pool_alloc_avail(pool, size, avail);
-	if (size <= pool->threshold)
-		return __pool_alloc_threashold(pool, size);
-	/* This is minimum align size supported right now */
-	return __pool_alloc_aligned_block(pool, size, CPU_SIMD_ALIGN);
-}
-#endif
+void *
+mm_pool_realloc(struct mm_pool *poo, void *addr, size_t size);
 
-static inline void *
-mm_pool_alloc_aligned(struct mm_pool *pool, size_t size, size_t align)
-{                                                                               
-	return __pool_alloc_aligned(pool, size, align);
-}
+void
+mm_pool_free(void *addr);
 
-static inline void *
-mm_pool_alloc(struct mm_pool *pool, size_t size)
-{
-	if (size <= pool->save.avail[0]) {
-		void *p = (u8 *)pool->save.final[0] - pool->save.avail[0];
-		pool->save.avail[0] -= size;
-		return p;
-	} 
+void *
+mm_pool_zalloc(struct mm_pool *pool, size_t size);
 
-	if (size <= pool->threshold)
-		return __pool_alloc_threashold(pool, size);
+void
+mm_pool_destroy(struct mm_pool *pool);
 
-	return __pool_alloc_aligned_block(pool, size, CPU_SIMD_ALIGN);
-}
+void
+mm_pool_flush(struct mm_pool *pool);
 
-static inline void
-mm_pool_destroy(struct mm_pool *pool)
-{
-	struct mm_vblock *it, *block;
-	mem_dbg("mm pool %p destroyed", pool);
+struct mm_pool *
+mm_pool_overlay(void *block, size_t blocksize);
+	
+struct mm_pool *
+mm_pool_create(size_t blocksize, int flags);
 
-	block = pool->save.final[1];
-	slist_for_each_delsafe(block, node, it)
-		vm_vblock_free(block);
+void *
+mm_pool_addr(struct mm_pool *p);
+                                                                                
+size_t
+mm_pool_avail(struct mm_pool *p);
 
-	block = pool->avail;
-	slist_for_each_delsafe(block, node, it)
-		vm_vblock_free(block);
+void *
+mm_pool_start(struct mm_pool *p, size_t size);
 
-	block = pool->save.final[0];
-	slist_for_each_delsafe(block, node, it)
-		vm_vblock_free(block);
+void *
+mm_pool_end(struct mm_pool *p, void *end);
 
-}
+void *
+mm_pool_extend(struct mm_pool *p, size_t size);
 
-static inline void
-mm_pool_flush(struct mm_pool *pool)
-{
-	struct mm_vblock *it, *block;
+char *
+mm_pool_vprintf(struct mm_pool *p, const char *fmt, va_list args);
 
-	block = pool->save.final[1];
-	slist_for_each_delsafe(block, node, it)
-		vm_vblock_free(block);
+char *
+mm_pool_printf(struct mm_pool *, const char *fmt, ...);
 
-	block = pool->save.final[0];
-	slist_for_each_delsafe(block, node, it) {
-		if ((void *)((u8*)block - block->size) == pool)
-			break;
-		slist_add_after(pool->avail, &block->node);
-		pool->avail = block;
-	}
-
-	pool->save.final[0] = block;
-	pool->save.avail[0] = block ? block->size - sizeof(*pool) : 0;
-	pool->save.final[1] = NULL;
-	pool->save.avail[1] = 0;
-	pool->final = &pool->final;
-
-	snode_init(&pool->save.node);
-}
-
-static inline struct mm_pool *
-mm_pool_create(struct mm_pool *object, size_t blocksize, int flags)
-{
-	struct mm_vblock *block;
-
-	/*
-	 * Support CPU_PAGE_ALIGN for variable memory blocks.
-	 * Support CPU_SIMD_ALIGN for allocated memory buffers.
-	 *
-	 * TODO:
-	 *
-	 * MM_ADDR_ALIGN
-	 * MM_FAST_ALIGN
-	 * MM_LOCK_ALIGN
-	 * MM_PAGE_ALIGN
-	*/
-
-	size_t size, aligned = align_simd(sizeof(*block));
-
-	size = max(blocksize, CPU_CACHE_LINE + aligned);
-	size = align_to(size, CPU_PAGE_SIZE) - aligned;
-
-	block = vm_vblock_alloc(size);
-	struct mm_pool *pool = (void *)((u8 *)block - size);
-
-	mem_dbg("mm pool %p created with %" PRIuMAX " bytes", 
-	        pool, (uintmax_t)blocksize);
-
-	pool->save.avail[0] = size - sizeof(*pool);
-	pool->save.final[0] = block;
-
-	pool->final = &pool->final;
-	pool->total_bytes  = block->size + aligned;
-	pool->blocksize = size; 
-	pool->threshold = size >> 1;
-
-	mm_savep_dump(&pool->save);
-
-	return pool;
-}
-
-static inline struct mm_pool *
-mm_pool_create_const(const struct mm_pool *pool, size_t size, int flags)
-{
-	return mm_pool_create((struct mm_pool *)pool, size, flags);
-}
+__END_DECLS
 
 #endif

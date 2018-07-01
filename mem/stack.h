@@ -1,25 +1,27 @@
-/*                                                                              
- * The MIT License (MIT)                          Generic stack based functions 
- *                               Copyright (c) 2015 Daniel Kubec <niel@rtfm.cz> 
- *                                                                              
+/*
+ * The MIT License (MIT)                          Generic stack based functions
+ *
+ * Copyright (c) 2012-2018                            OpenAAA <openaaa@rtfm.cz>
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy 
- * of this software and associated documentation files (the "Software"),to deal 
- * in the Software without restriction, including without limitation the rights 
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell    
- * copies of the Software, and to permit persons to whom the Software is        
- * furnished to do so, subject to the following conditions:                     
- *                                                                              
+ * of this software and associated documentation files (the "Software"),to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
  * The above copyright notice and this permission notice shall be included in   
- * all copies or substantial portions of the Software.                          
- *                                                                              
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR   
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,     
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER       
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN    
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 
 #ifndef MM_STACK_GENERIC_H__
 #define MM_STACK_GENERIC_H__
@@ -29,7 +31,6 @@
 #include <mem/alloc.h>
 #include <mem/safe.h>
 #include <mem/debug.h>
-#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -46,78 +47,78 @@
 #endif
 
 struct mm_stack {
-	struct mm_savep save;
-	void *avail, *final;
-	unsigned int blocksize;
-	unsigned int threshold;
-	unsigned int index;
-	unsigned int flags;
-	unsigned int size;
+	union {
+		void *addr; 
+		u8 *byte;
+		u32  *offset;
+	};
+	u8 *start;
+	u8 *end;
+	u8 *cur;
 };
 
-/* Stack-based libc like functions */
-#define sp_alloc(size) \
-({\
-	void *_X = alloca(size); \
-	_X; \
-})
+#ifndef zalloca
+#define zalloca(size) __extension__ \
+	({ void *_X = alloca(size); memset(_X, 0, size); _X; })
+#endif
 
-/* Stack-based libc like functions */
-#define sp_alloc_safe(sp, size) \
+#ifndef strdupa
+#define strdupa(string) __extension__ \
 ({\
-	void *_X = alloca(size); \
-	_X; \
-})
-
-/* call function prototype and alloca stack memory */
-#define sp_cfn(fn, ...) \
-({\
- 	void *_X; \
-	mem_stack_dbg("sp_cfn"); \
- 	_X; \
-})
-
-
-#define sp_zalloc(size) \
-({\
-	void *_X = alloca(size); memset(_X, 0, size); _X; \
-})
-
-#define sp_strdup(string) \
-({\
-	unsigned int ____size = strlen(string) + 1; \
+	unsigned ____size = strlen(string) + 1; \
 	char *_X = alloca(____size); memcpy(_X, string, ____size); _X; \
 })
+#endif
 
-#define sp_strndup(string, size) \
+#ifndef strndupa
+#define strndupa(string, size) __extension__ \
 ({\
 	const char *_S = (string); size_t _L = strnlen(_S,(size)); \
 	char *_X = alloca(_L + 1); \
 	memcpy(_X, _S, _L); _X[_L] = 0; _X; \
 })
+#endif
 
-#define sp_strndupa(s, n) \
-({							\
-	const char *_O = (s);				\
-	size_t _L = strnlen(_O, (n));			\
-	char *_N = alloca(_L + 1);			\
-	_N[_L] = '\0';					\
-	memcpy(_N, _O, _L);				\
-})
-
-#define sp_printf(...) \
+#ifndef strmema
+#define strmema(string, size) __extension__ \
 ({\
-	char *_S = (char *)alloca(sp_printfz((const char *)__VA_ARGS__)); \
+	char *_X = alloca(size + 1); \
+	memcpy(_X, string, size); _X[size] = 0; _X; \
+})
+#endif
+
+#ifndef memdupa
+#define memdupa(string, size) __extension__ \
+({\
+	char *_X = alloca(size); \
+	memcpy(_X, string, size); _X; \
+})
+#endif
+
+
+#ifndef printfa
+#define printfa(...) __extension__ \
+({\
+	char *_S = (char *)alloca(printfza((const char *)__VA_ARGS__)); \
         sprintf(_S, (const char *)__VA_ARGS__); _S; \
 })
+#endif
 
-#define sp_vprintf(fmt, args) \
+#ifndef vprintfa
+#define vprintfa(fmt, args) \
 ({\
-	char *_X = alloca(sp_vprintfz(fmt,args)); vsprintf(_X, fmt, args);_X;\
+	char *_X = alloca(vprintfza(fmt,args)); vsprintf(_X, fmt, args);_X;\
+})
+#endif
+
+/* call conforming function prototype and alloc stack memory */
+#define evala(fn, source, bytes) \
+({\
+	char *_X = alloca(fn##_size(bytes)); fn(source, bytes, _X); _X; \
 })
 
 /* Stack-based network layer functions */
-#define sp_inet_ntop(af, addr) \
+#define inet_ntopa(af, addr) \
 ({\
 	size_t _L = af == AF_INET ? INET_ADDRSTRLEN : INET6_ADDRSTRLEN;\
 	char *_S = alloca(_L + 1);\
@@ -127,7 +128,33 @@ struct mm_stack {
 })
 
 _unused _noinline static unsigned int
-sp_printfz(const char *fmt, ...)
+printfza(const char *fmt, ...)
+{
+	char *string = alloca(MM_STACK_BLOCK_SIZE);
+	unsigned int avail =  MM_STACK_BLOCK_SIZE;
+
+	va_list args, args2;
+	va_start(args, fmt);
+
+stack_avail:	
+	va_copy(args2, args);
+	int size = vsnprintf(string, avail, fmt, args2);
+	va_end(args2);
+
+	if (unlikely(size < 0)) {
+		avail *= 2;
+		string = alloca(avail);
+		goto stack_avail;
+	}
+
+	va_end(args);
+	return size + 1;
+}
+
+struct mm_stack_struct;
+
+_unused _noinline static unsigned int 
+printfza_safe(struct mm_stack_struct *sp, const char *fmt, ...)
 {
 	char *string = alloca(MM_STACK_BLOCK_SIZE);
 	unsigned int avail =  MM_STACK_BLOCK_SIZE;
@@ -151,32 +178,7 @@ stack_avail:
 }
 
 _unused _noinline static unsigned int 
-sp_printfz_safe(struct mm_stack *sp, const char *fmt, ...)
-{
-	char *string = alloca(MM_STACK_BLOCK_SIZE);
-	unsigned int avail =  MM_STACK_BLOCK_SIZE;
-
-	va_list args, args2;
-	va_start(args, fmt);
-
-stack_avail:	
-	va_copy(args2, args);
-	int size = vsnprintf(string, avail, fmt, args2);
-	va_end(args2);
-
-	if (unlikely(size < 0)) {
-		avail *= 2;
-		string = alloca(avail);
-		goto stack_avail;
-	}
-
-	va_end(args);
-	return size + 1;
-}
-
-
-_unused _noinline static unsigned int 
-sp_vprintfz(const char *fmt, va_list args)
+vprintfza(const char *fmt, va_list args)
 {
 	char *string = alloca(MM_STACK_BLOCK_SIZE);
 	unsigned int avail  = MM_STACK_BLOCK_SIZE;
@@ -199,7 +201,7 @@ stack_avail:
 
 /* Save version which check for the maximum limit for the current frame */
 _unused _noinline static unsigned int 
-sp_vprintfz_safe(struct mm_stack *sp, const char *fmt, va_list args)
+vprintfza_safe(struct mm_stack_struct *sp, const char *fmt, va_list args)
 {
 	char *string = alloca(MM_STACK_BLOCK_SIZE);
 	unsigned int avail  = MM_STACK_BLOCK_SIZE;

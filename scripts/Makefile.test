@@ -4,6 +4,8 @@
 #
 # testprogs-y := test1
 # test1-y := main.o helper.o
+testld_flags = 
+testld_builtin = arch/$(SRCARCH)/built-in.o sys/built-in.o mem/built-in.o
 
 __testprogs := $(sort $(testprogs-y))
 
@@ -20,23 +22,22 @@ __obj_fixed := $(patsubst %/,%,$(obj))
 __src_fixed := $(patsubst %/,%,$(src))
 
 # Add $(obj) prefix to all paths
-test-csingle := $(addprefix $(__obj_fixed)/,$(test-csingle))
-test-cmulti  := $(addprefix $(__obj_fixed)/,$(test-cmulti))
-test-cobjs   := $(addprefix $(__obj_fixed)/,$(test-cobjs))
+test-csingle := $(addprefix $(__obj_fixed)/,$(test-csingle)) 
+test-cmulti  := $(addprefix $(__obj_fixed)/,$(test-cmulti)) 
+test-cobjs   := $(addprefix $(__obj_fixed)/,$(test-cobjs)) 
 
 # Options to testcc.
-testc_flags = -Wp,-MD,$(depfile) $(KBUILD_CFLAGS) $(KBUILD_CPPFLAGS) \
-	      $(USERINCLUDE) $(TEST_CFLAGS) -I. -I../ \
+testc_flags = -g -O0 -Wp,-MD,$(depfile) $(KBUILD_CFLAGS) $(KBUILD_CPPFLAGS) \
+	      $(USERINCLUDE) $(TEST_CFLAGS) -I. -I../ -I../include \
 	      -include $(srctree)/sys/$(PLATFORM)/platform.h
 
 testld_flags = 
-testld_builtin = arch/$(SRCARCH)/built-in.o sys/$(PLATFORM)/built-in.o sys/unix/built-in.o mem/built-in.o
 testld_libs = $(KBUILD_LIBS)
 
 # test-csingle -> executable
 quiet_cmd_test-csingle = CC      $@
-      cmd_test-csingle = $(CC) $(testc_flags) -o $@ $< $(testld_builtin) \
-                               $(testld_libs)
+      cmd_test-csingle = $(CC) $(LDFLAGS_$(*F)) $(testc_flags) -o $@ $< $(testld_builtin) \
+                               $(testld_libs) $(LIBS_$(*F)) $(KBUILD_LIBS)
 
 $(test-csingle): $(__obj_fixed)/%: $(__src_fixed)/%.c FORCE
 	$(call if_changed_dep,test-csingle)
@@ -52,7 +53,7 @@ $(test-cobjs): $(__obj_fixed)/%.o: $(__src_fixed)/%.c FORCE
 quiet_cmd_test-cmulti	= LD      $@
       cmd_test-cmulti	= $(CC) $(testld_flags) -o $@ \
 			  $(addprefix $(obj)/,$($(@F)-y)) $(testld_builtin) \
-      			  $(testld_libs)
+      			  $(testld_libs) $(LIBS_$(*F)) $(KBUILD_LIBS)
 $(test-cmulti): $(__obj_fixed)/%: $(test-cobjs) FORCE
 	$(call if_changed,test-cmulti)
 

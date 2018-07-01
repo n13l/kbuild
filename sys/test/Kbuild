@@ -1,3 +1,0 @@
-testprogs-y := sandbox
-testprogs-y += hash
-subdir-y := perf/ mem/

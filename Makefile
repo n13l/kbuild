@@ -627,7 +627,7 @@ endif # $(dot-config)
 -include include/config/package.config
 export BUILD_DIRS
 
-objs-y += arch/$(SRCARCH) sys/$(PLATFORM) sys/unix mem sys/test sys/tools \
+objs-y += arch/$(SRCARCH) sys sys/$(PLATFORM) sys/unix mem test  \
           $(BUILD_DIRS)
 
 include arch/$(SRCARCH)/Makefile                                                
