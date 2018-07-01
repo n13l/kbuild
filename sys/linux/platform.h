@@ -20,4 +20,20 @@
 #define gmtime_s(a,b) gmtime_r(b,a)
 #endif
 
+const char *
+get_process_file(void);
+
+#include <sys/syscall.h>
+#ifdef SYS_gettid
+static inline pid_t gettid(void)
+{
+	return syscall(SYS_gettid);
+}
+#else
+#error "SYS_gettid unavailable on this system"
+#endif
+
+char **setproctitle_init(int argc, char *argv[]);
+void setproctitle(const char *fmt, ...);
+
 #endif

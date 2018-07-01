@@ -29,7 +29,7 @@
 #include <sys/cpu.h>
 #include <sys/log.h>
 #include <sys/decls.h>
-#include <list.h>
+#include <cex/list.h>
 
 struct mm_savepoint {
 	size_t avail[2];

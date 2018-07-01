@@ -1,6 +1,9 @@
 #ifndef __SYS_PLATFORM_H__
 #define __SYS_PLATFORM_H__
 
+#include <sys/compiler.h>
+#include <sys/time.h>
+
 #define SHLIB_EX           "dylib"
 
 #define HAVE_STRING_H
@@ -22,7 +25,27 @@ mremap(void *addr, int size , int , int);
 
 struct timespec;
 
+#ifndef gettid
+#define gettid(...) (int)1
+#endif
+
 int
 posix_clock_gettime(int clock_id, struct timespec *ts);
+
+struct mach_header;
+
+struct dl_phdr_info {
+	void *dlpi_addr;
+	const char *dlpi_name;
+	const struct mach_header *dlpi_phdr;
+	u64 dlpi_phnum;
+};
+
+int
+dl_iterate_phdr(int (*cb) (struct dl_phdr_info *info, 
+                size_t size, void *data), void *data);
+
+static inline char **setproctitle_init(int argc, char *argv[]) {return argv; };
+static inline void setproctitle(const char *fmt, ...) { };
 
 #endif

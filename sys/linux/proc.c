@@ -32,6 +32,12 @@
  * SUCH DAMAGE.
  */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+
+#undef HAVE_SETPROCTITLE
+
 #ifndef HAVE_SETPROCTITLE
 
 #include <stdlib.h>
@@ -46,8 +52,6 @@
 #ifdef HAVE_SYS_PSTAT_H
 #include <sys/pstat.h>
 #endif
-
-#include <sched.h>
 
 #if defined(CONFIG_DARWIN)
 #include <crt_externs.h>
@@ -75,7 +79,7 @@ static size_t argv_len = 0;
 
 #endif /* HAVE_SETPROCTITLE */
 
-void
+char **
 setproctitle_init(int argc, char *argv[])
 {
 #if defined(SPT_TYPE) && SPT_TYPE == SPT_REUSEARGV
@@ -92,14 +96,14 @@ setproctitle_init(int argc, char *argv[])
 	 */
 
 	if (argc == 0 || argv[0] == NULL)
-		return;
+		return argv;
 
 	/* Fail if we can't allocate room for the new environment */
 	for (i = 0; envp[i] != NULL; i++)
 		;
 	if ((environ = calloc(i + 1, sizeof(*environ))) == NULL) {
 		environ = envp;	/* put it back */
-		return;
+		return argv;
 	}
 
 	/*
@@ -125,6 +129,7 @@ setproctitle_init(int argc, char *argv[])
 		environ[i] = strdup((const char *)envp[i]);
 	environ[i] = NULL;
 #endif /* SPT_REUSEARGV */
+	return argv;
 }
 
 #ifndef HAVE_SETPROCTITLE
@@ -179,3 +184,10 @@ cpu_set_affinity(int id, int mode, int cpu)
 
 	return 0;                                                               
 }
+
+/* 
+if (prctl(PR_SET_PDEATHSIG, SIGHUP) < 0)
+die("prctl reason=%s", strerror(errno));
+debug4("prctl type=PR_SET_PDEATHSIG sig=SIGHUP");
+*/
+	

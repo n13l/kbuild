@@ -32,7 +32,7 @@
 #include <sys/decls.h>
 #include <mem/debug.h>
 #include <mem/vm.h>
-#include <list.h>
+#include <cex/list.h>
 
 __BEGIN_DECLS
 
