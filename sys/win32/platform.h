@@ -18,6 +18,11 @@
 
 #define F_GETFL 4
 
+int
+flock(int fd, int cmd);
+
+int
+kill(int pid, int signo);
 
 #if defined(__MINGW32__) || defined(__MINGW64__) 
 
@@ -42,12 +47,6 @@ fcntl(int fd, int cmd, ... /* arg */ );
 #else
 
 #endif
-
-/*
-#ifndef gmtime_r
-#define gmtime_r(a,b) gmtime_s(b,a)
-#endif
-*/
 
 struct tm *
 gmtime_r(const time_t *timep, struct tm *result);
