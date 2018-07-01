@@ -65,7 +65,7 @@ fi
 if [ "$BUILD_ARCH" == "s390x" ]; then
   echo "deb http://ftp.de.debian.org/debian sid main contrib non-free" | sudo tee -a /etc/apt/sources.list
   sudo apt-get update -qq
-  sudo -E apt-get -yq --no-install-suggests --no-install-recommends --allow-unauthenticated -o Dpkg::Options::="--force-overwrite" install flex bison gperf pkg-config gcc-s390x-linux-gnu binutils-s390x-linux-gnu linux-libc-dev-s390x-cross libc6-s390x-cross libc6-dev-s390x-cross qemu-user-static binfmt-support
+  sudo -E apt-get -yq --no-install-suggests --no-install-recommends --allow-unauthenticated install flex bison gperf pkg-config gcc-s390x-linux-gnu binutils-s390x-linux-gnu linux-libc-dev-s390x-cross libc6-s390x-cross libc6-dev-s390x-cross qemu-user-static binfmt-support
   unset CC
   export CROSS_COMPILE=s390x-linux-gnu-
   export OS_EXEC="echo"
