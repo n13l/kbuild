@@ -158,10 +158,10 @@ script:
 - wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
 - tar -xvzf gperf-3.1.tar.gz
 - cd gperf-3.1/
-- ./configure --prefix=/tmp/local
+- ./configure --prefix=$TMPDIR/local
 - make
 - make install
-- export PATH=/tmp/local/bin:$PATH
+- export PATH=$TMPDIR/local/bin:$PATH
 - cd ..
 - uname -a
 - make defconfig
