@@ -124,6 +124,11 @@ void win32_stacktrace(void *ctx);
 static inline char **setproctitle_init(int argc, char *argv[]) {return argv; };
 static inline void setproctitle(const char *fmt, ...) { };
 
+#if defined(_WIN32) || defined(_WIN64)
+/* We are on Windows */
+# define strtok_r strtok_s
+#endif
+
 ssize_t
 getline(char **buf, size_t *bufsiz, FILE *fp);
 #ifndef INET6_ADDRSTRLEN
