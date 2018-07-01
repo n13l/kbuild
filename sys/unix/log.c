@@ -9,6 +9,14 @@
 #include <syslog.h>
 #include <sys/log.h>
 
+#ifndef LOG_NDELAY
+#define LOG_NDELAY 0
+#endif
+
+#ifndef LOG_CONS
+#define LOG_CONS
+#endif
+
 static const char *log_lnames[] = {
 	[LOG_ERROR]  = "error",
 	[LOG_INFO]   = "info",
