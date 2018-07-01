@@ -114,6 +114,8 @@ test_alloc_stack(size_t size, long long unsigned iter)
 int 
 main(int argc, char *argv[]) 
 {
+	log_open("stdout", 0);
+
 	struct mm_pool *pool = mm_pool_create(CPU_PAGE_SIZE * 40, 0);
 
 	test_alloc_stack(CPU_CACHE_LINE, iterations);
