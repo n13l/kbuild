@@ -19,15 +19,13 @@ export VERSION="$BUILD_MAJOR"
 export PATCHLEVEL="$BUILD_MINOR"
 export SUBLEVEL="$BUILD_REVISION"
 
-if [ "$TRAVIS_OS_NAME" != "osx" ]; then                                       
-  wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                      
-  tar -xvzf gperf-3.1.tar.gz                                                  
-  cd gperf-3.1                                                                
-  ./configure --prefix=$HOME/local                                            
-  make                                                                        
-  make install                                                                
-  cd ..                                                                       
-fi
+wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                      
+tar -xvzf gperf-3.1.tar.gz                                                  
+cd gperf-3.1                                                                
+./configure --prefix=$HOME/local                                            
+make                                                                        
+make install                                                                
+cd ..                                                                       
 
 if [ "$BUILD_TARGET" == "win32" ]; then 
 #  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys
