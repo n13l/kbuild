@@ -29,8 +29,8 @@ echo "enter1: $NEWPWD/local/gperf-3.1"
 echo "enter2: $NEWPWD/local/gperf-3.1"
 $NEWPWD/local/gperf-3.1/configure --prefix=$NEWPWD/local
 echo "enter3: $NEWPWD/local/gperf-3.1"
-make -f $NEWPWD/local/gperf-3.1/Makefile make
-make -f $NEWPWD/local/gperf-3.1/Makefile install
+make
+make install
 #cd $NEWPWD
 
 if [ "$BUILD_TARGET" == "win32" ]; then 
