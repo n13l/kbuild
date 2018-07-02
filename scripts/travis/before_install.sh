@@ -116,7 +116,7 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   unset CROSS_COMPILE 
   export BUILD_OS_NAME="osx"
   brew update 
-  brew install flex bison gperftools3.1
+  brew install flex bison gperftools@3.1
 fi
 
 if [ "$BUILD_TARGET" == "linux" ]; then
