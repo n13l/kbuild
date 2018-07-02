@@ -2,7 +2,7 @@
 #define __POSIX_DARWIN_LINK_H__
 
 struct mach_header;
-
+/*
 struct dl_phdr_info {
 	void *dlpi_addr;
 	const char *dlpi_name;
@@ -13,5 +13,5 @@ struct dl_phdr_info {
 int
 dl_iterate_phdr(int (*cb) (struct dl_phdr_info *info, 
                 size_t size, void *data), void *data);
-
+*/
 #endif
