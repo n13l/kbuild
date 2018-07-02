@@ -21,13 +21,15 @@ export SUBLEVEL="$BUILD_REVISION"
 
 shell_session_update() { :; }
 if [ "$TRAVIS_OS_NAME" != "osx" ]; then
-  wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                      
-  tar -xvzf gperf-3.1.tar.gz                                                  
-  cd gperf-3.1                                                                
-  ./configure --prefix=$HOME/local                                            
-  make                                                                        
-  make install                                                                
-  cd ..                                                                       
+  wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
+  export NEWPWD=$PWD
+  mkdir -P $NEWPWD/local
+  tar -xvzf gperf-3.1.tar.gz -C $NEWPWD/local
+  cd $NEWPWD/local/gperf-3.1
+  ./configure --prefix=$NEWPWD/local
+  make
+  make install
+  cd $NEWPWD
 fi
 if [ "$BUILD_TARGET" == "win32" ]; then 
 #  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys
@@ -116,7 +118,7 @@ if [ "$TRAVIS_OS_NAME" == "osx" ]; then
   unset CROSS_COMPILE 
   export BUILD_OS_NAME="osx"
   brew update 
-  brew install flex bison gperftools@3.1
+  brew install flex bison gperftools
 fi
 
 if [ "$BUILD_TARGET" == "linux" ]; then
