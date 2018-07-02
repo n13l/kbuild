@@ -1,5 +1,5 @@
 #!/bin/sh
-#set -e
+set -e
 export BUILD_MAJOR=0
 export BUILD_MINOR=0
 export BUILD_REVISION=1
@@ -25,13 +25,13 @@ export NEWPWD=$PWD
 mkdir $NEWPWD/local
 tar -xvzf gperf-3.1.tar.gz -C $NEWPWD/local
 echo "enter1: $NEWPWD/local/gperf-3.1"
-cd $NEWPWD/local/gperf-3.1
-echo "enter2: $NEWPWD/local/gperf-3.1"
-./configure --prefix=$NEWPWD/local
-echo "enter3: $NEWPWD/local/gperf-3.1"
-make
-make install
-cd $NEWPWD
+sh -c 'cd $NEWPWD/local/gperf-3.1 && ./configure --prefix=$NEWPWD/local && make && make install'
+#echo "enter2: $NEWPWD/local/gperf-3.1"
+#./configure --prefix=$NEWPWD/local
+#echo "enter3: $NEWPWD/local/gperf-3.1"
+#make
+#make install
+#cd $NEWPWD
 
 if [ "$BUILD_TARGET" == "win32" ]; then 
 #  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys
