@@ -25,7 +25,7 @@ export NEWPWD=$PWD
 mkdir $NEWPWD/local
 tar -xvzf gperf-3.1.tar.gz -C $NEWPWD/local
 echo "enter1: $NEWPWD/local/gperf-3.1"
-cd $NEWPWD/local/gperf-3.1
+#cd $NEWPWD/local/gperf-3.1
 echo "enter2: $NEWPWD/local/gperf-3.1"
 $NEWPWD/local/gperf-3.1/configure --prefix=$NEWPWD/local
 echo "enter3: $NEWPWD/local/gperf-3.1"
