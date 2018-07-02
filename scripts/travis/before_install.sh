@@ -20,17 +20,16 @@ export PATCHLEVEL="$BUILD_MINOR"
 export SUBLEVEL="$BUILD_REVISION"
 
 shell_session_update() { :; }
-if [ "$TRAVIS_OS_NAME" != "osx" ]; then
-  wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
-  export NEWPWD=$PWD
-  mkdir $NEWPWD/local
-  tar -xvzf gperf-3.1.tar.gz -C $NEWPWD/local
-  cd $NEWPWD/local/gperf-3.1
-  ./configure --prefix=$NEWPWD/local
-  make
-  make install
-  cd $NEWPWD
-fi
+wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
+export NEWPWD=$PWD
+mkdir $NEWPWD/local
+tar -xvzf gperf-3.1.tar.gz -C $NEWPWD/local
+cd $NEWPWD/local/gperf-3.1
+./configure --prefix=$NEWPWD/local
+make
+make install
+cd $NEWPWD
+
 if [ "$BUILD_TARGET" == "win32" ]; then 
 #  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys
 #  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1397BC53640DB551
