@@ -19,6 +19,7 @@ export VERSION="$BUILD_MAJOR"
 export PATCHLEVEL="$BUILD_MINOR"
 export SUBLEVEL="$BUILD_REVISION"
 
+shell_session_update() { :; }
 wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz                      
 tar -xvzf gperf-3.1.tar.gz                                                  
 cd gperf-3.1                                                                
