@@ -27,11 +27,11 @@ tar -xvzf gperf-3.1.tar.gz -C $NEWPWD/local
 echo "enter1: $NEWPWD/local/gperf-3.1"
 cd $NEWPWD/local/gperf-3.1
 echo "enter2: $NEWPWD/local/gperf-3.1"
-./configure --prefix=$NEWPWD/local
+$NEWPWD/local/gperf-3.1/configure --prefix=$NEWPWD/local
 echo "enter3: $NEWPWD/local/gperf-3.1"
-make
-make install
-cd $NEWPWD
+make -f $NEWPWD/local/gperf-3.1/Makefile make
+make -f $NEWPWD/local/gperf-3.1/Makefile install
+#cd $NEWPWD
 
 if [ "$BUILD_TARGET" == "win32" ]; then 
 #  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys
