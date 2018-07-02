@@ -23,7 +23,7 @@ shell_session_update() { :; }
 if [ "$TRAVIS_OS_NAME" != "osx" ]; then
   wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
   export NEWPWD=$PWD
-  mkdir -P $NEWPWD/local
+  mkdir $NEWPWD/local
   tar -xvzf gperf-3.1.tar.gz -C $NEWPWD/local
   cd $NEWPWD/local/gperf-3.1
   ./configure --prefix=$NEWPWD/local
