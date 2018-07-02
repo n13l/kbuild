@@ -155,7 +155,7 @@ before_install:
   - source ./scripts/travis/before_install.sh
 script:
 #- shell_session_update() { :; } # workarround mac os build bug
-- export PATH=$HOME/local/bin:$PATH
+- export PATH=$PWD/local/bin:$PATH
 - uname -a
 - make defconfig
 - cat ./obj/.config
