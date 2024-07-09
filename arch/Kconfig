@@ -38,14 +38,6 @@ config HAVE_EFFICIENT_UNALIGNED_ACCESS
 	  See Documentation/unaligned-memory-access.txt for more
 	  information on the topic of unaligned memory accesses.
 
-config HAVE_ALIGNED_STRUCT_PAGE
-	bool
-	help
-	  This makes sure that struct pages are double word aligned and that
-	  e.g. the SLUB allocator can perform double word atomic operations
-	  on a struct page for better performance. However selecting this
-	  might increase the size of a struct page by a word.
-
 config HAVE_CC_STACKPROTECTOR
 	bool
 	help
@@ -68,15 +60,6 @@ config TARGET
 config SUBARCH
 	string
 
-config ARCH_ENABLE_MEMORY_POOL
-	def_bool n
-
-config HAVE_ARCH_ALLOC_PAGE
-	def_bool n
-
-config HAVE_ARCH_FREE_PAGE
-	def_bool n
-
 config MEMORY_HOTPLUG
 	def_bool n
 config MEMORY_HOTREMOVE
@@ -90,18 +73,5 @@ config ARCH_ENABLE_MEMORY_HOTREMOVE
         def_bool y                                                              
         depends on MEMORY_HOTPLUG                                               
                                                                                 
-config USE_PERCPU_NUMA_NODE_ID                                                  
-        def_bool y                                                              
-        depends on NUMA
-
-config HAVE_CMPXCHG_LOCAL                                                       
-        bool                                                                    
-                                                                                
-config HAVE_CMPXCHG_DOUBLE                                                      
-        bool
-
 config USE_EFFICIENT_MMAP
 	def_bool !ARCH_SUPPORTS_PAGEALLOC
-
-config ARCH_SUPPORTS_PAGEALLOC
-	def_bool n
