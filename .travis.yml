@@ -172,7 +172,7 @@ deploy:
   prerelease: true
   draft: true
   api_key:
-    secure: OfYWkedmramdd2ML/dL+lQ+rYWLNaLWy1HfMxxyKwOZThIgWekxhy9EeqEVAisGXBU6qEe9FpsrOi3EUb3OwUNLmKz5b46fs8DpcjsFTKEGhkpXPDJJiwf5Sk0kOUvQp34euv5tBzMFrDxcB/vOpgFMjvWVx5j7BM+e8X0t3RMJANp7vEK5v71KjbbvERZTVaVAeFLrC5vcqcbwad/0fVGJYcvDXRmzs0W8Vc9v8OznfhbwtCj0f8HyfYoPkUXudzDYyDGoGbadKrbeLYYx/fQqlCeLxxLsfjTStYe3fGer2pPUJIBHUL3vvQRhBNr4t89zVvkUcmg7ems2/SG1gCeIX1E1WbnMxpNd98v1CP4Ku7LfJTkpjOv+0FWCbKj32AtoklOMzU8FQw/X/Ys4+Qpo42v4u4NVzWcDTR7y7TQcnOqqmhBbU5GJs+xz3p1bDm0Q2aOwqUGo7OACQ4my5xjjPLCNrV5/FFv3GYn4XutHZjvyLPie7AMArggITSTPZEMn3SYYdxyDp+VloW2vHfI3jByDFwjDGMr3TN6dZyGXXI9DWXeqizVKG5t9P3zc6Vda+VLCaq3AC2vl57RSooDEg3m3kPEEuI+P2omnHuCgAXuHVQaxw5aji+fk72G6zYuTcAMhJJQujWFIQxRtuSZwDZc7M7DOpg5xE7dTfrVA=
+    secure: 
   file_glob: true
   file: "$BUILD_ARCHIVE"
   skip_cleanup: true
