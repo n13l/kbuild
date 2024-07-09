@@ -43,10 +43,9 @@ source "arch/$SRCARCH/Kconfig"
 source "arch/Kconfig"
 endmenu
 
-source "scripts/Kconfig.cc"
+source "scripts/Kconfig.compiler"
 source "scripts/Kconfig.modules"
 source "scripts/Kconfig.debug"
-source "scripts/Kconfig.bindings"
 endmenu
 
 source "$PACKAGE_NAME.kconfig"
