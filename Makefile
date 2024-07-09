@@ -627,8 +627,7 @@ endif # $(dot-config)
 -include include/config/package.config
 export BUILD_DIRS
 
-objs-y += arch/$(SRCARCH) sys sys/$(PLATFORM) sys/unix mem test  \
-          $(BUILD_DIRS)
+objs-y += arch/$(SRCARCH) $(BUILD_DIRS)
 
 include arch/$(SRCARCH)/Makefile                                                
 -include modules/Makefile                                                        
@@ -1195,7 +1194,7 @@ clean: archclean libarchclean
 #
 mrproper: rm-dirs  := $(wildcard $(MRPROPER_DIRS))
 mrproper: rm-files := $(wildcard $(MRPROPER_FILES))
-mrproper-dirs      := $(addprefix _mrproper_,scripts/doc/DocBook scripts)
+mrproper-dirs      := $(addprefix _mrproper_, scripts)
 
 PHONY += $(mrproper-dirs) mrproper archmrproper
 $(mrproper-dirs):
@@ -1287,9 +1286,6 @@ help:
 	@echo  ''
 	@echo  'Packaging:'
 	@$(MAKE) $(build)=$(package-dir) help
-	@echo  ''
-	@echo  'Documentation targets:'
-#@$(MAKE) -f $(srctree)/scripts/doc/DocBook/Makefile dochelp
 	@echo  ''
 	@echo  'Architecture specific targets ($(SRCARCH)):'
 	@$(if $(archhelp),$(archhelp),\

@@ -1,4 +1,0 @@
-obj-$(CONFIG_WINDOWS) += pe/
-obj-$(CONFIG_LINUX)   += elf/
-obj-$(CONFIG_DARWIN)  += mach/
-obj-$(CONFIG_AIX)     += elf/
