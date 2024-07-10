@@ -392,11 +392,7 @@ USERINCLUDE    := \
 		-include include/generated/autoconf.h \
 		-I$(srctree)/lib \
 		-Ilib -I$(srctree)/arch \
-		-I$(srctree)/sys \
-		-I$(srctree)/sys/unix \
 		-I$(srctree)/arch/$(hdr-arch) \
-		-include $(srctree)/sys/$(PLATFORM)/platform.h \
-		-I$(srctree)/sys/$(PLATFORM) \
 		-I..
 
 # Use LINUXINCLUDE when you must reference the include/ directory.

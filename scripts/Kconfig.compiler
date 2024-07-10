@@ -1,20 +1,84 @@
-config CC_FEATURES
-	bool "Enable compiler features"
+config CC_OPTIMIZE
+	bool "Enable compiler optimizations"
+	default y if !DEBUG
 	help
-	Say Y if you want to enable specific compiler features, such as
-	stack protector.
-	If you say N here, those features are not available.
+	  Say Y if you want to enable debug functions, such as
+	  sys_dbg.
+	  If you say N here, those functions are not compiled.
 
-config CC_PP_OUTPUT
-	bool "Enable pre-processing output" 
-	depends on CC_FEATURES
-	default n
+choice
+	prompt "Optimize "
+	depends on CC_OPTIMIZE
+
+config CC_OPTIMIZE_FOR_SPEED
+        bool "for speed"
+        depends on CC_OPTIMIZE
+        help
+          Enabling this option will pass "-O2" instead of "-Os" to
+          your compiler resulting in a faster code.
+
+          If unsure, say N
+
+config CC_OPTIMIZE_FOR_SIZE
+	bool "for size"
+	depends on CC_OPTIMIZE
 	help
-	Say Y If you want to enable pre-processing output with extension .i
+	Enabling this option will pass "-Os" instead of "-O2" to
+	your compiler resulting in a smaller code.
+
+	If unsure, say N
+endchoice
+
+config CC_PIC
+	bool "Enable Position-independent code"
+	default y
+	help
+	Position-independent code (PIC) is code that can execute regardless of
+	its absolute address (i.e. by using relative addressing).
+	PIC is used for shared libraries, allowing library code to be located
+	anywhere in memory.
+
+config CC_STDLIB
+	bool "Use the standard system startup libraries"
+	default y
+	help
+	  Use the standard system startup libraries when linking.
+
+config CC_CLIB
+	bool "Use the C library"
+	default y
+	help
+	  Use the C library when linking. When disabled, still link with the startup files.
+
+config MEASURE
+        bool "Enable Measurements"                                             
+        default y                                                               
+        help                                                                    
+          Say Y if you want to enable measurements.
+
+config SILENT
+        bool "Enable Silent Mode"                                             
+        default n                                                               
+        depends on !LOGGING
+        help                                                                    
+          Say Y if you want to enable silent mode.
+
+config LOGGING                                                           
+        bool "Enable Log Functions"                                             
+        default y                                                               
+        help                                                                    
+          Say Y if you want to enable log functions, such as                    
+          print_dbg, print_info, print_warn, print_err.                         
+          If you say N here, those functions are not compiled.                  
+
+config TRACE
+        bool "Enable Trace Functions"                                             
+        default y                                                               
+        help                                                                    
+          Say Y if you want to enable trace functions.
 
 config CC_STACKPROTECTOR
 	def_bool n
-	depends on CC_FEATURES
 	help
 	Set when a stack-protector mode is enabled, so that the build
 	can enable support for the GCC feature.
@@ -22,7 +86,6 @@ config CC_STACKPROTECTOR
 choice
 	prompt "Stack Protector buffer overflow detection"
 	depends on HAVE_CC_STACKPROTECTOR
-	depends on CC_FEATURES
 	default CC_STACKPROTECTOR_NONE
 	help
 	This option turns on the "stack-protector" GCC feature. This
@@ -30,13 +93,13 @@ choice
 	the stack just before the return address, and validates
 	the value just before actually returning.  Stack based buffer
 	overflows (that need to overwrite this return address) now also
-	overwrite the canary, which gets detected and the attack is then      
-	neutralized via a kernel panic.                                       
+	overwrite the canary, which gets detected and the attack is then
+	neutralized via a kernel panic.
 
-config CC_STACKPROTECTOR_NONE                                                   
-	bool "None"                                                             
-	help                                                                    
-	Disable "stack-protector" GCC feature.                                
+config CC_STACKPROTECTOR_NONE
+	bool "None"
+	help
+	Disable "stack-protector" GCC feature.
 
 config CC_STACKPROTECTOR_REGULAR                                                
 	bool "Regular"                                                          
@@ -73,49 +136,3 @@ config CC_STACKPROTECTOR_STRONG
 	size by about 2%.                                                     
 	
 endchoice
-
-config CC_OPTIMIZE
-	bool "Enable compiler optimizations"
-	default y if !DEBUG
-	depends on CC_FEATURES
-	help
-          Say Y if you want to enable debug functions, such as
-          sys_dbg.
-          If you say N here, those functions are not compiled.
-
-choice
-	prompt "Optimize "
-	depends on CC_OPTIMIZE
-
-config CC_OPTIMIZE_FOR_SPEED
-        bool "for speed"
-        depends on CC_OPTIMIZE
-        help                                                                    
-          Enabling this option will pass "-O2" instead of "-Os" to              
-          your compiler resulting in a faster code.
-                                                                                
-          If unsure, say N
-
-config CC_OPTIMIZE_FOR_SIZE
-	bool "for size"
-	depends on CC_OPTIMIZE
-	help
-	Enabling this option will pass "-Os" instead of "-O2" to
-	your compiler resulting in a smaller code.
-
-	If unsure, say N
-
-endchoice
-
-config CC_IPA
-        bool "Enable IBM XL C/C++ interprocedural analysis optimization"
-        default n
-        depends on CC_FEATURES && CC_OPTIMIZE
-        help
-        IPA (interprocedural analysis) optimization is independent from and can be
-        used in addition to the c89/cc/c++ optimization level options.
-
-        IPA optimization can also improve the execution time of your application.
-        IPA is a mechanism for performing optimizations across function boundaries,
-        even across compilation units. It also performs optimizations not otherwise
-        available with the z/OS XL C/C++ compiler.
