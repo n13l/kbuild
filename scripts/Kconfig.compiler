@@ -29,6 +29,33 @@ config CC_OPTIMIZE_FOR_SIZE
 	If unsure, say N
 endchoice
 
+config CC_RCU
+	bool "Enable (RCU) Read-Write-Update"
+	default n
+	help
+	  Efficient data structures based on RCU and lock-free algorithms.
+          This data synchronization provides userland read-side access which 
+          scales linearly with the number of cores
+
+config CC_RSEQ
+	bool "Enable (RSEQ) Restartable sequences"
+	default n
+	help
+	  Restartable sequences are small segments of user-space code designed 
+          to access per-CPU data structures without the need for heavyweight locking
+
+config CC_CPU_ACCELERATION
+	bool "Enable CPU acceleration"
+	default n
+	help
+	  Say Y if you want to enable CPU acceleration.
+
+config CC_GPU_ACCELERATION
+	bool "Enable GPU acceleration"
+	default n
+	help
+	  Say Y if you want to enable GPU acceleration.
+
 config CC_PIC
 	bool "Enable Position-independent code"
 	default y
@@ -49,6 +76,8 @@ config CC_CLIB
 	default y
 	help
 	  Use the C library when linking. When disabled, still link with the startup files.
+
+
 
 config MEASURE
         bool "Enable Measurements"                                             
