@@ -32,12 +32,14 @@ usage() {
 	echo "  -m    only merge the fragments, do not execute the make command"
 	echo "  -n    use allnoconfig instead of alldefconfig"
 	echo "  -r    list redundant entries when merging fragments"
+	echo "  -q    quiet: compact one-line override reports"
 	echo "  -O    dir to put generated output files"
 }
 
 MAKE=true
 ALLTARGET=alldefconfig
 WARNREDUN=false
+QUIET=false
 OUTPUT=.
 
 while true; do
@@ -58,6 +60,11 @@ while true; do
 		;;
 	"-r")
 		WARNREDUN=true
+		shift
+		continue
+		;;
+	"-q")
+		QUIET=true
 		shift
 		continue
 		;;
@@ -82,6 +89,15 @@ if [ "$#" -lt 2 ] ; then
 	exit
 fi
 
+# Short form of a config line for quiet mode:
+# "# CONFIG_FOO is not set" -> n, "CONFIG_FOO=value" -> value
+cfg_val() {
+	case "$1" in
+	"#"*) echo "n" ;;
+	*) echo "${1#*=}" ;;
+	esac
+}
+
 INITFILE=$1
 shift;
 
@@ -103,10 +119,14 @@ for MERGE_FILE in $MERGE_LIST ; do
 			PREV_VAL=$(grep -w $CFG $TMP_FILE)
 			NEW_VAL=$(grep -w $CFG $MERGE_FILE)
 			if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
+			if [ "$QUIET" = "true" ]; then
+			echo "  $CFG: $(cfg_val "$PREV_VAL") -> $(cfg_val "$NEW_VAL")"
+			else
 			echo Value of $CFG is redefined by fragment $MERGE_FILE:
 			echo Previous  value: $PREV_VAL
 			echo New value:       $NEW_VAL
 			echo
+			fi
 			elif [ "$WARNREDUN" = "true" ]; then
 			echo Value of $CFG is redundant by fragment $MERGE_FILE:
 			fi

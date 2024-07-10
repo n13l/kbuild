@@ -70,6 +70,11 @@ ifneq ($(testprogs-y)$(testprogs-m),)
 include scripts/Makefile.test
 endif
 
+# Do not include cmocka test rules unless needed
+ifneq ($(cmockatest-y)$(cmockatest-m),)
+include scripts/Makefile.cmocka
+endif
+
 # Do not include test rules unless needed
 ifneq ($(toolprogs-y)$(toolprogs-m),)
 include scripts/Makefile.tool
@@ -302,6 +307,10 @@ $(obj)/%.s: $(src)/%.S FORCE
 
 quiet_cmd_as_o_S = AS $(quiet_modtag)  $@
 cmd_as_o_S       = $(CC) $(a_flags) -c -o $@ $<
+
+quiet_cmd_ossl_as_o_S = AS $(quiet_modtag)  $@
+cmd_ossl_as_o_S       = (echo '.hidden OPENSSL_ia32cap_P'; cat $<) | \
+                         $(CC) $(a_flags) -Wa,--noexecstack -c -x assembler -o $@ -
 
 $(obj)/%.o: $(src)/%.S FORCE
 	$(call if_changed_dep,as_o_S)

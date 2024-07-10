@@ -1,8 +1,7 @@
 
 # Kbuild repository template for userland 
-> The same code base is used for a different range of computing systems, from supercomputers to very tiny devices.
-
-[![Build Status](https://travis-ci.org/n13l/kbuild.png?branch=master)](https://travis-ci.org/n13l/kbuild) [![Release](https://img.shields.io/github/release/n13l/kbuild.svg)](https://packagecloud.io/n13l/openaaa) 
+> The same code base is used for a different range of computing systems, from
+supercomputers to very tiny devices.
 
 ## Kbuild 
 - Much simpler makefiles without the glue code that are hard to read and maintain
@@ -18,6 +17,33 @@
 - Clear dependency between features and capabilities
 - Help docs in Kconfig rather than a README
 
+## Native CPU detection (cpucap)
+
+`scripts/cpucap.c` is a dependency-free host probe that reports the CPU
+crypto-acceleration extensions of the build host. It is compiled with `$(HOSTCC)`
+on every make (at parse time) to `$(objtree)/cpucap`, and its `--env` output is
+exported so `arch/*/Kconfig` can read it via `option env`:
+
+| Variable           | Consumed by                                    |
+|--------------------|------------------------------------------------|
+| `HOST_X86_MODEL`   | `arch/x86/Kconfig.cpu` "Processor family"       |
+| `HOST_ARM_MODEL`   | `arch/arm64/Kconfig` "ARM CPU"                  |
+| `HOST_ARM_HAS_DIT` | `arch/arm64/Kconfig` `ARM_DIT`                  |
+
+Enabling `CPU_NATIVE` then auto-selects the processor family matching the build
+host, pulling in its predefined capabilities (AES/PMULL/SHA-2, SHA-3, ...), and
+points the compiler at `-march=native` / `-mcpu=native`.
+
+```
+make cpucap          # report the host's capabilities
+./obj/cpucap --env   # just the detected model
+```
+
+Consuming projects get this for free — no per-project Makefile glue. A project
+that wants to probe differently can export `_CPUCAP_DONE` plus the `HOST_*`
+values from its own top-level Makefile before including kbuild's; the built-in
+probe then stands down.
+
 ## Directory structure
 
 | FilePath                | Description                                          |
@@ -25,9 +51,7 @@
 | Makefile                | The top Makefile.                                    |
 | .config                 | The package configuration file.                      |
 | arch/$(ARCH)/           | The Architecture layer                               |
-| sys/$(PLATFORM)/        | The Platform layer                                   |
-| sys/unix/               | System interfaces compatible with Unix and Linux extensions|
-| mem/                    | Generic, high performance and lock-free Memory Management      |
+| os/$(PLATFORM)/         | The Platform layer                                   |
 | scripts/                | Common rules, scripts and tools for the build system |
 | kbuild Makefiles        | Custom Makfiles                                      |
 
@@ -36,4 +60,15 @@
 | Architecture     | x86_32, x86_64, arm32, arm64, ppc64, os390 , os390x      |
 | Platform         | Linux, Windows, MacOS, iOS, Android, IBM AIX, IBM Z/OS   |
 | Compiler         | GCC, CLANG, XLC                                          |
+
+## Build in Action
+
+```
+git clone git@github.com:n13l/crypto.git
+cd crypto/
+git submodule update --init
+```
+
+![Demo](https://github.com/n13l/crypto/blob/main/.github/assets/demo.gif)
+
 

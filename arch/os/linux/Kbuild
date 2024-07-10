@@ -1,0 +1,28 @@
+# arch/os/linux — Linux process services.
+#
+# What is left of the platform layer after the syscall sites became the way in.
+# Three directories, and the split between them is what needs a process, what
+# needs a C library, and what needs neither:
+#
+#   io/     the system call as the instruction, and the handful of calls a
+#           program makes when there is no libc under it to make them through.
+#           ub is linked -nostdlib, so as a program this is the only way it
+#           reaches the kernel at all — and arch/os/linux/sc needs the same
+#           instruction for a different reason, so it is written once.
+#
+#   scan/   pure functions over a run of code: where the syscall instructions
+#           in it are, and the two bytes that turn one into a trap. No system
+#           calls, no allocation, no state. Both consumers link it — the agent,
+#           which scans its own mappings, and tools/ub-patch, which scans a
+#           file it is about to write.
+#
+#   sc/     the in-process half: walk this process's images, arm the sites the
+#           scan found, and dispatch the trap they raise.
+#
+# PLATFORM is not a Kconfig symbol. kbuild derives it from the target triple
+# before the configuration is read, and every tool and test compile
+# force-includes arch/os/$(PLATFORM)/platform.h — which is empty here and is only
+# ever the file that has to exist.
+obj-$(CONFIG_OS_LINUX_IO)   += io/
+obj-$(CONFIG_OS_LINUX_SCAN) += scan/
+obj-$(CONFIG_OS_LINUX_SC)   += sc/

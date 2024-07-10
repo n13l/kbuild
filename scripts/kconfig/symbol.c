@@ -1056,7 +1056,8 @@ static struct dep_stack {
 	struct expr *expr;
 } *check_top;
 
-static void dep_stack_insert(struct dep_stack *stack, struct symbol *sym)
+static void __attribute__((noinline))
+dep_stack_insert(struct dep_stack *stack, struct symbol *sym)
 {
 	memset(stack, 0, sizeof(*stack));
 	if (check_top)

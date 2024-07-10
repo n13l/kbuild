@@ -1,20 +1,261 @@
-config CC_FEATURES
-	bool "Enable compiler features"
+config CC_OPTIMIZE
+	bool "Enable compiler optimizations"
+	default y if !DEBUG
 	help
-	Say Y if you want to enable specific compiler features, such as
-	stack protector.
-	If you say N here, those features are not available.
+	  Say Y if you want to enable debug functions, such as
+	  sys_dbg.
+	  If you say N here, those functions are not compiled.
 
-config CC_PP_OUTPUT
-	bool "Enable pre-processing output" 
-	depends on CC_FEATURES
+choice
+	prompt "Optimize "
+	depends on CC_OPTIMIZE
+
+config CC_OPTIMIZE_FOR_SPEED
+        bool "for speed"
+        depends on CC_OPTIMIZE
+        help
+          Enabling this option will pass "-O2" instead of "-Os" to
+          your compiler resulting in a faster code.
+
+          If unsure, say y
+
+config CC_OPTIMIZE_FOR_SIZE
+	bool "for size"
+	depends on CC_OPTIMIZE
+	help
+	Enabling this option will pass "-Os" instead of "-O2" to
+	your compiler resulting in a smaller code.
+
+	If unsure, say N
+endchoice
+
+config THREADS
+	bool "Enable Threading support"
+	default y
+	help
+	  Enable multithreading primitives in the hpc runtime. Features that
+	  provide concurrent, lockless access to shared data structures (such
+	  as RCU) build on top of this.
+
+	  If unsure, say Y.
+
+config RCU
+	bool "Enable (RCU) Read-Write-Update"
+	default n
+	depends on THREADS
+	help
+	  Efficient data structures based on RCU and lock-free algorithms.
+          This data synchronization provides userland read-side access which 
+          scales linearly with the number of cores
+
+config CC_RSEQ
+	bool "Enable (RSEQ) Restartable sequences"
 	default n
 	help
-	Say Y If you want to enable pre-processing output with extension .i
+	  Restartable sequences are small segments of user-space code designed 
+          to access per-CPU data structures without the need for heavyweight locking
+
+choice
+	prompt "CPU hardware acceleration"
+	default CC_CPU_ACCEL_RUNTIME
+	help
+	  Select how CPU hardware acceleration (optimized assembly using
+	  SIMD / crypto instruction-set extensions) is chosen.
+
+	  Disabled       - portable C only; runs on any CPU, no acceleration.
+	  Build-time     - fixed to the configured "Processor family"; fastest
+	                   and smallest, but the binary requires a CPU at least
+	                   as capable as that target (no runtime checks).
+	  Runtime        - detect the host CPU at startup (CPUID / hwcaps) and
+	                   pick the best available code path; runs correctly on
+	                   any CPU of the architecture.
+
+config CC_CPU_ACCEL_NONE
+	bool "Disabled (portable C only)"
+	help
+	  No CPU-specific acceleration. Only generic C implementations are
+	  built. The result runs on any CPU of the target architecture.
+
+config CC_CPU_ACCEL_BUILDTIME
+	bool "Build-time (fixed to target CPU)"
+	help
+	  Acceleration is selected at build time from the configured
+	  "Processor family". Only instruction-set extensions guaranteed by
+	  that target are used, with no runtime checks. Fastest and smallest,
+	  but the binary requires a CPU at least as capable as the configured
+	  target (it may fault with an illegal instruction on an older CPU).
+
+config CC_CPU_ACCEL_RUNTIME
+	bool "Runtime CPU detection"
+	help
+	  A self-dispatching implementation is built and the best code path
+	  supported by the host CPU is selected at run time (via CPUID /
+	  hwcaps, populated by a startup constructor). The binary runs
+	  correctly on any CPU of the architecture and automatically uses the
+	  extensions that are actually present, at a small one-time detection
+	  cost.
+
+	  If unsure, choose this.
+
+endchoice
+
+# Backwards-compatibility alias: true whenever any acceleration is enabled.
+# Existing `depends on CC_CPU_ACCELERATION` throughout the tree keep working.
+config CC_CPU_ACCELERATION
+	def_bool CC_CPU_ACCEL_BUILDTIME || CC_CPU_ACCEL_RUNTIME
+
+config CC_GPU_ACCELERATION
+	bool "Enable GPU acceleration"
+	default n
+	help
+	  Say Y if you want to enable GPU acceleration.
+
+config CC_PIC
+	bool "Enable Position-independent code"
+	default n
+	help
+	Position-independent code (PIC) is code that can execute regardless of
+	its absolute address (i.e. by using relative addressing).
+	PIC is used for shared libraries, allowing library code to be located
+	anywhere in memory.
+
+config CC_STRIP
+	bool "Strip executables"
+	default y
+	help
+	  Strip all symbols and debug information from executables and
+	  shared libraries during the build. This significantly reduces
+	  binary size but makes debugging impossible.
+
+	  If unsure, say N.
+
+config CC_STDLIB
+	bool "Use the standard system startup libraries"
+	default y
+	help
+	  Use the standard system startup libraries when linking.
+
+config CC_CLIB
+	bool "Use the C library"
+	default y
+	help
+	  Use the C library when linking. When disabled, still link with the startup files.
+
+config SILENT
+        bool "Enable Silent Mode"
+        default n
+        help
+          Say Y for a build that says nothing about itself: the log functions,
+          the trace points and the measurement instrumentation below are all
+          turned off and cannot be turned back on while this is set.
+
+          It is one switch rather than three because they are one decision -
+          an image that is configured by whoever builds it, and never read by
+          whoever runs it, has no use for any of them - and because leaving
+          one of the three on by accident is how a "silent" build ends up
+          carrying a metric namespace or a log archive it never emits.
+
+          Say N and each of them is a choice of its own again.
+
+config MEASURE
+        bool "Enable Measurements"
+        default y
+        depends on !SILENT
+        help
+          Say Y if you want to enable measurements.
+
+          This turns on the instrumentation half of <hpc/measure.h>: the
+          storage pointer a subsystem counts through, the measure_inc() and
+          friends that bump it, and the metric names and descriptions the
+          reports are labelled with. With it off all of that costs nothing -
+          no field, no branch, no string.
+
+          Metrics the logic itself reads (a gauge like the slab's committed
+          level is an input to the algorithm, not an observation of it) are
+          declared with the always_measure_* family instead, and stay
+          compiled in either way. Only their names and descriptions follow
+          this symbol.
+
+config MEASURE_HISTORY
+        int "Measurement history depth (rows, 0 = none)"
+        depends on MEASURE
+        default 64
+        range 0 65536
+        help
+          How many snapshots one measurement history keeps - the number of
+          rows in the ring that DEFINE_MEASURE_HISTORY() reserves. When the
+          ring is full the oldest row is overwritten, so a history costs a
+          fixed amount of memory: depth * sizeof(struct <ns>_measure) plus a
+          timestamp per row.
+
+          0 keeps no history at all, and not as an empty ring: the rings, the
+          sampler and every loop over rows compile away to nothing. The API
+          stays - the history type keeps the live struct a subsystem counts
+          through, and every measure_history_* macro keeps its shape - so the
+          code that uses it is not touched, only removed.
+
+          64 rows at the default interval is a bit under eleven minutes of
+          recent behaviour, which is what a trend (is the slab still growing?
+          did the hit rate fall off?) needs to be read from.
+
+          Needs CONFIG_MEASURE: without it the symbol goes and the header's
+          own default stands in. Callers that want no history simply do not
+          instantiate one.
+
+config MEASURE_HISTORY_INTERVAL
+        int "Measurement history interval (seconds)"
+        depends on MEASURE
+        default 10
+        range 1 86400
+        help
+          Seconds between history rows. measure_history_tick(), which the
+          application calls from a loop it already has, saves a row only once
+          this much time has passed since the last one; every other call is a
+          compare and a return.
+
+          Shorter resolves bursts, longer covers more time in the same number
+          of rows - the ring holds CONFIG_MEASURE_HISTORY * this many seconds
+          of the recent past either way.
+
+config LOGGING
+        bool "Enable Log Functions"
+        default y
+        depends on !SILENT
+        help
+          Say Y if you want to enable log functions, such as
+          print_dbg, print_info, print_warn, print_err.
+          If you say N here, those functions are not compiled.
+
+config VERBOSE
+        int "Default log verbosity level (0..4)"
+        depends on LOGGING
+        default 2
+        range 0 4
+        help
+          The verbosity a build starts at: the value log_verbose is
+          initialised to, which is what the debug1() .. debug4() gates in
+          <hpc/log.h> compare against. 0 keeps every debug level quiet, 4
+          lets all four through; the levels above them (info, warning, error)
+          are not gated by it and always print.
+
+          This is a default, not a limit. A program that has a verbosity
+          option of its own - -v/--verbose - assigns log_verbose from it after
+          parsing, so the command line still decides what a run says. What
+          this sets is what is said before that point, which is where a
+          configuration error or a failure to reach a device is reported, and
+          what a program without such an option says at all.
+
+          Needs CONFIG_LOGGING: with logging off nothing consults it.
+
+config TRACE
+        bool "Enable Trace Functions"
+        default y
+        depends on !SILENT
+        help
+          Say Y if you want to enable trace functions.
 
 config CC_STACKPROTECTOR
 	def_bool n
-	depends on CC_FEATURES
 	help
 	Set when a stack-protector mode is enabled, so that the build
 	can enable support for the GCC feature.
@@ -22,7 +263,6 @@ config CC_STACKPROTECTOR
 choice
 	prompt "Stack Protector buffer overflow detection"
 	depends on HAVE_CC_STACKPROTECTOR
-	depends on CC_FEATURES
 	default CC_STACKPROTECTOR_NONE
 	help
 	This option turns on the "stack-protector" GCC feature. This
@@ -30,13 +270,13 @@ choice
 	the stack just before the return address, and validates
 	the value just before actually returning.  Stack based buffer
 	overflows (that need to overwrite this return address) now also
-	overwrite the canary, which gets detected and the attack is then      
-	neutralized via a kernel panic.                                       
+	overwrite the canary, which gets detected and the attack is then
+	neutralized via a kernel panic.
 
-config CC_STACKPROTECTOR_NONE                                                   
-	bool "None"                                                             
-	help                                                                    
-	Disable "stack-protector" GCC feature.                                
+config CC_STACKPROTECTOR_NONE
+	bool "None"
+	help
+	Disable "stack-protector" GCC feature.
 
 config CC_STACKPROTECTOR_REGULAR                                                
 	bool "Regular"                                                          
@@ -74,48 +314,43 @@ config CC_STACKPROTECTOR_STRONG
 	
 endchoice
 
-config CC_OPTIMIZE
-	bool "Enable compiler optimizations"
-	default y if !DEBUG
-	depends on CC_FEATURES
+config MODULES
+	bool "Enable loadable module support"
+	depends on CC_PIC
+	default n
+	option modules
 	help
-          Say Y if you want to enable debug functions, such as
-          sys_dbg.
-          If you say N here, those functions are not compiled.
+	  Modules are small pieces of compiled code which can be loaded
+	  and unloaded into the running system. This allows extending
+	  functionality without rebuilding the entire project.
 
-choice
-	prompt "Optimize "
-	depends on CC_OPTIMIZE
+	  If you say N here, all modules in the modules/ directory will
+	  be compiled statically into the main binary with full inlining
+	  for zero overhead.
 
-config CC_OPTIMIZE_FOR_SPEED
-        bool "for speed"
-        depends on CC_OPTIMIZE
-        help                                                                    
-          Enabling this option will pass "-O2" instead of "-Os" to              
-          your compiler resulting in a faster code.
-                                                                                
-          If unsure, say N
+	  If unsure, say N.
 
-config CC_OPTIMIZE_FOR_SIZE
-	bool "for size"
-	depends on CC_OPTIMIZE
-	help
-	Enabling this option will pass "-Os" instead of "-O2" to
-	your compiler resulting in a smaller code.
-
-	If unsure, say N
-
-endchoice
-
-config CC_IPA
-        bool "Enable IBM XL C/C++ interprocedural analysis optimization"
-        default n
-        depends on CC_FEATURES && CC_OPTIMIZE
+config MODVERSIONS
+        bool "Module versioning support"
+	depends on MODULES
+	default n
         help
-        IPA (interprocedural analysis) optimization is independent from and can be
-        used in addition to the c89/cc/c++ optimization level options.
+          Usually, you have to use modules compiled with your package.
+          Saying Y here makes it sometimes possible to use modules
+          compiled for different packages, by adding enough information
+          to the modules to (hopefully) spot any changes which would
+          make them incompatible with the software you are running.  If
+          unsure, say N.
 
-        IPA optimization can also improve the execution time of your application.
-        IPA is a mechanism for performing optimizations across function boundaries,
-        even across compilation units. It also performs optimizations not otherwise
-        available with the z/OS XL C/C++ compiler.
+config MODULE_SRCVERSION_ALL
+        bool "Source checksum for all modules"
+	depends on MODULES
+        help
+          Modules which contain a MODULE_VERSION get an extra "srcversion"
+          field inserted into their modinfo section, which contains a
+          sum of the source files which made it.  This helps maintainers
+          see exactly which source was used to build a module (since
+          others sometimes change the module source without updating
+          the version).  With this option, such a "srcversion" field
+          will be created for all modules.  If unsure, say N.
+

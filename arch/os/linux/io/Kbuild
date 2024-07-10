@@ -1,0 +1,16 @@
+# arch/os/linux/io — the system call, without a C library to make it through.
+#
+# Everything in here exists to not be a call into libc, and the compiler is
+# entitled to make one anyway: a byte loop becomes memcpy(), an array makes the
+# stack protector emit __stack_chk_fail. A build where the line below prints
+# anything at all has grown a dependency this directory exists to not have:
+#
+#	nm -u obj/arch/os/linux/io/io.o
+#
+obj-$(CONFIG_OS_LINUX_IO) += io.o nostdlib.o
+
+# -fno-builtin, and -fno-stack-protector for the same reason one step further
+# out: a distribution that turns the stack protector on by default puts a call
+# to libc's __stack_chk_fail in every function that has an array in it, which
+# in here is most of them.
+ccflags-y += -fno-builtin -fno-stack-protector

@@ -1,0 +1,105 @@
+#
+# arch/os/linux — Linux process services.
+#
+# The code under here acts on a process rather than on data: it decides where
+# the system call instructions in a run of code are, writes one byte over each
+# of them, and stands behind the trap that byte raises. Nothing in it needs a
+# privilege — a process may write to its own text, and the trap it takes is its
+# own signal — and nothing in it is out-of-process: there is no ptrace here and
+# no second program to attach with.
+#
+menu "Linux process services"
+	depends on PLATFORM = "linux"
+
+config OS_LINUX_IO
+	bool "the system call, without a C library to make it through"
+	default y
+	help
+	  _syscall6() and the calls a program makes with it, one _sys_ name
+	  each: _sys_read, _sys_write, _sys_open, _sys_close, _sys_readlink,
+	  _sys_access, _sys_execve, _sys_exit, _sys_getpid, _sys_getppid,
+	  _sys_sendto, _sys_recvfrom, _sys_stat. Beside them, in str.h, are the
+	  string helpers a program with no <string.h> still needs: xstr* macros
+	  that resolve to the C library's strlen/strcmp/... where a build has a
+	  libc and to the hand-written nolibc_ loops here where it does not, plus
+	  nolibc_utoa and nolibc_say. That is why this directory is built
+	  -fno-builtin: otherwise the compiler turns a nolibc_ loop back into the
+	  libc call it was written to replace.
+
+	  This tree links -nostdlib, so tools/ub carries no DT_NEEDED naming a
+	  C library. Preloaded that costs nothing: the process being loaded
+	  into has one, and every undefined symbol resolves out of it. Run as a
+	  program it is the whole difference between starting and not, because
+	  ub is entered at its own entry point with no libc under it — so
+	  everything ub's program half does, it does through here.
+
+	  The same instruction is what arch/os/linux/sc's dispatcher needs, for
+	  the opposite reason: it stands behind an armed system call and must not
+	  reach the kernel through the C library, which is what it armed. One
+	  definition serves both.
+
+	  hpc's logger is the third caller. Its open and its write go through
+	  here whenever this symbol is set (hpc/log/write.c), so a program with
+	  no C library can still log, and so an object that interposes on write
+	  does not catch its own log lines. Formatting stays libc's.
+
+	  It also carries arch/os/linux/io/nostdlib.c, which is the part of
+	  building without a C library that is not a matter of not calling one:
+	  six data symbols hpc's own objects refer to (the getopt globals,
+	  stdout and stderr) whose relocations the loader resolves when the
+	  image is loaded rather than when the code runs. That file says what it
+	  does about them and why.
+
+config OS_LINUX_SCAN
+	bool "the syscall instruction sites in a run of code"
+	depends on ARCH = "x86_64" || ARCH = "arm64"
+	default y
+	help
+	  scan_run(): given a run of machine code and a list of offsets known
+	  to be instruction boundaries, say where in it the system call
+	  instructions are and, where the preceding instruction settled it,
+	  which number each one makes.
+
+	  On x86-64 that needs an instruction length decoder, because
+	  `syscall` is two bytes (0f 05) that also occur inside immediates,
+	  displacements and data — so the run is swept instruction by
+	  instruction from each anchor and a candidate is a site only if the
+	  sweep arrives exactly on it. On arm64 instructions are four bytes and
+	  aligned, and `svc #0` is one word with nothing else to be mistaken
+	  for.
+
+	  It is pure: no system calls, no allocation, no state, and nothing in
+	  it cares whether the bytes came from a mapping or from a file. That
+	  is what lets the agent and ub-patch share one answer to the same
+	  question, one of them at run time and the other at patch time.
+
+config OS_LINUX_SC
+	bool "arm the syscall sites in this process and dispatch the trap"
+	depends on OS_LINUX_SCAN
+	depends on OS_LINUX_IO
+	default y
+	help
+	  sc_open()/sc_arm_self()/sc_close(): walk this process's mappings,
+	  turn every syscall instruction the scan above accepted into an
+	  undefined instruction, and hand what the resulting SIGILL carries —
+	  the number, the six arguments, the site — to one callback.
+
+	  This is how a call is seen at the boundary the kernel draws rather
+	  than at the symbol the loader bound: a program that reaches the
+	  kernel by inline syscall, or through a libc entry point nothing
+	  interposed on, or through sendmsg() and recvmsg(), arrives here all
+	  the same. And it needs neither an environment nor a relink, so it
+	  works on a process that is already running.
+
+	  What it costs is a signal per watched call, which is why only the
+	  sites the scan could not rule out are armed: a site whose preceding
+	  instruction says it makes clock_gettime() is left alone, and one
+	  whose number is not decidable is armed and reverts itself the first
+	  time it turns out to make a call that must not be made from a signal
+	  handler.
+
+	  arch/os/linux/README.md has the whole of it, including the two things it
+	  will not survive: a program that installs its own SIGILL handler
+	  after this one, and a debugger that stops on the trap.
+
+endmenu

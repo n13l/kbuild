@@ -1,0 +1,91 @@
+#
+# cmocka-based unit test support
+#
+# Usage in Kbuild files:
+#
+#   cmockatest-y := test_foo test_bar
+#
+# Will compile test_foo.c and test_bar.c as cmocka test executables.
+#
+# Multi-object tests:
+#   cmockatest-y := test_complex
+#   test_complex-y := test_main.o test_helpers.o
+#
+# Extra link objects (e.g. built-in.o from another directory):
+#   CMOCKA_LIBS_test_foo = modules/built-in.o
+#
+# Extra compiler flags for the test directory:
+#   CMOCKA_CFLAGS = -I$(srctree)/some/path
+#
+
+__cmockatest := $(sort $(cmockatest-y))
+
+# Executables compiled from a single .c file
+cmocka-csingle := $(foreach m,$(__cmockatest),$(if $($(m)-y),,$(m)))
+
+# Executables linked based on several .o files
+cmocka-cmulti := $(foreach m,$(__cmockatest),$(if $($(m)-y),$(m)))
+
+# Object (.o) files compiled from .c files
+cmocka-cobjs := $(sort $(foreach m,$(__cmockatest),$($(m)-y)))
+
+__obj_fixed := $(patsubst %/,%,$(obj))
+__src_fixed := $(patsubst %/,%,$(src))
+
+cmocka-csingle := $(addprefix $(__obj_fixed)/,$(cmocka-csingle))
+cmocka-cmulti  := $(addprefix $(__obj_fixed)/,$(cmocka-cmulti))
+cmocka-cobjs   := $(addprefix $(__obj_fixed)/,$(cmocka-cobjs))
+
+# Compiler flags for cmocka tests
+cmockac_flags = -Wp,-MD,$(depfile) \
+	      $(KBUILD_CFLAGS) $(KBUILD_CPPFLAGS) $(KBUILD_SUBDIR_CCFLAGS) \
+	      $(USERINCLUDE) $(CMOCKA_CFLAGS) -I. -I../ -I../include \
+	      -include $(srctree)/arch/os/$(PLATFORM)/platform.h
+
+# cmocka tests always require libc (setjmp, malloc, etc.)
+cmocka_ldlibs = -lcmocka -lc -lrt -lm
+
+# Every object a test in this directory links in from elsewhere
+# (CMOCKA_LIBS_*), as a prerequisite of all of them.
+#
+# Without this a test binary is only ever relinked when its own sources change,
+# so a test that links a built-in.o from another directory goes on running
+# against whatever that archive held when the test was last compiled - the code
+# under test changes and the test does not notice. That failure is worse than a
+# broken build, because the test still passes, or still fails, for reasons that
+# are no longer in the tree.
+#
+# Over-approximated on purpose: each test gets every test's libs rather than
+# its own, which costs a relink nobody needed and never misses one. Filtered
+# through $(wildcard) so that a lib not yet built is simply not a prerequisite
+# rather than a "no rule to make target", which is what the link error it
+# causes should say instead.
+cmocka-libs := $(sort $(foreach m,$(__cmockatest),$(CMOCKA_LIBS_$(m))))
+cmocka-libs := $(wildcard $(cmocka-libs))
+
+# cmocka-csingle -> executable
+quiet_cmd_cmocka-csingle = CC    $@
+      cmd_cmocka-csingle = $(CC) $(LDFLAGS_$(*F)) $(cmockac_flags) -o $@ $< \
+                               $(CMOCKA_LIBS_$(*F)) $(cmocka_ldlibs)
+
+$(cmocka-csingle): $(__obj_fixed)/%: $(__src_fixed)/%.c $(cmocka-libs) FORCE
+	$(call if_changed_dep,cmocka-csingle)
+
+# cmocka-cobjs -> .o
+quiet_cmd_cmocka-cobjs	= CC      $@
+      cmd_cmocka-cobjs	= $(CC) $(cmockac_flags) -c -o $@ $<
+
+$(cmocka-cobjs): $(__obj_fixed)/%.o: $(__src_fixed)/%.c FORCE
+	$(call if_changed_dep,cmocka-cobjs)
+
+# Link an executable based on list of .o files
+quiet_cmd_cmocka-cmulti	= CC      $@
+      cmd_cmocka-cmulti	= $(CC) -o $@ \
+			  $(addprefix $(obj)/,$($(@F)-y)) \
+			  $(CMOCKA_LIBS_$(*F)) $(cmocka_ldlibs)
+
+$(cmocka-cmulti): $(__obj_fixed)/%: $(cmocka-cobjs) $(cmocka-libs) FORCE
+	$(call if_changed,cmocka-cmulti)
+
+targets += $(cmocka-csingle) $(cmocka-cmulti) $(cmocka-cobjs)
+always += $(cmocka-csingle) $(cmocka-cmulti)

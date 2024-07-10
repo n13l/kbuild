@@ -1,4 +1,3 @@
-export KBUILD_OUTPUT=obj
 VERSION ?= 0
 PATCHLEVEL ?= 0
 SUBLEVEL ?= 1
@@ -124,6 +123,8 @@ ifeq ($(KBUILD_SRC),)
 # Do we want to locate output files in a separate directory?
 ifeq ("$(origin O)", "command line")
   KBUILD_OUTPUT := $(O)
+else
+  KBUILD_OUTPUT := $(CURDIR)/obj
 endif
 
 # That's our default target when none is given on the command line
@@ -219,7 +220,7 @@ obj		:= $(objtree)
 VPATH		:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
 
 export srctree objtree VPATH
-export PACKAGE_NAME=$(shell $(srctree)/scripts/package/name.sh)
+export PACKAGE_NAME:=$(shell $(srctree)/scripts/package/name.sh)
 
 include scripts/Makefile.target
 
@@ -229,12 +230,12 @@ include scripts/Makefile.target
 # then ARCH is assigned, getting whatever value it gets normally, and
 # SUBARCH is subsequently ignored.
 
-SUBARCH ?= $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+SUBARCH := $(or $(SUBARCH),$(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
 				  -e s/sun4u/sparc64/ \
 				  -e s/arm.*/arm/ -e s/sa110/arm/ \
 				  -e s/s390x*/s390/ -e s/parisc64/parisc/ \
 				  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
-				  -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ )
+				  -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ ))
 
 # Cross compiling and selecting different set of gcc/bin-utils
 # ---------------------------------------------------------------------------
@@ -307,13 +308,53 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 HOSTCC       ?= gcc
 HOSTCXX      ?= g++
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wno-format-security \
-	       -Wno-char-subscripts\
-	       -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu99
-HOSTCXXFLAGS = -O2
+	       -Wno-char-subscripts -Wstrict-prototypes -O2 -fomit-frame-pointer
+HOSTCXXFLAGS = 
 
 ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
 #HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter 
 #		-Wno-missing-field-initializers -fno-delete-null-pointer-checks
+endif
+
+# cpucap — build-host CPU crypto-acceleration probe (scripts/cpucap.c).
+#
+# It is compiled with the host compiler and ALWAYS built (on every make, at
+# parse time) to $(objtree)/cpucap, so it is also available as a standalone
+# utility:
+#
+#     make          # (any target — even 'make defconfig' — builds obj/cpucap)
+#     ./obj/cpucap        # print the host's crypto-acceleration capabilities
+#     ./obj/cpucap --env  # print the detected model (HOST_<arch>_MODEL=...)
+#
+# The same binary feeds the CPU_NATIVE Kconfig checkbox (arch/*/Kconfig): its
+# --env output names the build host's best-matching CPU model, which Kconfig
+# reads via `option env` (HOST_X86_MODEL, HOST_ARM_MODEL, HOST_ARM_HAS_DIT) to
+# auto-select the matching processor family and its predefined capabilities.
+# Without the export, kconfig warns that those variables are undefined.
+#
+# The value MUST be computed once and exported so every recursive make (the
+# silentoldconfig sub-make that regenerates auto.conf, the per-directory
+# descends, ...) sees an identical value. Kconfig's env-change tracking
+# (include/config/auto.conf.cmd) forces a reconfigure whenever an `option env`
+# variable differs from the value recorded at configure time; if it were
+# recomputed per-make and ever varied, that check would fire on every pass — an
+# infinite "GEN Makefile" reconfigure loop. The _CPUCAP_DONE sentinel makes the
+# first make build+probe while every inherited sub-make reuses the exported
+# value. It sits ahead of the auto.conf/auto.conf.cmd includes below so the
+# values are defined before that check runs.
+#
+# A project may pre-empt this by exporting _CPUCAP_DONE and the HOST_* values
+# from its own top-level Makefile (e.g. to probe a differently located source);
+# this block then leaves them untouched.
+CPUCAP := $(CURDIR)/cpucap
+CPUCAP_SRC := $(srctree)/scripts/cpucap.c
+export CPUCAP
+ifndef _CPUCAP_DONE
+export _CPUCAP_DONE := 1
+$(shell if test ! -x $(CPUCAP) || test $(CPUCAP_SRC) -nt $(CPUCAP); then \
+		$(HOSTCC) -O2 -o $(CPUCAP) $(CPUCAP_SRC) 2>/dev/null; \
+	fi)
+$(foreach kv,$(shell $(CPUCAP) --env 2>/dev/null),$(eval export $(kv)))
 endif
 
 # Decide whether to build built-in, modular, or both.
@@ -333,9 +374,12 @@ endif
 
 # If we have "make <whatever> modules", compile modules
 # in addition to whatever we do anyway.
-# Just "make" or "make all" shall build modules as well
+# Just "make" or "make all" shall build modules as well.
+# "check" depends on "all", so it must build modules too, otherwise the
+# per-directory modules.order files are never generated and the modules
+# target's awk step fails.
 
-ifneq ($(filter all _all modules,$(MAKECMDGOALS)),)
+ifneq ($(filter all _all modules check,$(MAKECMDGOALS)),)
   KBUILD_MODULES := 1
 endif
 
@@ -378,7 +422,7 @@ PERL		= perl
 PYTHON		= python
 CHECK		= sparse
 
-CHECKFLAGS     := -D__unix__ -Dunix -D__STDC__ -Wbitwise -Wno-return-void $(CF)
+CHECKFLAGS     := -Wbitwise -Wno-return-void $(CF)
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
@@ -392,11 +436,9 @@ USERINCLUDE    := \
 		-include include/generated/autoconf.h \
 		-I$(srctree)/lib \
 		-Ilib -I$(srctree)/arch \
-		-I$(srctree)/sys \
-		-I$(srctree)/sys/unix \
 		-I$(srctree)/arch/$(hdr-arch) \
-		-include $(srctree)/sys/$(PLATFORM)/platform.h \
-		-I$(srctree)/sys/$(PLATFORM) \
+		-iquote $(srctree)/modules \
+		-I$(objtree) \
 		-I..
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
@@ -511,7 +553,8 @@ version_h := include/generated/version.h
 old_version_h := include/version.h
 
 no-dot-config-targets := clean mrproper distclean \
-			 cscope gtags TAGS tags help% %docs check% coccicheck \
+			 cscope gtags TAGS tags help% %docs coccicheck \
+			 checkstack checkincludes checkversion \
 			 $(version_h) headers_% archheaders archscripts \
 			 kernelversion %src-pkg
 
@@ -564,9 +607,13 @@ export KBUILD_DEFCONFIG KBUILD_KCONFIG
 
 config: scripts_basic outputmakefile FORCE
 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+	$(Q)$(CONFIG_SHELL) $(srctree)/vendor/post-config.sh \
+		$(srctree) $(objtree) $(KCONFIG_CONFIG)
 
 %config: scripts_basic outputmakefile FORCE
 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+	$(Q)$(CONFIG_SHELL) $(srctree)/vendor/post-config.sh \
+		$(srctree) $(objtree) $(KCONFIG_CONFIG)
 
 else
 # ===========================================================================
@@ -657,6 +704,22 @@ KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 endif
 ifdef CONFIG_CC_OPTIMIZE_FOR_SPEED
 KBUILD_CFLAGS	+= -O3
+endif
+
+ifdef CONFIG_CC_PIC
+KBUILD_CFLAGS	+= -fPIC
+endif
+
+ifdef CONFIG_CC_STRIP
+KBUILD_CFLAGS	+= -s
+endif
+
+ifndef CONFIG_CC_STDLIB
+KBUILD_CFLAGS	+= -nostdlib
+endif
+
+ifndef CONFIG_CC_CLIB
+KBUILD_CFLAGS	+= -nodefaultlibs
 endif
 
 ifdef CONFIG_SUPPORT_LANGUAGE
@@ -754,7 +817,7 @@ endif
 #KBUILD_CFLAGS   += $(call cc-option, -fno-var-tracking-assignments)
 
 ifndef CONFIG_DEBUG
-KBUILD_CFLAGS += -O3
+#KBUILD_CFLAGS += -O3
 endif
 
 ifdef CONFIG_DEBUG_INFO
@@ -992,6 +1055,19 @@ archprepare: archheaders archscripts prepare1 scripts_basic
 prepare0: archprepare FORCE
 	$(Q)$(MAKE) $(build)=.
 
+# Configure vendor dependencies (e.g., OpenSSL)
+PHONY += vendor-prepare
+vendor-prepare: include/config/auto.conf
+	$(Q)$(CONFIG_SHELL) $(srctree)/vendor/post-config.sh \
+		$(srctree) $(objtree) include/config/auto.conf
+
+PHONY += modules-built-in
+modules-built-in: include/config/auto.conf
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/gen-builtin-modules.sh \
+		$(srctree) $(objtree)
+
+archprepare: vendor-prepare modules-built-in
+
 # All the preparing..
 prepare: prepare0
 
@@ -1065,10 +1141,48 @@ headers_check: headers_install
 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
 
 # ---------------------------------------------------------------------------
-# Kernel selftest
-PHONY += kselftest
-kselftest:
-	$(Q)$(MAKE) -C tools/testing/selftests run_tests
+# Tests
+#
+# test / kselftest - unit tests (cmocka) + the bats integration suites, minus
+#                    the cases a suite tagged `slow` (see scripts/run-check.sh);
+#                    the fast edit-compile-test loop.
+# check            - everything the above run, PLUS those slow cases and the
+#                    performance benchmarks (CONFIG_BENCHMARK); i.e. the full
+#                    suite.
+#
+# All three build first (`all`), then run the shared runner. The runner is
+# invoked directly (not via `-C tools/testing/selftests`, which would resolve
+# against the output tree in an out-of-tree build) with the desired mode:
+# "unit" = unit tests + bats only, "all" = also the performance benchmarks.
+PHONY += kselftest test
+kselftest test: all
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/run-check.sh \
+		$(objtree) $(srctree) unit
+
+PHONY += check
+check: all
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/run-check.sh \
+		$(objtree) $(srctree) all
+
+# ---------------------------------------------------------------------------
+# install
+#
+# A package whose `make install` is not the kernel's says so by setting
+# PACKAGE_INSTALL to the target that does it, before including this Makefile.
+# Without that, install stays what it has always been: modules_install, which
+# is defined with the rest of the module machinery below and therefore only
+# exists in a CONFIG_MODULES build.
+#
+# The hook exists because the two cannot simply be added together — a package
+# that installs programs and configuration has no use for MODLIB, and inheriting
+# the module chain would have it writing symlinks under /usr/lib on the way to
+# doing something else. It is here rather than beside modules_install so that a
+# package can have an install target whether or not it has modules.
+#
+ifdef PACKAGE_INSTALL
+PHONY += install
+install: $(PACKAGE_INSTALL)
+endif
 
 # ---------------------------------------------------------------------------
 # Modules
@@ -1091,8 +1205,16 @@ all: prepare $(progs) modules
 PHONY += modules 
 modules: $(package-dirs) $(if $(KBUILD_BUILTIN),package) modules.builtin
 	$(Q)$(AWK) '!x[$$0]++' $(package-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
-#	@$(kecho) '  Building modules, stage 2.';
-#	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ifdef CONFIG_MODULES
+	@$(kecho) '  Building modules, stage 2.';
+	$(Q)for f in $(MODVERDIR)/*.mod; do \
+		[ -f "$$f" ] || continue; \
+		so=$$(head -1 "$$f"); \
+		obj=$${so%.so}.o; \
+		echo "  LD [M]  $$so"; \
+		$(CC) $(SHLIB_LDFLAGS) -o $(objtree)/$$so $(objtree)/$$obj; \
+	done
+endif
 
 modules.builtin: $(package-dirs:%=%/modules.builtin)
 	$(Q)$(AWK) '!x[$$0]++' $^ > $(objtree)/modules.builtin
@@ -1105,8 +1227,11 @@ PHONY += modules_prepare
 modules_prepare: prepare scripts
 
 # Target to install modules
-PHONY += modules_install install 
+PHONY += modules_install install
+# install is the package's when it claimed it (see the hook above).
+ifndef PACKAGE_INSTALL
 install: modules_install
+endif
 modules_install: _modinst_ _modinst_post
 
 PHONY += _modinst_
@@ -1168,12 +1293,12 @@ CLEAN_DIRS  += $(MODVERDIR)
 
 # Directories & files removed with 'make mrproper'
 MRPROPER_DIRS  += include/config usr/include include/generated          \
-		  arch/*/include/generated .tmp_objdiff 
+		  arch/*/include/generated .tmp_objdiff vendor/openssl 
 MRPROPER_FILES += .config .dirs .config.old .version .old_version \
 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
 		  signing_key.priv signing_key.x509 x509.genkey		\
 		  extra_certificates signing_key.x509.keyid		\
-		  signing_key.x509.signer 
+		  signing_key.x509.signer cpucap
 
 # clean - Delete most, but leave enough to build external modules
 #
@@ -1209,8 +1334,13 @@ mrproper: clean archmrproper $(mrproper-dirs)
 PHONY += distclean
 
 distclean: mrproper
-ifneq ($(KBUILD_OUTPUT),)
-	@rm -rf $(srctree)/$(KBUILD_OUTPUT)/*
+# For an out-of-tree build (default: O=obj) this recipe runs in the output
+# directory via sub-make, where objtree=. and srctree points back at the
+# source tree. KBUILD_OUTPUT is only known in the outer wrapper invocation
+# (it is neither exported nor passed to sub-make), so keying off it here never
+# fires; compare srctree/objtree instead and wipe the whole output dir.
+ifneq ($(srctree),$(objtree))
+	@find $(objtree) -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 
 endif
 	@find $(srctree) $(RCS_FIND_IGNORE) \
@@ -1265,6 +1395,8 @@ help:
 	@echo  '  tags/TAGS	  - Generate tags file for editors'
 	@echo  '  cscope	  - Generate cscope index'
 	@echo  '  gtags           - Generate GNU GLOBAL index'
+	@echo  '  cpucap          - Report the build-host CPU crypto capabilities'
+	@echo  '                    (always built; run $(objtree)/cpucap directly too)'
 	@echo  '  packagerelease  - Output the release version string (use with make -s)'
 	@echo  '  packageversion  - Output the version stored in Makefile (use with make -s)'
 	@echo  '  image_name	  - Output the image name (use with make -s)'
@@ -1281,8 +1413,10 @@ help:
 	@echo  '  headerdep       - Detect inclusion cycles in headers'
 #@$(MAKE) -f $(srctree)/scripts/Makefile.help checker-help
 	@echo  ''
-	@echo  'selftest'
-	@echo  '  selftest        - Build and run package selftest'
+	@echo  'Testing:'
+	@echo  '  test            - Build and run unit tests (cmocka) + the fast bats cases'
+	@echo  '  kselftest       - Alias of test (kernel-style entry point)'
+	@echo  '  check           - test + the bats cases tagged slow + benchmarks (CONFIG_BENCHMARK)'
 	@echo  ''
 	@echo  'Packaging:'
 	@$(MAKE) $(build)=$(package-dir) help
@@ -1417,10 +1551,18 @@ prepare: ;
 scripts: ;
 endif # KBUILD_EXTMOD
 
+# $(objtree)/vendor holds the foreign sub-builds staged by vendor/post-config.sh
+# (openssl, rustls, userspace-rcu). Each is driven by its own build system and
+# owns its own clean; sweeping it by file extension deletes the halves those
+# builds do not track - libtool leaves .lo/.la behind when its .o/.a are removed
+# from under it, after which `make` reports nothing to do and `make install`
+# fails on the missing archive. un's own objects live in $(objtree)/{crypto,hpc,
+# net,...}, never here, so prune the whole directory.
 clean: $(clean-dirs)
 	$(call cmd,rmdirs)
 	$(call cmd,rmfiles)
 	@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
+		-path './vendor' -prune -o \
 		\( -name '*.[oas]' -o -name '*.$(SO)' -o -name '.*.cmd' \
 		-o -name '*.$(SO).*' \
 		-o -name '*.dwo'  \
@@ -1464,7 +1606,7 @@ export_report:
 endif #ifeq ($(config-targets),1)
 endif #ifeq ($(mixed-targets),1)
 
-PHONY += checkstack packageversion packagerelease kernelrelease kernelversion image_name
+PHONY += checkstack packageversion packagerelease kernelrelease kernelversion image_name cpucap
 
 # UML needs a little special treatment here.  It wants to use the host
 # toolchain, so needs $(SUBARCH) passed to checkstack.pl.  Everyone
@@ -1478,6 +1620,11 @@ endif
 checkstack:
 	$(OBJDUMP) -d libarch $$(find . -name '*.$(SO)') | \
 	$(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
+
+# The binary is built at parse time (see the cpucap block near the top), so this
+# only runs the report; $(objtree)/cpucap can equally be run by hand.
+cpucap:
+	@$(CPUCAP)
 
 packagerelease:
 	@echo "$(PACKAGEVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"

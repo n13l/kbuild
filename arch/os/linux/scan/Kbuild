@@ -1,0 +1,13 @@
+# arch/os/linux/scan — where the system calls in a run of code are.
+#
+# Pure functions over a buffer: no system calls, no allocation, no state. Two
+# programs link this and ask it the same question — the agent, of a mapping it
+# is about to arm, and tools/ub-patch, of a file it is about to write — and the
+# point of it being one object is that they cannot disagree.
+#
+# The driver is machine-independent; the step is not, and is the file named
+# after the architecture being built for. There is no generic one: a machine
+# whose syscall instruction this tree does not know is a #error out of scan.h
+# rather than a build that quietly watches nothing, and Kconfig will not offer
+# CONFIG_OS_LINUX_SCAN there in the first place.
+obj-$(CONFIG_OS_LINUX_SCAN) += scan.o $(ARCH).o

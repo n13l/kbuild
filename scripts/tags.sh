@@ -47,6 +47,7 @@ fi
 # find sources in arch/$ARCH
 find_arch_sources()
 {
+	[ -d "${tree}arch/$1" ] || return 0
 	for i in $archincludedir; do
 		prune="$prune -wholename $i -prune -o"
 	done
@@ -57,6 +58,7 @@ find_arch_sources()
 # find sources in arch/$1/include
 find_arch_include_sources()
 {
+	[ -d "${tree}arch/$1" ] || return 0
 	include=$(find ${tree}arch/$1/ $subarchprune \
 					-name include -type d -print);
 	if [ -n "$include" ]; then
@@ -68,6 +70,7 @@ find_arch_include_sources()
 # find sources in include/
 find_include_sources()
 {
+	[ -d "${tree}include" ] || return 0
 	find ${tree}include $ignore -name config -prune -o -name "$1" \
 		-not -type l -print;
 }
@@ -152,6 +155,18 @@ dogtags()
 
 exuberant()
 {
+	# Universal Ctags renamed --extra to --extras, and ships a Kconfig
+	# parser, so --langdef=kconfig is rejected as already defined.
+	if $1 --version 2>&1 | grep -iq "universal ctags"; then
+		extras_opt="--extras=+f"
+		kconfig_lang="--language-force=Kconfig"
+		kconfig_regex="--regex-Kconfig"
+	else
+		extras_opt="--extra=+f"
+		kconfig_lang="--langdef=kconfig --language-force=kconfig"
+		kconfig_regex="--regex-kconfig"
+	fi
+
 	all_target_sources | xargs $1 -a                        \
 	-I __initdata,__exitdata,__initconst,			\
 	-I __cpuinitdata,__initdata_memblock			\
@@ -165,7 +180,7 @@ exuberant()
 	-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL,ACPI_EXPORT_SYMBOL   \
 	-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL,EXPORT_TRACEPOINT_SYMBOL_GPL \
 	-I static,const						\
-	--extra=+f --c-kinds=+px                                \
+	$extras_opt --c-kinds=+px                                \
 	--regex-asm='/^(ENTRY|_GLOBAL)\(([^)]*)\).*/\2/'        \
 	--regex-c='/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/' \
 	--regex-c='/^COMPAT_SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/compat_sys_\1/' \
@@ -214,12 +229,12 @@ exuberant()
 	--regex-c='/DEFINE_HASHTABLE\((\w*)/\1/v/'
 
 	all_kconfigs | xargs $1 -a                              \
-	--langdef=kconfig --language-force=kconfig              \
-	--regex-kconfig='/^[[:blank:]]*(menu|)config[[:blank:]]+([[:alnum:]_]+)/\2/'
+	$kconfig_lang                                           \
+	${kconfig_regex}='/^[[:blank:]]*(menu|)config[[:blank:]]+([[:alnum:]_]+)/\2/'
 
 	all_kconfigs | xargs $1 -a                              \
-	--langdef=kconfig --language-force=kconfig              \
-	--regex-kconfig='/^[[:blank:]]*(menu|)config[[:blank:]]+([[:alnum:]_]+)/CONFIG_\2/'
+	$kconfig_lang                                           \
+	${kconfig_regex}='/^[[:blank:]]*(menu|)config[[:blank:]]+([[:alnum:]_]+)/CONFIG_\2/'
 
 	all_defconfigs | xargs -r $1 -a                         \
 	--langdef=dotconfig --language-force=dotconfig          \

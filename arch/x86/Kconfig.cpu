@@ -1,6 +1,40 @@
+# CPU native detection. When enabled, the build host is probed by the cpucap
+# tool (built and exported as HOST_X86_MODEL by the top-level Makefile) and the
+# matching entry in the "Processor family" choice below is selected
+# automatically, pulling in that model's predefined CPU capabilities. When
+# disabled, the processor family is chosen manually.
+config CPU_NATIVE
+	bool "Optimize for the build host CPU (native detection)"
+	depends on X86_64
+	help
+	  Detect the CPU this build is running on and automatically select the
+	  closest matching processor family below, so its predefined
+	  instruction-set capabilities (AVX, AVX2, SHA-NI, ...) are enabled
+	  without picking a model by hand. The compiler is also pointed at the
+	  exact host CPU (-march=native).
+
+	  The resulting binary is tuned for and requires a CPU at least as
+	  capable as the build host, so it is not portable to older CPUs. Turn
+	  this off to choose a specific processor family (or Generic) manually.
+
+	  If unsure, say N.
+
+# Host-detected processor family, emitted by `scripts/cpucap --env` and exported
+# by kbuild's top-level Makefile. Selects the matching choice entry when
+# CPU_NATIVE is set.
+config HOST_X86_MODEL
+	string
+	option env="HOST_X86_MODEL"
+
 # Put here option for CPU selection and depending optimization
 choice
 	prompt "Processor family"
+	default MSKYLAKEX    if CPU_NATIVE && HOST_X86_MODEL = "MSKYLAKEX"
+	default MZEN3        if CPU_NATIVE && HOST_X86_MODEL = "MZEN3"
+	default MHASWELL     if CPU_NATIVE && HOST_X86_MODEL = "MHASWELL"
+	default MZEN         if CPU_NATIVE && HOST_X86_MODEL = "MZEN"
+	default MSANDYBRIDGE if CPU_NATIVE && HOST_X86_MODEL = "MSANDYBRIDGE"
+	default GENERIC_CPU  if CPU_NATIVE
 	default M686 if X86_32
 	default GENERIC_CPU if X86_64
 
@@ -269,6 +303,57 @@ config MATOM
 	  accordingly optimized code. Use a recent GCC with specific Atom
 	  support in order to fully benefit from selecting this option.
 
+config MNEHALEM
+	bool "Intel Nehalem"
+	depends on X86_64
+	---help---
+	  Select this for Intel Nehalem family processors (i7/i5/i3 1st gen,
+	  Xeon 55xx/56xx). Enables SSE4.2 optimizations.
+
+config MSANDYBRIDGE
+	bool "Intel Sandy Bridge"
+	depends on X86_64
+	---help---
+	  Select this for 2nd generation Intel Core processors (Sandy Bridge)
+	  and newer. Enables AVX instruction support.
+
+config MHASWELL
+	bool "Intel Haswell"
+	depends on X86_64
+	---help---
+	  Select this for 4th generation Intel Core processors (Haswell) and
+	  newer. Enables AVX2 and BMI2 instruction support.
+
+config MSKYLAKE
+	bool "Intel Skylake"
+	depends on X86_64
+	---help---
+	  Select this for 6th generation Intel Core processors (Skylake) and
+	  newer, or AMD Zen 3+. Similar to Haswell but with improved
+	  scheduling. Enables AVX2 instruction support.
+
+config MSKYLAKEX
+	bool "Intel Skylake-X / Ice Lake"
+	depends on X86_64
+	---help---
+	  Select this for Intel Skylake-X (AVX-512), Ice Lake, or newer
+	  server processors, or AMD Zen 4+. Enables AVX2, AVX-512 and
+	  SHA-NI instruction support.
+
+config MZEN
+	bool "AMD Zen"
+	depends on X86_64
+	---help---
+	  Select this for AMD Zen (Ryzen/EPYC 1st/2nd gen) processors.
+	  Enables AVX2 instruction support.
+
+config MZEN3
+	bool "AMD Zen 3+"
+	depends on X86_64
+	---help---
+	  Select this for AMD Zen 3 (Ryzen 5000 / EPYC 7003) and newer
+	  processors. Enables AVX2 and SHA-NI instruction support.
+
 config GENERIC_CPU
 	bool "Generic-x86-64"
 	depends on X86_64
@@ -300,7 +385,7 @@ config X86_INTERNODE_CACHE_SHIFT
 config X86_L1_CACHE_SHIFT
 	int
 	default "7" if MPENTIUM4 || MPSC
-	default "6" if MK7 || MK8 || MPENTIUMM || MCORE2 || MATOM || MVIAC7 || X86_GENERIC || GENERIC_CPU
+	default "6" if MK7 || MK8 || MPENTIUMM || MCORE2 || MATOM || MVIAC7 || X86_GENERIC || GENERIC_CPU || MNEHALEM || MSANDYBRIDGE || MHASWELL || MSKYLAKE || MSKYLAKEX || MZEN || MZEN3
 	default "4" if MELAN || M486 || MGEODEGX1
 	default "5" if MWINCHIP3D || MWINCHIPC6 || MCRUSOE || MEFFICEON || MCYRIXIII || MK6 || MPENTIUMIII || MPENTIUMII || M686 || M586MMX || M586TSC || M586 || MVIAC3_2 || MGEODE_LX
 
@@ -331,11 +416,11 @@ config X86_ALIGNMENT_16
 
 config X86_INTEL_USERCOPY
 	def_bool y
-	depends on MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M586MMX || X86_GENERIC || MK8 || MK7 || MEFFICEON || MCORE2
+	depends on MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M586MMX || X86_GENERIC || MK8 || MK7 || MEFFICEON || MCORE2 || MNEHALEM || MSANDYBRIDGE || MHASWELL || MSKYLAKE || MSKYLAKEX || MZEN || MZEN3
 
 config X86_USE_PPRO_CHECKSUM
 	def_bool y
-	depends on MWINCHIP3D || MWINCHIPC6 || MCYRIXIII || MK7 || MK6 || MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M686 || MK8 || MVIAC3_2 || MVIAC7 || MEFFICEON || MGEODE_LX || MCORE2 || MATOM
+	depends on MWINCHIP3D || MWINCHIPC6 || MCYRIXIII || MK7 || MK6 || MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M686 || MK8 || MVIAC3_2 || MVIAC7 || MEFFICEON || MGEODE_LX || MCORE2 || MATOM || MNEHALEM || MSANDYBRIDGE || MHASWELL || MSKYLAKE || MSKYLAKEX || MZEN || MZEN3
 
 config X86_USE_3DNOW
 	def_bool y
@@ -355,21 +440,21 @@ config X86_USE_3DNOW
 config X86_P6_NOP
 	def_bool y
 	depends on X86_64
-	depends on (MCORE2 || MPENTIUM4 || MPSC)
+	depends on (MCORE2 || MPENTIUM4 || MPSC || MNEHALEM || MSANDYBRIDGE || MHASWELL || MSKYLAKE || MSKYLAKEX)
 
 config X86_TSC
 	def_bool y
-	depends on (MWINCHIP3D || MCRUSOE || MEFFICEON || MCYRIXIII || MK7 || MK6 || MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M686 || M586MMX || M586TSC || MK8 || MVIAC3_2 || MVIAC7 || MGEODEGX1 || MGEODE_LX || MCORE2 || MATOM) || X86_64
+	depends on (MWINCHIP3D || MCRUSOE || MEFFICEON || MCYRIXIII || MK7 || MK6 || MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M686 || M586MMX || M586TSC || MK8 || MVIAC3_2 || MVIAC7 || MGEODEGX1 || MGEODE_LX || MCORE2 || MATOM || MNEHALEM || MSANDYBRIDGE || MHASWELL || MSKYLAKE || MSKYLAKEX || MZEN || MZEN3) || X86_64
 
 config X86_CMPXCHG64
 	def_bool y
-	depends on X86_PAE || X86_64 || MCORE2 || MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M686 || MATOM
+	depends on X86_PAE || X86_64 || MCORE2 || MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M686 || MATOM || MNEHALEM || MSANDYBRIDGE || MHASWELL || MSKYLAKE || MSKYLAKEX || MZEN || MZEN3
 
 # this should be set for all -march=.. options where the compiler
 # generates cmov.
 config X86_CMOV
 	def_bool y
-	depends on (MK8 || MK7 || MCORE2 || MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M686 || MVIAC3_2 || MVIAC7 || MCRUSOE || MEFFICEON || X86_64 || MATOM || MGEODE_LX)
+	depends on (MK8 || MK7 || MCORE2 || MPENTIUM4 || MPENTIUMM || MPENTIUMIII || MPENTIUMII || M686 || MVIAC3_2 || MVIAC7 || MCRUSOE || MEFFICEON || X86_64 || MATOM || MGEODE_LX || MNEHALEM || MSANDYBRIDGE || MHASWELL || MSKYLAKE || MSKYLAKEX || MZEN || MZEN3)
 
 config X86_MINIMUM_CPU_FAMILY
 	int
@@ -381,6 +466,18 @@ config X86_MINIMUM_CPU_FAMILY
 config X86_DEBUGCTLMSR
 	def_bool y
 	depends on !(MK6 || MWINCHIPC6 || MWINCHIP3D || MCYRIXIII || M586MMX || M586TSC || M586 || M486) && !UML
+
+config X86_HAS_AVX
+	def_bool y
+	depends on MSANDYBRIDGE || MHASWELL || MSKYLAKE || MSKYLAKEX || MZEN || MZEN3
+
+config X86_HAS_AVX2
+	def_bool y
+	depends on MHASWELL || MSKYLAKE || MSKYLAKEX || MZEN || MZEN3
+
+config X86_HAS_SHA_NI
+	def_bool y
+	depends on MSKYLAKEX || MZEN3
 
 menuconfig PROCESSOR_SELECT
 	bool "Supported processor vendors" if EXPERT

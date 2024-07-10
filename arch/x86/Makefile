@@ -11,6 +11,11 @@ else
         KBUILD_DEFCONFIG := $(ARCH)_defconfig
 endif
 
+# HOST_X86_MODEL (the cpucap-detected build-host model that CPU_NATIVE selects)
+# is probed and exported once by kbuild's top-level Makefile, from
+# scripts/cpucap.c, so every recursive make sees an identical value; see the
+# comment there.
+
 # How to compile the 16-bit code.  Note we always compile for -march=i386;
 # that way we can complain to the user if the CPU is insufficient.
 #
@@ -93,6 +98,19 @@ else
 	cflags-$(CONFIG_MATOM) += $(call cc-option,-march=atom) \
 		$(call cc-option,-mtune=atom,$(call cc-option,-mtune=generic))
         cflags-$(CONFIG_GENERIC_CPU) += $(call cc-option,-mtune=generic)
+        cflags-$(CONFIG_MNEHALEM) += $(call cc-option,-march=nehalem)
+        cflags-$(CONFIG_MSANDYBRIDGE) += $(call cc-option,-march=sandybridge)
+        cflags-$(CONFIG_MHASWELL) += $(call cc-option,-march=haswell)
+        cflags-$(CONFIG_MSKYLAKE) += $(call cc-option,-march=skylake)
+        cflags-$(CONFIG_MSKYLAKEX) += $(call cc-option,-march=skylake-avx512,$(call cc-option,-march=skylake))
+        cflags-$(CONFIG_MZEN) += $(call cc-option,-march=znver1,$(call cc-option,-march=znver1,-mtune=generic))
+        cflags-$(CONFIG_MZEN3) += $(call cc-option,-march=znver3,$(call cc-option,-march=znver1))
+        # Native detection: compile for the exact host CPU. This overrides the
+        # auto-selected model's -march (which only conveys the capability tier
+        # to Kconfig) so codegen is always correct and optimal for the host.
+        ifdef CONFIG_CPU_NATIVE
+        cflags-y := $(call cc-option,-march=native,$(call cc-option,-mtune=generic))
+        endif
         KBUILD_CFLAGS += $(cflags-y)
 
         #KBUILD_CFLAGS += -mno-red-zone
@@ -153,8 +171,13 @@ asinstr += $(call as-instr,crc32l %eax$(comma)%eax,-DCONFIG_AS_CRC32=1)
 avx_instr := $(call as-instr,vxorps %ymm0$(comma)%ymm1$(comma)%ymm2,-DCONFIG_AS_AVX=1)
 avx2_instr :=$(call as-instr,vpbroadcastb %xmm0$(comma)%ymm1,-DCONFIG_AS_AVX2=1)
 
+# Detect build-host CPU features for crypto dispatch
+cpu_has_sha_ni := $(shell grep -qw sha_ni /proc/cpuinfo 2>/dev/null && echo -DCONFIG_X86_HAS_SHA_NI=1)
+cpu_has_avx    := $(shell grep -qw avx /proc/cpuinfo 2>/dev/null && echo -DCONFIG_X86_HAS_AVX=1)
+
 KBUILD_AFLAGS += $(cfi) $(cfi-sigframe) $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr)
 KBUILD_CFLAGS += $(cfi) $(cfi-sigframe) $(cfi-sections) $(asinstr) $(avx_instr) $(avx2_instr)
+KBUILD_CFLAGS += $(cpu_has_sha_ni) $(cpu_has_avx)
 
 #LDFLAGS := -m elf_$(UTS_MACHINE)
 

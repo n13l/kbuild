@@ -1,0 +1,57 @@
+menu "Test"
+
+config TEST
+	bool "Build selftests (tools/testing/selftests)"
+	default y
+	help
+	  Build the kernel-style selftests under tools/testing/selftests for un
+	  and, in place, for the crypto and hpc submodules, so `make check` can
+	  run them from object tree. Covers the cmocka unit tests and the
+	  perf benchmarks. The Catch2 (C++) unit suite and net-dependent bats are
+	  wired separately and gated on their own prerequisites.
+
+	  If unsure, say Y.
+
+config BENCHMARK
+	bool "Performance benchmarks"
+	default n
+	help
+	  Build and run the performance benchmarks under
+	  tools/testing/selftests/perf/ during `make check`
+
+	  If unsure, say N.
+
+
+config CMOCKA
+	bool "Enable cmocka unit test framework"
+	depends on CC_CLIB
+	default y
+	help
+	  Enable building cmocka-based unit tests. When enabled,
+	  'make check' will build and run all cmocka test suites.
+
+	  cmocka requires libc support (CONFIG_CC_CLIB=y).
+
+	  If unsure, say Y.
+
+config CMOCKA_TAP
+	bool "Use TAP output format for cmocka"
+	depends on CMOCKA
+	default y
+	help
+	  Output test results in Test Anything Protocol (TAP) format
+	  for easy integration with CI/CD systems.
+
+	  If unsure, say Y.
+
+config CHECK_SUBMODULES
+	bool "Run submodule tests during make check"
+	depends on CMOCKA
+	default y
+	help
+	  When enabled, 'make check' will also discover and run
+	  tests defined in submodules (e.g., vendor/hpc/tests).
+
+	  If unsure, say Y.
+
+endmenu

@@ -196,8 +196,15 @@ hdr-inst := -f $(srctree)/scripts/Makefile.headersinst obj
 
 # Prefix -I with $(srctree) if it is not an absolute path.
 # skip if -I has no parameter
+#
+# A path that already names one of the trees is left alone: prefixing
+# -I$(srctree)/foo a second time gives -I$(srctree)/$(srctree)/foo, which with
+# the relative srctree of an O= build ('..') is a directory outside the source
+# tree altogether - the parent of the checkout - and any header found there
+# shadows the one that was meant. Same for a path already under $(objtree).
 addtree = $(if $(patsubst -I%,%,$(1)), \
-$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
+$(if $(filter-out -I/% -I$(srctree) -I$(srctree)/% -I$(objtree) -I$(objtree)/%,$(1)),\
+$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
 
 # Find all -I options and call addtree
 flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))

@@ -1,0 +1,9 @@
+# arch/os/linux/sc — arm this process's syscall sites, and stand behind the trap.
+#
+# Three objects and one rule between them: nothing on the handler path may
+# reach the kernel through the C library, because the C library is what has
+# been armed. internal.h says it again where it can be read next to the code.
+#
+# It links the scan, which is where the sites come from, and dl_iterate_phdr(3)
+# and dladdr(3), which is why this half is not the half ub-patch shares.
+obj-$(CONFIG_OS_LINUX_SC) += site.o trap.o image.o

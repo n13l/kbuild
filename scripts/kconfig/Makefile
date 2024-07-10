@@ -93,23 +93,37 @@ oldnoconfig: $(obj)/conf
 savedefconfig: $(obj)/conf
 	$< --$@=defconfig $(Kconfig)
 
+# Configuration search path. A project that uses this kbuild as a git
+# submodule can ship its own configs/$(SRCARCH)/ (or configs/) directory in
+# its srctree to override or extend the defaults supplied in
+# arch/$(SRCARCH)/configs, without touching the kbuild tree itself.
+#
+# findconfig: single-file lookup (defconfigs) - most specific location wins.
+# configfiles: fragment list for merging - kbuild-supplied fragments are
+# applied first, project-local fragments last, so the project wins.
+config-dirs = $(srctree)/configs/$(SRCARCH) $(srctree)/configs \
+	      $(srctree)/kernel/configs $(srctree)/arch/$(SRCARCH)/configs
+findconfig = $(firstword $(wildcard $(addsuffix /$(1),$(config-dirs))))
+
 defconfig: $(obj)/conf
 ifeq ($(KBUILD_DEFCONFIG),)
 	$< --defconfig $(Kconfig)
 else
-	@echo "* Default configuration is based on '$(KBUILD_DEFCONFIG)'"
-	$(Q)$< --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
+	@echo "* Default configuration is based on '$(or $(call findconfig,$(KBUILD_DEFCONFIG)),$(KBUILD_DEFCONFIG))'"
+	$(Q)$< --defconfig=$(or $(call findconfig,$(KBUILD_DEFCONFIG)),arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)) $(Kconfig)
 endif
 
 %_defconfig: $(obj)/conf
-	$(Q)$< --defconfig=arch/$(SRCARCH)/configs/$@ $(Kconfig)
+	$(Q)$< --defconfig=$(or $(call findconfig,$@),arch/$(SRCARCH)/configs/$@) $(Kconfig)
 
-configfiles=$(wildcard $(srctree)/kernel/configs/$(1).config $(srctree)/arch/$(SRCARCH)/configs/$(1).config)
+configfiles=$(wildcard $(addsuffix /$(1).config,$(srctree)/kernel/configs \
+	    $(srctree)/arch/$(SRCARCH)/configs \
+	    $(srctree)/configs $(srctree)/configs/$(SRCARCH)))
 
 define mergeconfig
 $(if $(wildcard $(objtree)/.config),, $(error You need an existing .config for this target))
 $(if $(call configfiles,$(1)),, $(error No configuration exists for this target on this architecture))
-$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m -O $(objtree) $(objtree)/.config $(call configfiles,$(1))
+$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m $(if $(filter 1,$(KBUILD_VERBOSE)),,-q) -O $(objtree) $(objtree)/.config $(call configfiles,$(1))
 $(Q)yes "" | $(MAKE) -f $(srctree)/Makefile oldconfig
 endef
 
@@ -120,6 +134,14 @@ kvmconfig:
 PHONY += tinyconfig
 tinyconfig: allnoconfig
 	$(call mergeconfig,tiny)
+
+# Merge any <name>.config fragment found in the configuration search path
+# into the current .config, e.g. 'make defconfig perf.config'. Profile
+# fragments (embedded, compat, perf, perf-rt) live in
+# arch/$(SRCARCH)/configs/; a project using kbuild as a submodule may layer
+# its own fragments on top from configs/ in its srctree.
+%.config: $(obj)/conf
+	$(call mergeconfig,$*)
 
 # Help text used by make help
 help:
@@ -143,6 +165,10 @@ help:
 	@echo  '  olddefconfig	  - Same as silentoldconfig but sets new symbols to their default value'
 	@echo  '  kvmconfig	  - Enable additional options for guest kernel support'
 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
+	@echo  '  <name>.config   - Merge fragment <name>.config into current .config.'
+	@echo  '                    Profiles: embedded/compat/perf/perf-rt.config,'
+	@echo  '                    e.g. "make defconfig perf.config". Searched in'
+	@echo  '                    configs/[$$SRCARCH/] (project) and arch/$$SRCARCH/configs'
 
 # lxdialog stuff
 check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
