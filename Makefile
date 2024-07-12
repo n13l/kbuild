@@ -307,9 +307,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 HOSTCC       ?= gcc
 HOSTCXX      ?= g++
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wno-format-security \
-	       -Wno-char-subscripts\
-	       -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu99
-HOSTCXXFLAGS = -O2
+	       -Wno-char-subscripts -Wstrict-prototypes -O2 -fomit-frame-pointer
+HOSTCXXFLAGS = 
 
 ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
 #HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter 
@@ -378,7 +377,7 @@ PERL		= perl
 PYTHON		= python
 CHECK		= sparse
 
-CHECKFLAGS     := -D__unix__ -Dunix -D__STDC__ -Wbitwise -Wno-return-void $(CF)
+CHECKFLAGS     := -Wbitwise -Wno-return-void $(CF)
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
@@ -655,6 +654,10 @@ ifdef CONFIG_CC_OPTIMIZE_FOR_SPEED
 KBUILD_CFLAGS	+= -O3
 endif
 
+ifdef CONFIG_CC_PIC
+KBUILD_CFLAGS	+= -fPIC
+endif
+
 ifdef CONFIG_SUPPORT_LANGUAGE
 -include scripts/Makefile.bindings
 endif
@@ -750,7 +753,7 @@ endif
 #KBUILD_CFLAGS   += $(call cc-option, -fno-var-tracking-assignments)
 
 ifndef CONFIG_DEBUG
-KBUILD_CFLAGS += -O3
+#KBUILD_CFLAGS += -O3
 endif
 
 ifdef CONFIG_DEBUG_INFO
