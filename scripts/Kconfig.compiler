@@ -65,6 +65,16 @@ config CC_PIC
 	PIC is used for shared libraries, allowing library code to be located
 	anywhere in memory.
 
+config CC_STRIP
+	bool "Strip executables"
+	default n
+	help
+	  Strip all symbols and debug information from executables and
+	  shared libraries during the build. This significantly reduces
+	  binary size but makes debugging impossible.
+
+	  If unsure, say N.
+
 config CC_STDLIB
 	bool "Use the standard system startup libraries"
 	default y
