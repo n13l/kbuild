@@ -659,6 +659,16 @@ ifdef CONFIG_CC_PIC
 KBUILD_CFLAGS	+= -fPIC
 endif
 
+ifndef CONFIG_CC_STDLIB
+KBUILD_CFLAGS	+= -nostdlib
+LDFLAGS		+= -nostdlib
+endif
+
+ifndef CONFIG_CC_CLIB
+KBUILD_CFLAGS	+= -nodefaultlibs
+LDFLAGS		+= -nodefaultlibs
+endif
+
 ifdef CONFIG_SUPPORT_LANGUAGE
 -include scripts/Makefile.bindings
 endif

@@ -28,17 +28,23 @@ test-cmulti  := $(addprefix $(__obj_fixed)/,$(test-cmulti))
 test-cobjs   := $(addprefix $(__obj_fixed)/,$(test-cobjs)) 
 
 # Options to testcc.
-testc_flags = -g -O0 -Wp,-MD,$(depfile) $(KBUILD_CFLAGS) $(KBUILD_CPPFLAGS) \
+testc_flags = -Wp,-MD,$(depfile) \
+	      $(KBUILD_CFLAGS) $(KBUILD_CPPFLAGS) \
 	      $(USERINCLUDE) $(TEST_CFLAGS) -I. -I../ -I../include \
 	      -include $(srctree)/sys/$(PLATFORM)/platform.h
 
-testld_flags = 
-testld_libs = $(KBUILD_LIBS)
+ifdef CONFIG_CC_CLIB
+testld_flags =
+testld_libs = -lc -lrt -lm
+else
+testld_flags = -static -no-pie
+testld_libs =
+endif
 
 # test-csingle -> executable
 quiet_cmd_test-csingle = CC      $@
-      cmd_test-csingle = $(CC) $(LDFLAGS_$(*F)) $(testc_flags) -o $@ $< $(testld_builtin) \
-                               $(testld_libs) $(LIBS_$(*F)) $(KBUILD_LIBS)
+      cmd_test-csingle = $(CC) $(LDFLAGS_$(*F)) $(testld_flags) $(testc_flags) -o $@ $< \
+                               $(testld_builtin) $(testld_libs) $(LIBS_$(*F))
 
 $(test-csingle): $(__obj_fixed)/%: $(__src_fixed)/%.c FORCE
 	$(call if_changed_dep,test-csingle)
@@ -54,7 +60,7 @@ $(test-cobjs): $(__obj_fixed)/%.o: $(__src_fixed)/%.c FORCE
 quiet_cmd_test-cmulti	= LD      $@
       cmd_test-cmulti	= $(CC) $(testld_flags) -o $@ \
 			  $(addprefix $(obj)/,$($(@F)-y)) $(testld_builtin) \
-      			  $(testld_libs) $(LIBS_$(*F)) $(KBUILD_LIBS)
+      			  $(testld_libs) $(LIBS_$(*F))
 $(test-cmulti): $(__obj_fixed)/%: $(test-cobjs) FORCE
 	$(call if_changed,test-cmulti)
 

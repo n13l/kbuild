@@ -52,7 +52,9 @@ EXEC_EX=
 endif
 
 ifeq ($(PLATFORM),linux)
+ifdef CONFIG_CC_CLIB
 KBUILD_LIBS += -lc -lrt -lm
+endif
 endif
 
 ifeq ($(ARCH),s390)
