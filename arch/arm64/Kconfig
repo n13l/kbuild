@@ -56,8 +56,101 @@ config NR_CPUS
 	depends on SMP
 	default "8"
 
+choice
+	prompt "ARM CPU"
+	default ARM_CPU_GENERIC
+	help
+	  Select the target ARM CPU for optimized code generation.
+	  The compiler will use architecture-specific instructions
+	  and tuning for the selected CPU.
+
+config ARM_CPU_GENERIC
+	bool "Generic ARMv8-A"
+	help
+	  Generic ARMv8-A target. Compatible with all AArch64 CPUs.
+
+config ARM_CPU_CORTEX_A53
+	bool "Cortex-A53 (ARMv8.0-A)"
+	help
+	  ARM Cortex-A53, low-power in-order core.
+	  Used in Raspberry Pi 3, many mobile SoCs.
+
+config ARM_CPU_CORTEX_A55
+	bool "Cortex-A55 (ARMv8.2-A)"
+	help
+	  ARM Cortex-A55, high-efficiency core.
+	  Successor to Cortex-A53.
+
+config ARM_CPU_CORTEX_A57
+	bool "Cortex-A57 (ARMv8.0-A)"
+	help
+	  ARM Cortex-A57, high-performance out-of-order core.
+
+config ARM_CPU_CORTEX_A72
+	bool "Cortex-A72 (ARMv8.0-A)"
+	help
+	  ARM Cortex-A72, used in Raspberry Pi 4 and many
+	  embedded/networking SoCs.
+
+config ARM_CPU_CORTEX_A76
+	bool "Cortex-A76 (ARMv8.2-A)"
+	help
+	  ARM Cortex-A76, high-performance core.
+
+config ARM_CPU_NEOVERSE_N1
+	bool "Neoverse N1 (ARMv8.2-A)"
+	help
+	  ARM Neoverse N1, server-class core.
+	  Used in AWS Graviton2 (M6g, C6g, R6g).
+
+config ARM_CPU_NEOVERSE_V1
+	bool "Neoverse V1 (ARMv8.4-A)"
+	help
+	  ARM Neoverse V1, high-performance server core.
+	  Used in AWS Graviton3 (M7g, C7g, R7g).
+
+config ARM_CPU_NEOVERSE_V2
+	bool "Neoverse V2 (ARMv9.0-A)"
+	help
+	  ARM Neoverse V2, next-gen server core.
+	  Used in AWS Graviton4 (M8g, C8g, R8g).
+
+config ARM_CPU_CORTEX_A710
+	bool "Cortex-A710 (ARMv9.0-A)"
+	help
+	  ARM Cortex-A710, ARMv9 high-performance core.
+
+config ARM_CPU_CORTEX_X2
+	bool "Cortex-X2 (ARMv9.0-A)"
+	help
+	  ARM Cortex-X2, ARMv9 peak-performance core.
+
+config ARM_CPU_APPLE_M1
+	bool "Apple M1 (ARMv8.5-A)"
+	help
+	  Apple M1, high-performance desktop/laptop core.
+
+endchoice
+
 config NEON
 	bool "Advanced SIMD (NEON) Extension support"
 	default y
 	help
 	  AArch64 always has Advanced SIMD support.
+
+config ARM_CRYPTO_EXTENSIONS
+	bool "ARMv8 Cryptographic Extensions"
+	default y if !ARM_CPU_GENERIC && !ARM_CPU_CORTEX_A53 && !ARM_CPU_CORTEX_A57
+	help
+	  Enable ARMv8 cryptographic instructions (AES, SHA1, SHA2,
+	  PMULL). Available on most ARMv8.0-A and later cores.
+
+config ARM_SHA3_EXTENSIONS
+	bool "ARMv8.2 SHA-3 Extensions"
+	depends on ARM_CRYPTO_EXTENSIONS
+	default y if ARM_CPU_NEOVERSE_N1 || ARM_CPU_NEOVERSE_V1 || \
+	             ARM_CPU_NEOVERSE_V2 || ARM_CPU_CORTEX_A76 || \
+	             ARM_CPU_CORTEX_A710 || ARM_CPU_CORTEX_X2
+	help
+	  Enable ARMv8.2 SHA-3 and SHA-512 instructions.
+	  Available on Neoverse and newer Cortex-A cores.
