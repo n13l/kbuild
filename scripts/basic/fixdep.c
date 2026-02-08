@@ -136,10 +136,18 @@ static void usage(void)
 
 /*
  * Print out the commandline prefixed with cmd_<target filename> :=
+ * Escape '#' as '\#' so make does not treat it as a comment.
  */
 static void print_cmdline(void)
 {
-	printf("cmd_%s := %s\n\n", target, cmdline);
+	printf("cmd_%s := ", target);
+	const char *p;
+	for (p = cmdline; *p; p++) {
+		if (*p == '#')
+			putchar('\\');
+		putchar(*p);
+	}
+	printf("\n\n");
 }
 
 struct item {

@@ -1,4 +1,3 @@
-export KBUILD_OUTPUT=obj
 VERSION ?= 0
 PATCHLEVEL ?= 0
 SUBLEVEL ?= 1
@@ -124,6 +123,8 @@ ifeq ($(KBUILD_SRC),)
 # Do we want to locate output files in a separate directory?
 ifeq ("$(origin O)", "command line")
   KBUILD_OUTPUT := $(O)
+else
+  KBUILD_OUTPUT := $(CURDIR)/obj
 endif
 
 # That's our default target when none is given on the command line
