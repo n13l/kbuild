@@ -6,7 +6,7 @@
 # test1-y := main.o helper.o
 testld_flags = 
 #testld_builtin = arch/$(SRCARCH)/built-in.o sys/built-in.o mem/built-in.o
-testld_builtin = arch/$(SRCARCH)/built-in.o sys/built-in.o mem/built-in.o
+testld_builtin =
 
 __testprogs := $(sort $(testprogs-y))
 
