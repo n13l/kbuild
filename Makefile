@@ -661,17 +661,14 @@ endif
 
 ifdef CONFIG_CC_STRIP
 KBUILD_CFLAGS	+= -s
-LDFLAGS		+= -s
 endif
 
 ifndef CONFIG_CC_STDLIB
 KBUILD_CFLAGS	+= -nostdlib
-LDFLAGS		+= -nostdlib
 endif
 
 ifndef CONFIG_CC_CLIB
 KBUILD_CFLAGS	+= -nodefaultlibs
-LDFLAGS		+= -nodefaultlibs
 endif
 
 ifdef CONFIG_SUPPORT_LANGUAGE
