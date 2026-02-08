@@ -1,0 +1,63 @@
+config LITTLE_ENDIAN
+        def_bool y
+
+config PAGE_SIZE
+        int
+        default 4096
+
+config ARM64
+	bool
+	default y
+	select ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE
+	select ARCH_HAS_ELF_RANDOMIZE
+	select ARCH_HAS_GCOV_PROFILE_ALL
+	select ARCH_SUPPORTS_ATOMIC_RMW
+	select ARCH_USE_BUILTIN_BSWAP
+	select ARCH_USE_CMPXCHG_LOCKREF
+	select HAVE_EFFICIENT_UNALIGNED_ACCESS
+	select HAVE_CC_STACKPROTECTOR
+	select GENERIC_HWEIGHT
+	select GENERIC_CALIBRATE_DELAY
+	select SWIOTLB
+	help
+	  AArch64 (64-bit ARM) architecture support.
+
+config 64BIT
+	def_bool y
+
+config ARCH_PHYS_ADDR_T_64BIT
+	def_bool y
+
+config GENERIC_HWEIGHT
+	bool
+	default y
+
+config GENERIC_CALIBRATE_DELAY
+	bool
+	default y
+
+config SWIOTLB
+	def_bool y
+
+config HAVE_SMP
+	bool
+	default y
+
+config SMP
+	bool "Symmetric Multi-Processing"
+	depends on HAVE_SMP
+	default y
+	help
+	  This enables support for systems with more than one CPU.
+
+config NR_CPUS
+	int "Maximum number of CPUs (2-4096)"
+	range 2 4096
+	depends on SMP
+	default "8"
+
+config NEON
+	bool "Advanced SIMD (NEON) Extension support"
+	default y
+	help
+	  AArch64 always has Advanced SIMD support.

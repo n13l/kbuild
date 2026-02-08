@@ -6,7 +6,7 @@ LD ?= $(CROSS_COMPILE)$(CROSS_LINKER)
 UNAME_SYSTEM:=$(shell uname -s)
 UNAME_MACHINE:=$(shell uname -m)
 
-HOST ?= $(shell $(src)/scripts/host_from_sys.sh $(UNAME_SYSTEM))
+HOST := $(or $(HOST),$(shell $(src)/scripts/host_from_sys.sh $(UNAME_SYSTEM)))
 
 export HOST
 
@@ -32,13 +32,13 @@ so := so
 export COMPILER ARCH HOSTCC HOSTLD CC LD OBJDUMP so
 endif
 
-TARGET ?= $(shell $(CC) -dumpmachine 2>&1)
-ARCH ?= $(shell echo $(TARGET) | sed -e s/i.86.*/i386/ -e s/x86_64.*/x86_64/ \
+TARGET := $(or $(TARGET),$(shell $(CC) -dumpmachine 2>&1))
+ARCH := $(or $(ARCH),$(shell echo $(TARGET) | sed -e s/i.86.*/i386/ -e s/x86_64.*/x86_64/ \
                                      -e s/.390.*/s390/ \
 				     -e s/powerpc64.*/powerpc/ \
-                                     -e s/aarch64.*/arm/ -e s/arm.*/arm/)
+                                     -e s/aarch64.*/arm64/ -e s/arm[^6].*/arm/))
 
-PLATFORM ?= $(shell $(src)/scripts/host_from_sys.sh $(TARGET))
+PLATFORM := $(or $(PLATFORM),$(shell $(src)/scripts/host_from_sys.sh $(TARGET)))
 PLAT:=$(shell echo "$(PLATFORM)" | tr '[:lower:]' '[:upper:]')
 
 ifeq ($(PLATFOWM),win32)
