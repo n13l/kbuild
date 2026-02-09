@@ -1103,8 +1103,15 @@ all: prepare $(progs) modules
 PHONY += modules 
 modules: $(package-dirs) $(if $(KBUILD_BUILTIN),package) modules.builtin
 	$(Q)$(AWK) '!x[$$0]++' $(package-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
-#	@$(kecho) '  Building modules, stage 2.';
-#	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ifdef CONFIG_MODULES
+	@$(kecho) '  Building modules, stage 2.';
+	$(Q)for d in $(objtree)/modules/xdg/*/; do \
+		[ -f "$$d/built-in.o" ] || continue; \
+		soname=$$(basename $$d); \
+		echo "  LD [M]  $${soname}.$(so)"; \
+		$(CC) $(SHLIB_LDFLAGS) -o $(objtree)/$${soname}.$(so) $$d/built-in.o; \
+	done
+endif
 
 modules.builtin: $(package-dirs:%=%/modules.builtin)
 	$(Q)$(AWK) '!x[$$0]++' $^ > $(objtree)/modules.builtin
