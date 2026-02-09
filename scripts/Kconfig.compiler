@@ -175,3 +175,20 @@ config CC_STACKPROTECTOR_STRONG
 	size by about 2%.                                                     
 	
 endchoice
+
+config MODULES
+	bool "Enable loadable module support"
+	depends on CC_PIC
+	option modules
+	help
+	  Modules are small pieces of compiled code which can be loaded
+	  and unloaded into the running system. This allows extending
+	  functionality without rebuilding the entire project.
+
+	  If you say N here, all modules in the modules/ directory will
+	  be compiled statically into the main binary with full inlining
+	  for zero overhead.
+
+	  If unsure, say N.
+
+
