@@ -58,7 +58,7 @@ config CC_GPU_ACCELERATION
 
 config CC_PIC
 	bool "Enable Position-independent code"
-	default y
+	default n
 	help
 	Position-independent code (PIC) is code that can execute regardless of
 	its absolute address (i.e. by using relative addressing).
@@ -67,7 +67,7 @@ config CC_PIC
 
 config CC_STRIP
 	bool "Strip executables"
-	default n
+	default y
 	help
 	  Strip all symbols and debug information from executables and
 	  shared libraries during the build. This significantly reduces
@@ -77,21 +77,19 @@ config CC_STRIP
 
 config CC_STDLIB
 	bool "Use the standard system startup libraries"
-	default y
+	default n
 	help
 	  Use the standard system startup libraries when linking.
 
 config CC_CLIB
 	bool "Use the C library"
-	default y
+	default n
 	help
 	  Use the C library when linking. When disabled, still link with the startup files.
 
-
-
 config MEASURE
         bool "Enable Measurements"                                             
-        default y                                                               
+        default n                                                               
         help                                                                    
           Say Y if you want to enable measurements.
 
@@ -104,7 +102,7 @@ config SILENT
 
 config LOGGING                                                           
         bool "Enable Log Functions"                                             
-        default y                                                               
+        default n                                                               
         help                                                                    
           Say Y if you want to enable log functions, such as                    
           print_dbg, print_info, print_warn, print_err.                         
@@ -112,7 +110,7 @@ config LOGGING
 
 config TRACE
         bool "Enable Trace Functions"                                             
-        default y                                                               
+        default n                                                               
         help                                                                    
           Say Y if you want to enable trace functions.
 
@@ -179,6 +177,7 @@ endchoice
 config MODULES
 	bool "Enable loadable module support"
 	depends on CC_PIC
+	default n
 	option modules
 	help
 	  Modules are small pieces of compiled code which can be loaded
