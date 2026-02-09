@@ -393,6 +393,7 @@ USERINCLUDE    := \
 		-I$(srctree)/lib \
 		-Ilib -I$(srctree)/arch \
 		-I$(srctree)/arch/$(hdr-arch) \
+		-iquote $(srctree)/modules \
 		-I..
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
