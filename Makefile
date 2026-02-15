@@ -394,6 +394,7 @@ USERINCLUDE    := \
 		-Ilib -I$(srctree)/arch \
 		-I$(srctree)/arch/$(hdr-arch) \
 		-iquote $(srctree)/modules \
+		-I$(objtree) \
 		-I..
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
@@ -1015,7 +1016,12 @@ vendor-prepare: include/config/auto.conf
 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/configure-openssl.sh \
 		$(srctree) $(objtree) include/config/auto.conf
 
-archprepare: vendor-prepare
+PHONY += modules-built-in
+modules-built-in: include/config/auto.conf
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/gen-builtin-modules.sh \
+		$(srctree) $(objtree)
+
+archprepare: vendor-prepare modules-built-in
 
 # All the preparing..
 prepare: prepare0
