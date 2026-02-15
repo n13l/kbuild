@@ -561,9 +561,13 @@ export KBUILD_DEFCONFIG KBUILD_KCONFIG
 
 config: scripts_basic outputmakefile FORCE
 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/configure-openssl.sh \
+		$(srctree) $(objtree) $(KCONFIG_CONFIG)
 
 %config: scripts_basic outputmakefile FORCE
 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/configure-openssl.sh \
+		$(srctree) $(objtree) $(KCONFIG_CONFIG)
 
 else
 # ===========================================================================
@@ -1005,6 +1009,14 @@ archprepare: archheaders archscripts prepare1 scripts_basic
 prepare0: archprepare FORCE
 	$(Q)$(MAKE) $(build)=.
 
+# Configure vendor dependencies (e.g., OpenSSL)
+PHONY += vendor-prepare
+vendor-prepare: include/config/auto.conf
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/configure-openssl.sh \
+		$(srctree) $(objtree) include/config/auto.conf
+
+archprepare: vendor-prepare
+
 # All the preparing..
 prepare: prepare0
 
@@ -1188,7 +1200,7 @@ CLEAN_DIRS  += $(MODVERDIR)
 
 # Directories & files removed with 'make mrproper'
 MRPROPER_DIRS  += include/config usr/include include/generated          \
-		  arch/*/include/generated .tmp_objdiff 
+		  arch/*/include/generated .tmp_objdiff vendor/openssl 
 MRPROPER_FILES += .config .dirs .config.old .version .old_version \
 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
 		  signing_key.priv signing_key.x509 x509.genkey		\

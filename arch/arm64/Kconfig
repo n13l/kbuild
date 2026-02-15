@@ -145,6 +145,27 @@ config ARM_CRYPTO_EXTENSIONS
 	  Enable ARMv8 cryptographic instructions (AES, SHA1, SHA2,
 	  PMULL). Available on most ARMv8.0-A and later cores.
 
+config ARM_DIT
+	bool "Enable DIT for constant-time cryptographic operations"
+	default y if !ARM_CPU_GENERIC && !ARM_CPU_CORTEX_A53 && !ARM_CPU_CORTEX_A57
+	help
+	  Certain instructions on ARM64, including but not limited to those
+	  described in Arm Architecture Registers for Future Architecture
+	  Technologies, may take a different amount of time to run depending on
+	  the data values on which they operate. Malicious code running on the
+	  device might use this property to infer information about the data the
+	  CPU processes, such as cryptographic keys, or other sensitive data.
+	  Apple silicon provides data-independent timing (DIT), in which the
+	  processor completes certain instructions in a constant amount of time.
+	  With DIT enabled, the processor uses the longer, worst-case amount of
+	  time to complete the instruction, regardless of the input data. When
+	  you write software specifically to avoid leaking internal information
+	  and to run code in constant time, enabling DIT — and restricting your
+	  code to instructions that support DIT — before loading cryptographic key
+	  material, performing cryptographic operations, or processing sensitive
+	  data ensures the timing of specific instructions doesn’t reveal
+	  information about the data being processed.
+
 config ARM_SHA3_EXTENSIONS
 	bool "ARMv8.2 SHA-3 Extensions"
 	depends on ARM_CRYPTO_EXTENSIONS

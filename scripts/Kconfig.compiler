@@ -17,7 +17,7 @@ config CC_OPTIMIZE_FOR_SPEED
           Enabling this option will pass "-O2" instead of "-Os" to
           your compiler resulting in a faster code.
 
-          If unsure, say N
+          If unsure, say y
 
 config CC_OPTIMIZE_FOR_SIZE
 	bool "for size"
@@ -46,7 +46,7 @@ config CC_RSEQ
 
 config CC_CPU_ACCELERATION
 	bool "Enable CPU acceleration"
-	default n
+	default y
 	help
 	  Say Y if you want to enable CPU acceleration.
 
@@ -77,13 +77,13 @@ config CC_STRIP
 
 config CC_STDLIB
 	bool "Use the standard system startup libraries"
-	default n
+	default y
 	help
 	  Use the standard system startup libraries when linking.
 
 config CC_CLIB
 	bool "Use the C library"
-	default n
+	default y
 	help
 	  Use the C library when linking. When disabled, still link with the startup files.
 
