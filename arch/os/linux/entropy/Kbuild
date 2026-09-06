@@ -1,0 +1,11 @@
+# arch/os/linux/entropy — the entropy system call, without a C library.
+#
+# The sibling of arch/os/linux/io: one _sys_ name for getrandom(2), made the
+# same freestanding way and for the same reason, so an object with no libc
+# under it can still draw randomness and can fall back here when the symbol it
+# wraps is unresolved. -fno-builtin and -fno-stack-protector as io is built,
+# so the compiler turns none of this back into a call into the library this
+# tree does not link.
+obj-$(CONFIG_OS_LINUX_ENTROPY) += entropy.o
+
+ccflags-y += -fno-builtin -fno-stack-protector

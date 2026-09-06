@@ -10,6 +10,11 @@
 #           reaches the kernel at all — and arch/os/linux/sc needs the same
 #           instruction for a different reason, so it is written once.
 #
+#   entropy/ getrandom(2) the same freestanding way, beside io/ and for the
+#           same reason: the one call a program draws randomness with, and
+#           the seam a reader of it rides. A build that watches entropy arms
+#           this call's site the way the agent arms io's.
+#
 #   scan/   pure functions over a run of code: where the syscall instructions
 #           in it are, and the two bytes that turn one into a trap. No system
 #           calls, no allocation, no state. Both consumers link it — the agent,
@@ -24,5 +29,6 @@
 # force-includes arch/os/$(PLATFORM)/platform.h — which is empty here and is only
 # ever the file that has to exist.
 obj-$(CONFIG_OS_LINUX_IO)   += io/
+obj-$(CONFIG_OS_LINUX_ENTROPY) += entropy/
 obj-$(CONFIG_OS_LINUX_SCAN) += scan/
 obj-$(CONFIG_OS_LINUX_SC)   += sc/

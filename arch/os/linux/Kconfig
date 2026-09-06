@@ -50,6 +50,44 @@ config OS_LINUX_IO
 	  image is loaded rather than when the code runs. That file says what it
 	  does about them and why.
 
+config OS_LINUX_ENTROPY
+	bool "the entropy system call, without a C library to make it through"
+	default y
+	help
+	  _sys_getrandom(), the getrandom(2) wrapper, made the same freestanding
+	  way arch/os/linux/io makes _sys_read and the rest — one inline system
+	  call through io's _syscall3 — so an object linked -nostdlib has a way
+	  to draw randomness and a fallback for when the getrandom() symbol it
+	  wraps could not be resolved.
+
+	  Beside it is the entropy seam, <arch/os/linux/entropy/hooks.h>: one
+	  macro, entropy_hook_fill(), handed the buffer a source just filled,
+	  free to read it or to rewrite it in place before the program sees it.
+	  It is the same shape as un's TLS hook seam — off by default, and
+	  turned into something by the header a build names below — and it is
+	  what lets a testing build make getrandom(2) draw a chosen value.
+
+	  Say N and neither the wrapper nor the seam is in the tree; a build
+	  that watches io still builds, and simply does not watch entropy.
+
+config OS_LINUX_ENTROPY_HOOKS
+	bool
+	depends on OS_LINUX_ENTROPY
+	help
+	  Whether the entropy seam is asked for. Left to a consumer to turn on
+	  — modules/ub/entropy does, the way modules/ub/tls turns on un's
+	  NET_TLS_HOOKS — because a seam nothing reads is a call to nothing.
+	  With it on, the header below names where the definitions come from.
+
+config OS_LINUX_ENTROPY_HOOKS_HEADER
+	string
+	depends on OS_LINUX_ENTROPY_HOOKS
+	help
+	  The header <arch/os/linux/entropy/hooks.h> includes, written as it
+	  would be inside the angle brackets — a path against one of the
+	  build's header roots ("modules/ub/entropy/entropy.h"). Whatever it
+	  does not define falls back to the same nothing.
+
 config OS_LINUX_SCAN
 	bool "the syscall instruction sites in a run of code"
 	depends on ARCH = "x86_64" || ARCH = "arm64"
