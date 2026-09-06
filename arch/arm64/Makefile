@@ -41,3 +41,13 @@ endif
 
 KBUILD_CFLAGS += $(mflags-y)
 KBUILD_AFLAGS += $(mflags-y)
+
+# The outline atomics gcc emits by default call into libgcc's __aarch64_*()
+# helpers, and those pull in its lse-init.o -- a constructor that reads the LSE
+# bit out of the auxiliary vector with __getauxval(), which is a C library
+# symbol. tools/ub links -nostdlib (see tools/ub/Kbuild), so nothing resolves it
+# and the binary dies at load with a symbol lookup error. Nothing here wants the
+# dispatch anyway: the tree is compiled for the -mcpu chosen above, so the
+# compiler can emit the atomics that core actually has.
+KBUILD_CFLAGS += $(call cc-option,-mno-outline-atomics)
+KBUILD_AFLAGS += $(call cc-option,-mno-outline-atomics)
