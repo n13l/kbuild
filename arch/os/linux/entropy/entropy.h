@@ -8,4 +8,6 @@
 
 long _sys_getrandom(void *buf, size_t len, unsigned int flags);
 
+int _entropy_is_source_fd(int fd);
+
 #endif

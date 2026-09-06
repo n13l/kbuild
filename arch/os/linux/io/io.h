@@ -6,9 +6,10 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <sys/syscall.h>
 
-#include <arch/os/linux/io/str.h>
+#include <arch/os/str.h>
 
 
 #if defined(__x86_64__)
@@ -84,6 +85,16 @@ long _sys_stat(const char *path, struct stat *st);
 
 long _sys_getpid(void);
 long _sys_getppid(void);
+
+/*
+ * This thread's own identifier, and the time of day. Both are here rather than
+ * at the caller because both are exactly the kind of fact a platform layer is
+ * for: the thread id is gettid(2) here and thread_selfid(2) on macOS, and the
+ * number Darwin spells SYS_gettid is a different call altogether.
+ */
+long _sys_gettid(void);
+long _sys_gettimeofday(struct timeval *tv);
+
 void _sys_exit(int status) __attribute__((noreturn));
 
 
@@ -92,7 +103,7 @@ void _sys_exit(int status) __attribute__((noreturn));
  * pieces. The freestanding stand-in for the fprintf() a program with a libc
  * would use for the same job — hence nolibc_, and hence here rather than in
  * str.h: it makes a system call. The string helpers it is built on, and the
- * xstr* dispatch, are in <arch/os/linux/io/str.h>, included above.
+ * xstr* dispatch, are in <arch/os/str.h>, included above.
  */
 void nolibc_say(int fd, const char *first, ...);
 

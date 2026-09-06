@@ -63,6 +63,7 @@ config NR_CPUS
 # chosen manually.
 config CPU_NATIVE
 	bool "Optimize for the build host CPU (native detection)"
+	depends on CROSS_BUILD != "y"
 	help
 	  Detect the CPU this build is running on and automatically select the
 	  closest matching ARM CPU below, so its predefined cryptographic
@@ -73,6 +74,9 @@ config CPU_NATIVE
 	  The resulting binary is tuned for and requires a CPU at least as
 	  capable as the build host, so it is not portable to older cores. Turn
 	  this off to choose a specific ARM CPU (or Generic) manually.
+
+	  Not offered in a cross build: native there is the machine doing
+	  the compiling, not the one that will run the result.
 
 	  If unsure, say N.
 

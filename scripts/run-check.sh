@@ -43,6 +43,17 @@ OBJDIR="${1:-.}"
 SRCDIR="${2:-.}"
 MODE="${3:-unit}"	# "unit" (default): units + bats; "all": also perf benchmarks
 
+# Both absolute, before anything below uses them. kbuild passes $(objtree) and
+# $(srctree), which in an out-of-tree build are `.` and `..` -- relative to the
+# object tree make started this in. Anything here that has to survive a cd
+# would otherwise break, and one thing does so silently: the vendored bats goes
+# on PATH as $SRCDIR/vendor/bats-core/bin, run_bats_dir cds into the package
+# root to run a suite from there, and a relative PATH entry names nothing from
+# the new directory. bats stops existing one cd after the check that found it,
+# and every suite reports unmet prerequisites instead of running.
+OBJDIR=$(cd "$OBJDIR" 2>/dev/null && pwd) || OBJDIR="${1:-.}"
+SRCDIR=$(cd "$SRCDIR" 2>/dev/null && pwd) || SRCDIR="${2:-.}"
+
 pass=0; fail=0; skip=0; total=0
 
 RED='\033[0;31m'; GRN='\033[0;32m'; YEL='\033[0;33m'; BLU='\033[0;34m'; RST='\033[0m'

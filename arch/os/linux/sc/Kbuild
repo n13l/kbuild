@@ -6,4 +6,4 @@
 #
 # It links the scan, which is where the sites come from, and dl_iterate_phdr(3)
 # and dladdr(3), which is why this half is not the half ub-patch shares.
-obj-$(CONFIG_OS_LINUX_SC) += site.o trap.o image.o
+obj-$(CONFIG_OS_SC) += site.o trap.o image.o

@@ -1,0 +1,13 @@
+# arch/os/macos/entropy — the entropy system call, without a C library.
+#
+# The sibling of arch/os/macos/io: one _sys_ name for the call a program draws
+# randomness with, made the same freestanding way and for the same reason, so an
+# object with no library under it can still draw some and can fall back here
+# when the symbol it wraps is unresolved. The name is getrandom's because that
+# is what the callers are written against; the call underneath is getentropy(2),
+# which is what this kernel has. -fno-builtin and -fno-stack-protector as io is
+# built, so the compiler turns none of this back into a call into the library
+# this tree does not link.
+obj-$(CONFIG_OS_ENTROPY) += entropy.o
+
+ccflags-y += -fno-builtin -fno-stack-protector

@@ -1,0 +1,97 @@
+#
+# arch/os/windows — Windows process services.
+#
+# The counterpart of arch/os/linux and arch/os/macos, and the same three
+# questions: how a program reaches the kernel without a C library under it,
+# how it draws randomness, and where the system call instructions in a run of
+# code are. On Windows the first answer is not an instruction at all — the
+# system call numbers belong to ntdll and change with every build — so it is
+# kernel32 and Winsock, which are the system's interface and not a C library.
+#
+# The fourth — arming those instructions in this process and standing behind
+# the trap — has no entry here yet. Unlike on macOS nothing forbids it: ntdll's
+# text can be made writable by the process that maps it, and a vectored
+# exception handler sees the illegal instruction before anything else does.
+# README.md in this directory says what it would take.
+#
+menu "Windows process services"
+	depends on PLATFORM = "windows"
+
+config OS_IO
+	bool "the system calls, without a C library to make them through"
+	default y
+	help
+	  The _sys_ calls the rest of this tree makes when there is no C
+	  library to make them through — _sys_read, _sys_write, _sys_open,
+	  _sys_close, _sys_readlink, _sys_access, _sys_execve, _sys_exit,
+	  _sys_getpid, _sys_getppid, _sys_gettid, _sys_gettimeofday,
+	  _sys_sendto, _sys_recvfrom, _sys_stat — each one call into kernel32,
+	  ntdll or Winsock and none into msvcrt. The string helpers beside them
+	  are shared with every other platform layer and live in
+	  <arch/os/str.h>.
+
+	  There is no _syscall6() here. The instruction exists, but the numbers
+	  it takes are renumbered by every Windows build and are ntdll's to
+	  know, so a program that made one would be right on one machine.
+
+	  What Windows does not have is made up, and io.c says how at each
+	  place: an int descriptor is the HANDLE's value (0, 1 and 2 the
+	  standard handles), errors come back as a negative errno translated
+	  from GetLastError(), paths are UTF-8 turned into the UTF-16 the wide
+	  API takes, and execve() starts the program, waits for it and exits
+	  with its status.
+
+	  hpc's logger is the caller that matters: its open and its write go
+	  through here whenever this symbol is set (hpc/log/write.c).
+
+config OS_ENTROPY
+	bool "the entropy call, without a C library to make it through"
+	default y
+	help
+	  _sys_getrandom(), over BCryptGenRandom() with the system-preferred
+	  generator — no algorithm handle to open, nothing to fail at startup.
+	  The flags are accepted and ignored, as on macOS: the generator never
+	  blocks and there is one of it. A request longer than a ULONG is
+	  filled in pieces.
+
+	  _entropy_is_source_fd() is always false: there is no file on Windows
+	  a read() draws randomness from.
+
+	  Beside it is the entropy seam, <arch/os/windows/entropy/hooks.h>, the
+	  same macro as on the other platforms.
+
+config OS_ENTROPY_HOOKS
+	bool
+	depends on OS_ENTROPY
+	help
+	  Whether the entropy seam is asked for. Left to a consumer to turn on,
+	  because a seam nothing reads is a call to nothing.
+
+config OS_ENTROPY_HOOKS_HEADER
+	string
+	depends on OS_ENTROPY_HOOKS
+	help
+	  The header <arch/os/windows/entropy/hooks.h> includes, written as it
+	  would be inside the angle brackets. Whatever it does not define falls
+	  back to the same nothing.
+
+config OS_SCAN
+	bool "the syscall instruction sites in a run of code"
+	depends on ARCH = "x86_64" || ARCH = "arm64"
+	default y
+	help
+	  scan_run(): given a run of machine code, say where in it the system
+	  call instructions are and which number each one makes.
+
+	  On Windows those are ntdll's stubs and nothing else's. On arm64 the
+	  number is the svc's own immediate and is read off the word; armed is
+	  udf with the same immediate, so the trap carries the number. On
+	  x86-64 the instruction is Linux's `syscall` and the decoder is
+	  Linux's (compiled again, not copied); what differs is that a current
+	  stub sets eax three instructions before the site, behind a test and
+	  a branch, and the lookback knows that shape.
+
+	  It is pure: no system calls, no allocation, no state. Nothing in this
+	  tree links it on Windows yet.
+
+endmenu

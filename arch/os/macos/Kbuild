@@ -1,0 +1,30 @@
+# arch/os/macos — macOS process services.
+#
+# The counterpart of arch/os/linux, and the split between its directories is
+# the same one: what needs a C library, what needs none, and what needs
+# neither.
+#
+#   io/     the system call as the instruction, and the handful of calls a
+#           program makes when there is no libc under it to make them through.
+#           `svc #0x80` with the number in x16 on arm64, `syscall` with the
+#           UNIX class in the number on x86-64, and the carry flag turned back
+#           into the negative errno every caller of this tree expects.
+#
+#   entropy/ getentropy(2) the same freestanding way, beside io/ and for the
+#           same reason: the one call a program draws randomness with, and the
+#           seam a reader of it rides.
+#
+#   scan/   pure functions over a run of code: where the system call
+#           instructions in it are. No system calls, no allocation, no state.
+#
+# There is no sc/ here. arch/os/macos/README.md says why, and CONFIG_OS_SC is
+# simply not offered on this platform — a build that asks for the in-process
+# half gets told it is not there rather than getting one that cannot work.
+#
+# PLATFORM is not a Kconfig symbol. kbuild derives it from the target triple
+# before the configuration is read, and every tool and test compile
+# force-includes arch/os/$(PLATFORM)/platform.h — which is empty here and is
+# only ever the file that has to exist.
+obj-$(CONFIG_OS_IO)      += io/
+obj-$(CONFIG_OS_ENTROPY) += entropy/
+obj-$(CONFIG_OS_SCAN)    += scan/

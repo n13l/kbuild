@@ -43,10 +43,14 @@ config RCU
 	bool "Enable (RCU) Read-Write-Update"
 	default n
 	depends on THREADS
+	depends on PLATFORM != "windows"
 	help
 	  Efficient data structures based on RCU and lock-free algorithms.
-          This data synchronization provides userland read-side access which 
+          This data synchronization provides userland read-side access which
           scales linearly with the number of cores
+
+	  Not offered on Windows: liburcu, which this is built on, is
+	  written against POSIX threads and futexes and has no Windows port.
 
 config CC_RSEQ
 	bool "Enable (RSEQ) Restartable sequences"
@@ -55,8 +59,14 @@ config CC_RSEQ
 	  Restartable sequences are small segments of user-space code designed 
           to access per-CPU data structures without the need for heavyweight locking
 
+# Windows defaults to the portable C. The accelerated backends are assembly
+# vendored from aws-lc and s2n-bignum in its ELF and Mach-O spellings (.type,
+# .size, .note.GNU-stack), which a COFF assembler refuses; aws-lc's own Windows
+# assembly is NASM, a different assembler from the one this tree drives. Both
+# can be chosen by hand, and both fail to assemble until that is done.
 choice
 	prompt "CPU hardware acceleration"
+	default CC_CPU_ACCEL_NONE if PLATFORM = "windows"
 	default CC_CPU_ACCEL_RUNTIME
 	help
 	  Select how CPU hardware acceleration (optimized assembly using

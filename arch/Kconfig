@@ -60,6 +60,16 @@ config TARGET
 config SUBARCH
 	string
 
+# "y" when the target is not the build host — another machine, another system,
+# or both — and "n" when it is. Derived by scripts/Makefile.target from the
+# target triple and uname before the configuration is read, so like PLATFORM it
+# is not something a .config can set. What it is for is the options that ask
+# the build host a question about the target: CPU_NATIVE above all, whose
+# -march=native/-mcpu=native describe the compiling machine.
+config CROSS_BUILD
+	string
+	option env="CROSS_BUILD"
+
 config MEMORY_HOTPLUG
 	def_bool n
 config MEMORY_HOTREMOVE

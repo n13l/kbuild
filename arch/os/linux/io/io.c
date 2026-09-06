@@ -80,6 +80,18 @@ _sys_getppid(void)
 	return _syscall0(SYS_getppid);
 }
 
+long
+_sys_gettid(void)
+{
+	return _syscall0(SYS_gettid);
+}
+
+long
+_sys_gettimeofday(struct timeval *tv)
+{
+	return _syscall2(SYS_gettimeofday, tv, 0);
+}
+
 void
 _sys_exit(int status)
 {

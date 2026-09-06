@@ -1,0 +1,13 @@
+# arch/os/windows/scan — where the system calls in a run of code are.
+#
+# Pure functions over a buffer: no system calls, no allocation, no state. The
+# driver is this directory's; the step is the file named after the machine
+# being built for, and on x86-64 that file is the Linux decoder compiled again
+# with a Windows lookback in front (x86_64.c says why it is not a copy).
+#
+# Both machines Windows runs on are here, which is more than macOS has: on
+# Windows the system calls are all in one image, ntdll, and every one of them is
+# a stub of the same few instructions, so the question this answers has a
+# precise answer and a reason to be asked. Nothing in this tree asks it yet —
+# there is no sc/ here (see the platform README) and tools/ub-patch writes ELF.
+obj-$(CONFIG_OS_SCAN) += scan.o $(ARCH).o

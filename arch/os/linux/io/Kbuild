@@ -7,7 +7,7 @@
 #
 #	nm -u obj/arch/os/linux/io/io.o
 #
-obj-$(CONFIG_OS_LINUX_IO) += io.o nostdlib.o
+obj-$(CONFIG_OS_IO) += io.o nostdlib.o
 
 # -fno-builtin, and -fno-stack-protector for the same reason one step further
 # out: a distribution that turns the stack protector on by default puts a call

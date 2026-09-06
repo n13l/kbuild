@@ -220,7 +220,10 @@ obj		:= $(objtree)
 VPATH		:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
 
 export srctree objtree VPATH
-export PACKAGE_NAME:=$(shell $(srctree)/scripts/package/name.sh)
+# Asked in the source tree: name.sh reads the package's git remote, and an
+# object tree given by O= outside the checkout has no repository around it —
+# PACKAGE_NAME came out empty there, and Kconfig went looking for ".kconfig".
+export PACKAGE_NAME:=$(shell cd $(srctree) && ./scripts/package/name.sh)
 
 include scripts/Makefile.target
 
@@ -357,6 +360,17 @@ $(shell if test ! -x $(CPUCAP) || test $(CPUCAP_SRC) -nt $(CPUCAP); then \
 $(foreach kv,$(shell $(CPUCAP) --env 2>/dev/null),$(eval export $(kv)))
 endif
 
+# cpucap names only the build host's own architecture: an arm64 host prints
+# HOST_ARM_MODEL and nothing for x86, and the reverse. The other one is still an
+# `option env` in a Kconfig a cross build reads (arch/x86/Kconfig.cpu on an
+# arm64 host), and an env option whose variable is not set at all is a warning
+# on every configure. Empty is the truthful answer — no model was detected for
+# that architecture, because the host is not one — and is what CPU_NATIVE,
+# which is off in a cross build anyway, reads as "nothing to select".
+export HOST_X86_MODEL ?=
+export HOST_ARM_MODEL ?=
+export HOST_ARM_HAS_DIT ?=
+
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
 
@@ -415,6 +429,25 @@ NM		?= $(CROSS_COMPILE)nm
 STRIP		?= $(CROSS_COMPILE)strip
 OBJCOPY		?= $(CROSS_COMPILE)objcopy
 OBJDUMP		?= $(CROSS_COMPILE)objdump
+
+# What the target toolchain can link, asked of it once per build and exported
+# for Kconfig to read (option env), the same way and for the same reason as
+# cpucap's answers above: a value recomputed per sub-make that ever differed
+# would be a reconfigure loop. The question is the target's and not the host's
+# — a host with libcmocka installed says nothing about an x86_64-linux-gnu
+# sysroot or a mingw one, and asking the host is how a cross build ends up
+# configured for tests it cannot link. Into a temporary file rather than
+# /dev/null, because a PE linker cannot write an executable to a device.
+cc_links = $(shell t=$$(mktemp 2>/dev/null || echo /tmp/kbuild-probe.$$$$); \
+	printf 'int main(void) { return 0; }\n' | \
+	$(CC) -x c - $(1) -o $$t >/dev/null 2>&1 && r=y || r=n; \
+	rm -f $$t $$t.exe; echo $$r)
+
+ifndef _CC_PROBE_DONE
+export _CC_PROBE_DONE := 1
+export CC_HAS_LIBCMOCKA := $(call cc_links,-lcmocka)
+endif
+
 AWK		= awk
 GENKSYMS	= scripts/genksyms/genksyms
 DEPMOD		= /sbin/depmod
@@ -710,8 +743,23 @@ ifdef CONFIG_CC_PIC
 KBUILD_CFLAGS	+= -fPIC
 endif
 
+# Strip at link time. -s is the GNU spelling and the only one ld(1) had on
+# every platform this built for until Mach-O: Apple's linker removed it and
+# answers it with "ld: warning: -s is obsolete" on every link. -Wl,-x is what
+# it left -- drop the local symbols, keep the exported ones a dylib has to
+# have -- and it is the whole of what -s could do to a Mach-O file anyway.
+# Not -Wl,-S beside it: that one makes the linker warn about the debug info it
+# was asked to omit and did not find, which trades one warning for another.
+#
+# Either spelling is a link flag in KBUILD_CFLAGS, unused on the compile lines
+# it also lands on; -Qunused-arguments (KBUILD_CPPFLAGS, below) is what keeps
+# that quiet, for this flag the same as for the rest of them.
 ifdef CONFIG_CC_STRIP
+ifeq ($(PLATFORM),macos)
+KBUILD_CFLAGS	+= -Wl,-x
+else
 KBUILD_CFLAGS	+= -s
+endif
 endif
 
 ifndef CONFIG_CC_STDLIB
@@ -782,6 +830,10 @@ KBUILD_CFLAGS += $(stackp-flag)
 
 ifeq ($(COMPILER),clang)
 KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+# The same for the assembler lines, which take KBUILD_AFLAGS and not the
+# CPPFLAGS above: under LLVM=1, CC itself carries -fuse-ld (scripts/
+# Makefile.target), and a .S compile is a compile like any other.
+KBUILD_AFLAGS += $(call cc-option,-Qunused-arguments,)
 KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
 KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
 KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)

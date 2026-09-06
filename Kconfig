@@ -43,6 +43,12 @@ source "arch/$SRCARCH/Kconfig"
 source "arch/Kconfig"
 endmenu
 
+# The platform layer's menu (OS_IO, OS_SCAN, OS_SC, OS_ENTROPY). A consumer tree
+# sources it from its own Kconfig and this file is not read there; here it is,
+# so a standalone kbuild build can configure and test the platform layer. The
+# menu and the rationale live in arch/os/Kconfig, shared with the consumers.
+source "arch/os/Kconfig"
+
 source "scripts/Kconfig.compiler"
 source "scripts/Kconfig.debug"
 endmenu

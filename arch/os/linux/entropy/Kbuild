@@ -6,6 +6,6 @@
 # wraps is unresolved. -fno-builtin and -fno-stack-protector as io is built,
 # so the compiler turns none of this back into a call into the library this
 # tree does not link.
-obj-$(CONFIG_OS_LINUX_ENTROPY) += entropy.o
+obj-$(CONFIG_OS_ENTROPY) += entropy.o
 
 ccflags-y += -fno-builtin -fno-stack-protector

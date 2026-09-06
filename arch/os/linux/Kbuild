@@ -28,7 +28,7 @@
 # before the configuration is read, and every tool and test compile
 # force-includes arch/os/$(PLATFORM)/platform.h — which is empty here and is only
 # ever the file that has to exist.
-obj-$(CONFIG_OS_LINUX_IO)   += io/
-obj-$(CONFIG_OS_LINUX_ENTROPY) += entropy/
-obj-$(CONFIG_OS_LINUX_SCAN) += scan/
-obj-$(CONFIG_OS_LINUX_SC)   += sc/
+obj-$(CONFIG_OS_IO)   += io/
+obj-$(CONFIG_OS_ENTROPY) += entropy/
+obj-$(CONFIG_OS_SCAN) += scan/
+obj-$(CONFIG_OS_SC)   += sc/

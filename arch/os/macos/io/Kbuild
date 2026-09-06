@@ -1,0 +1,23 @@
+# arch/os/macos/io — the system call, without a C library to make it through.
+#
+# Everything in here exists to not be a call into libSystem, and the compiler is
+# entitled to make one anyway: a byte loop becomes memcpy(), an array makes the
+# stack protector emit __stack_chk_fail. A build where the line below prints
+# anything at all has grown a dependency this directory exists to not have:
+#
+#	nm -u obj/arch/os/macos/io/io.o
+#
+# There is no nostdlib.o beside io.o the way there is under arch/os/linux. That
+# file is the six data symbols an ELF -nostdlib link leaves undefined, and two
+# of them are stdout and stderr — which on macOS are not data symbols at all but
+# macros over __stdoutp, so there is nothing here for such a file to define. The
+# program that needed it, tools/ub, is an ELF shape besides (see the platform
+# README), so on this platform nothing links without libSystem in the first
+# place.
+obj-$(CONFIG_OS_IO) += io.o
+
+# -fno-builtin, and -fno-stack-protector for the same reason one step further
+# out: a toolchain that turns the stack protector on by default puts a call to
+# the library's __stack_chk_fail in every function that has an array in it,
+# which in here is most of them.
+ccflags-y += -fno-builtin -fno-stack-protector

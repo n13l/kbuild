@@ -1,0 +1,119 @@
+#
+# arch/os/macos — macOS process services.
+#
+# The counterpart of arch/os/linux, and the same three questions: how a program
+# with no C library under it reaches the kernel, how it draws randomness, and
+# where the system call instructions in a run of code are.
+#
+# The fourth — arming those instructions in this process and standing behind the
+# trap — has no entry here, because macOS has no answer to it. README.md in this
+# directory says why at length; the short of it is that the text a program would
+# want to arm is libsystem's, libsystem's text lives in the dyld shared cache,
+# and the shared cache is mapped read-only, shared between every process on the
+# machine and validated against its code signature. There is no CONFIG_OS_SC on
+# this platform rather than one that returns an error.
+#
+menu "macOS process services"
+	depends on PLATFORM = "macos"
+
+config OS_IO
+	bool "the system call, without a C library to make it through"
+	default y
+	help
+	  _syscall6() and the calls a program makes with it, one _sys_ name
+	  each: _sys_read, _sys_write, _sys_open, _sys_close, _sys_readlink,
+	  _sys_access, _sys_execve, _sys_exit, _sys_getpid, _sys_getppid,
+	  _sys_gettid, _sys_gettimeofday, _sys_sendto, _sys_recvfrom,
+	  _sys_stat. The string helpers beside them are shared with every other
+	  platform layer and live in <arch/os/str.h>: xstr* macros that resolve
+	  to the C library's strlen/strcmp/... where a build has one and to the
+	  hand-written nolibc_ loops where it does not, plus nolibc_utoa and
+	  nolibc_say. That is why this directory is built -fno-builtin:
+	  otherwise the compiler turns a nolibc_ loop back into the library
+	  call it was written to replace.
+
+	  Two things here are macOS and not Linux, and io.h says both where the
+	  asm is. The number goes in x16 on arm64 rather than x8, and on x86-64
+	  it carries the UNIX class in its top byte, because Darwin multiplexes
+	  several call tables through one instruction. And the error comes back
+	  as a positive number with the carry flag set, the way the BSDs have
+	  always returned one — so the flag is read with the result and folded
+	  into it, and every caller above this line goes on reading a negative
+	  return as the kernel's error the way it does on Linux.
+
+	  hpc's logger is the caller that matters on this platform: its open
+	  and its write go through here whenever this symbol is set
+	  (hpc/log/write.c), so a program with no C library can still log, and
+	  so an object that interposes on write does not catch its own log
+	  lines. Formatting stays the library's.
+
+config OS_ENTROPY
+	bool "the entropy system call, without a C library to make it through"
+	default y
+	help
+	  _sys_getrandom(), made the same freestanding way arch/os/macos/io
+	  makes _sys_read and the rest — one inline system call — so an object
+	  with no library under it has a way to draw randomness and a fallback
+	  for when the symbol it wraps could not be resolved.
+
+	  The name is getrandom's and the call underneath is getentropy(2),
+	  which is the one this kernel has. Two things are made up to keep the
+	  Linux shape the callers are written against: the flags argument is
+	  accepted and ignored, because there is no pool here to have opinions
+	  about, and the 256-byte limit getentropy fails a longer call for is a
+	  loop rather than an error.
+
+	  Beside it is the entropy seam,
+	  <arch/os/macos/entropy/hooks.h>: one macro, entropy_hook_fill(),
+	  handed the buffer a source just filled, free to read it or to rewrite
+	  it in place before the program sees it. Off by default, and turned
+	  into something by the header a build names below.
+
+	  Say N and neither the wrapper nor the seam is in the tree.
+
+config OS_ENTROPY_HOOKS
+	bool
+	depends on OS_ENTROPY
+	help
+	  Whether the entropy seam is asked for. Left to a consumer to turn on,
+	  because a seam nothing reads is a call to nothing. With it on, the
+	  header below names where the definitions come from.
+
+config OS_ENTROPY_HOOKS_HEADER
+	string
+	depends on OS_ENTROPY_HOOKS
+	help
+	  The header <arch/os/macos/entropy/hooks.h> includes, written as it
+	  would be inside the angle brackets — a path against one of the
+	  build's header roots ("modules/ub/entropy/entropy.h"). Whatever it
+	  does not define falls back to the same nothing.
+
+config OS_SCAN
+	bool "the syscall instruction sites in a run of code"
+	depends on ARCH = "arm64"
+	default y
+	help
+	  scan_run(): given a run of machine code and a list of offsets known
+	  to be instruction boundaries, say where in it the system call
+	  instructions are and, where the preceding instruction settled it,
+	  which number each one makes.
+
+	  Instructions are four bytes and aligned on arm64, so `svc #0x80` is
+	  one word with nothing else to be mistaken for and the sweep is the
+	  word loop in scan/arm64.c. Two constants are Darwin's rather than
+	  Linux's: that trap immediate, and x16 as the register the number is
+	  loaded into.
+
+	  It is pure: no system calls, no allocation, no state, and nothing in
+	  it cares whether the bytes came from a mapping or from a file.
+	  Nothing in this tree links it on macOS yet — there is no in-process
+	  half here to arm what it finds, and tools/ub-patch is an ELF editor —
+	  so it is built for what it is, one answer to a question about bytes.
+
+	  x86-64 is not offered. The two-byte `syscall` there occurs inside
+	  immediates and displacements and needs the instruction length decoder
+	  arch/os/linux/scan carries to tell a site from a coincidence, and
+	  there is no consumer on this platform to have written a second one
+	  for.
+
+endmenu

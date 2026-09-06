@@ -1,0 +1,32 @@
+#
+# arch/os — the platform layer's configuration, kbuild's own.
+#
+# The code under arch/os/<platform> acts on a process rather than on data: the
+# system call without a C library to make it through, the call randomness is
+# drawn with, where the system call instructions in a run of code are, and (on
+# the platforms that have it) arming them in this process. It is kbuild's, not
+# any one consumer's — the same system call on the same kernel for every tree
+# that vendors kbuild — so its menu lives here, sourced in one line by a tree
+# that builds the layer rather than copied into each tree's own Kconfig.
+#
+# PLATFORM is a fact about the build, not a choice: kbuild derives it from the
+# target triple before the configuration is read (scripts/Makefile.target), so
+# the layer that is offered is the one that could be built — arch/os/linux,
+# arch/os/macos or arch/os/windows — and the symbols under it (OS_IO,
+# OS_ENTROPY, OS_SCAN, OS_SC) are named for what they are rather than for the
+# kernel that answers them, so a consumer writes `select OS_IO` and gets the
+# platform's. A target with no layer here has no directory to source and the
+# build fails on that, rather than quietly configuring nothing.
+#
+# This is sourced by the trees that build the platform layer — ub, and a
+# standalone kbuild build for its own selftests — not by every tree that
+# vendors kbuild: a tree that does not build arch/os (un, whose logger falls
+# back to the C library) must not offer these symbols, because setting OS_IO
+# without building arch/os/<platform>/io leaves the _sys_ calls its callers
+# reference undefined at link time.
+#
+menu "Platform services"
+
+source "arch/os/$PLATFORM/Kconfig"
+
+endmenu

@@ -1,5 +1,46 @@
 CROSS_COMPILER ?= gcc
 CROSS_LINKER ?= ld
+
+# LLVM=1 builds with clang and the LLVM binutils instead of gcc and GNU's, the
+# same switch and the same three spellings the kernel has:
+#
+#   make LLVM=1                                 clang, ld.lld, llvm-ar, ...
+#   make LLVM=-21                               clang-21, ld.lld-21, ...
+#   make LLVM=/opt/llvm/bin/                    /opt/llvm/bin/clang, ...
+#
+# One clang is every cross compiler at once, so CROSS_COMPILE stops naming a
+# program and names a target instead: its triple, without the trailing dash,
+# becomes --target. And it goes into CC itself rather than into KBUILD_CFLAGS,
+# because CC is also what $(CC) -dumpmachine below asks, what links every
+# program, and what the vendor builds (OpenSSL, liburcu) are handed — none of
+# which read KBUILD_CFLAGS, and all of which would otherwise build for the host.
+# -fuse-ld for the same reason: the system ld is the host's.
+#
+# The one exception is the partial link. Every directory's built-in.o is an
+# `ld -r`, and lld's COFF driver has no -r at all, so a Windows target keeps
+# binutils' ld for that one step ($(CROSS_COMPILE)ld, which a mingw install
+# has); clang still compiles everything and lld still links the programs.
+ifneq ($(LLVM),)
+ifneq ($(filter %/,$(LLVM)),)
+LLVM_PREFIX := $(LLVM)
+else ifneq ($(filter -%,$(LLVM)),)
+LLVM_SUFFIX := $(LLVM)
+endif
+LLVM_TARGET := $(if $(CROSS_COMPILE),--target=$(notdir $(patsubst %-,%,$(CROSS_COMPILE))))
+CROSS_COMPILER := clang
+CC	:= $(LLVM_PREFIX)clang$(LLVM_SUFFIX) $(LLVM_TARGET) -fuse-ld=lld$(LLVM_SUFFIX)
+LD	:= $(LLVM_PREFIX)ld.lld$(LLVM_SUFFIX)
+AR	:= $(LLVM_PREFIX)llvm-ar$(LLVM_SUFFIX)
+NM	:= $(LLVM_PREFIX)llvm-nm$(LLVM_SUFFIX)
+STRIP	:= $(LLVM_PREFIX)llvm-strip$(LLVM_SUFFIX)
+OBJCOPY	:= $(LLVM_PREFIX)llvm-objcopy$(LLVM_SUFFIX)
+OBJDUMP	:= $(LLVM_PREFIX)llvm-objdump$(LLVM_SUFFIX)
+ifneq ($(filter %mingw32 %windows %cygwin %msys,$(patsubst %-,%,$(CROSS_COMPILE))),)
+LD	:= $(CROSS_COMPILE)ld
+endif
+export LLVM
+endif
+
 CC ?= $(CROSS_COMPILE)$(CROSS_COMPILER)
 LD ?= $(CROSS_COMPILE)$(CROSS_LINKER)
 
@@ -32,21 +73,72 @@ so := so
 export COMPILER ARCH HOSTCC HOSTLD CC LD OBJDUMP so
 endif
 
-TARGET := $(or $(TARGET),$(shell $(CC) -dumpmachine 2>&1))
-ARCH := $(or $(ARCH),$(shell echo $(TARGET) | sed -e s/i.86.*/i386/ -e s/x86_64.*/x86_64/ \
+# One spelling of a machine, from whichever triple or uname names it.
+machine_of = $(shell echo $(1) | sed -e s/i.86.*/i386/ -e s/x86_64.*/x86_64/ \
+                                     -e s/amd64.*/x86_64/ \
                                      -e s/.390.*/s390/ \
 				     -e s/powerpc64.*/powerpc/ \
-                                     -e s/aarch64.*/arm64/ -e s/arm[^6].*/arm/))
+                                     -e s/aarch64.*/arm64/ -e s/arm64.*/arm64/ \
+                                     -e s/arm[^6].*/arm/)
+
+TARGET := $(or $(TARGET),$(shell $(CC) -dumpmachine 2>&1))
+ARCH := $(or $(ARCH),$(call machine_of,$(TARGET)))
 
 PLATFORM := $(or $(PLATFORM),$(shell $(src)/scripts/host_from_sys.sh $(TARGET)))
 PLAT:=$(shell echo "$(PLATFORM)" | tr '[:lower:]' '[:upper:]')
 
-ifeq ($(PLATFOWM),win32)
-SHLIB_EX=dll
-EXEC_EX=exe
+# Whether what is being built runs where it is being built. y when the target's
+# machine or its system is not the build host's — which is a cross build
+# whatever CROSS_COMPILE says: a native-looking CC can be pointed elsewhere
+# (clang --target, an x86_64 gcc given -m32), and a CROSS_COMPILE can name the
+# host's own triple. Kconfig reads it (option env) to stop offering what only
+# makes sense on the build host — CPU_NATIVE above all, whose -march=native
+# would describe the machine doing the compiling and not the one running the
+# result.
+HOST_ARCH := $(call machine_of,$(UNAME_MACHINE))
+CROSS_BUILD := $(if $(filter-out $(HOST_ARCH),$(ARCH))$(filter-out $(HOST),$(PLATFORM)),y,n)
+
+# pkg-config for the target, not the host. A cross toolchain that ships one
+# names it after its triple (x86_64-w64-mingw32-pkg-config, the Debian
+# crossbuild wrappers); where there is none, asking the host's would hand a
+# cross build the host's include paths and libraries — and its CPU flags,
+# which is how an arm64 host's -moutline-atomics ends up on an x86_64 compile
+# line. So a cross build without a target pkg-config gets a command that finds
+# nothing: whatever asks for a library sees it as not installed, which is the
+# truth about the target.
+ifeq ($(CROSS_BUILD),y)
+PKG_CONFIG ?= $(or $(shell command -v $(CROSS_COMPILE)pkg-config 2>/dev/null),\
+                   $(shell command -v $(TARGET)-pkg-config 2>/dev/null),false)
+else
+PKG_CONFIG ?= pkg-config
 endif
 
-ifeq ($(PLATFOWM),os390)
+# Libraries a package wants to know the target has, by pkg-config name: the
+# package's top Makefile sets PKG_PROBE before it includes this one (un says
+# PKG_PROBE := libdpdk), and each name is answered here as HAVE_PKG_<NAME> —
+# upper case, with - . + made _ — "y" or "n", for a Kconfig `option env` to
+# read and a feature to depend on.
+#
+# Here and not in the package's Makefile, because the answer has to exist
+# before include/config/auto.conf.cmd is read further down: that file compares
+# every env option with the value it was configured with, and a variable that
+# is only set after the comparison is one that never matches — a reconfigure on
+# every make. Once per build, exported, for the same reason cpucap's answers are.
+pkg_probe_var = HAVE_PKG_$(shell echo '$(1)' | tr 'a-z.+-' 'A-Z___')
+ifndef _PKG_PROBE_DONE
+export _PKG_PROBE_DONE := 1
+$(foreach p,$(PKG_PROBE),$(eval export $(call pkg_probe_var,$(p)) := \
+	$(shell $(PKG_CONFIG) --exists $(p) 2>/dev/null && echo y || echo n)))
+endif
+
+# What a program and a shared object are called on the target. exe is a suffix
+# (empty on everything but Windows), so= the extension without its dot.
+ifeq ($(PLATFORM),windows)
+SHLIB_EX=dll
+EXEC_EX=.exe
+endif
+
+ifeq ($(PLATFORM),os390)
 SHLIB_EX=so
 EXEC_EX=
 endif
@@ -55,6 +147,19 @@ ifeq ($(PLATFORM),linux)
 ifdef CONFIG_CC_CLIB
 KBUILD_LIBS += -lc -lrt -lm
 endif
+endif
+
+# The C library, named on a link line that has to name it (the test and cmocka
+# programs). librt is glibc's and separate only on Linux; Windows has no libc
+# by that name at all — msvcrt or the UCRT is the driver's to link, and is
+# linked whatever this says — and the POSIX clock_gettime() that librt carries
+# on Linux is winpthreads' there.
+ifeq ($(PLATFORM),linux)
+LIBC_LDLIBS := -lc -lrt -lm
+else ifeq ($(PLATFORM),windows)
+LIBC_LDLIBS := -lpthread -lm
+else
+LIBC_LDLIBS := -lc -lm
 endif
 
 ifeq ($(ARCH),s390)
@@ -67,12 +172,13 @@ ifeq ($(ARCH),arm)
 #KBUILD_CFLAGS += "--sysroot=/usr/arm-linux-gnueabi -B/usr/arm-linux-gnueabi/libhfa"
 endif
 
-ifeq ($(PLATFORM),darwin)
+ifeq ($(PLATFORM),macos)
 #SO=dylib
 #SHLIB_LDFLAGS=-dynamiclib
 endif
 
 export PLATFORM PLATFORM_U
 export ARCH HOST TARGET SO LD
-export SHLIB_EX KBUILD_CFLAGS EXE_LDFLAGS KBUILD_LIBS
+export CROSS_BUILD HOST_ARCH PKG_CONFIG LIBC_LDLIBS
+export SHLIB_EX EXEC_EX KBUILD_CFLAGS EXE_LDFLAGS KBUILD_LIBS
 #

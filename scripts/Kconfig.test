@@ -22,9 +22,18 @@ config BENCHMARK
 	  If unsure, say N.
 
 
+# Whether the target toolchain can link -lcmocka: "y" or "n", asked once per
+# build by kbuild's top-level Makefile (cc_links) and exported. It is the
+# target's answer, so a cross build whose sysroot has no cmocka does not offer
+# the tests below rather than failing to link every one of them.
+config CC_HAS_LIBCMOCKA
+	string
+	option env="CC_HAS_LIBCMOCKA"
+
 config CMOCKA
 	bool "Enable cmocka unit test framework"
 	depends on CC_CLIB
+	depends on CC_HAS_LIBCMOCKA != "n"
 	default y
 	help
 	  Enable building cmocka-based unit tests. When enabled,

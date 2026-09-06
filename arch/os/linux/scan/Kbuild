@@ -9,5 +9,5 @@
 # after the architecture being built for. There is no generic one: a machine
 # whose syscall instruction this tree does not know is a #error out of scan.h
 # rather than a build that quietly watches nothing, and Kconfig will not offer
-# CONFIG_OS_LINUX_SCAN there in the first place.
-obj-$(CONFIG_OS_LINUX_SCAN) += scan.o $(ARCH).o
+# CONFIG_OS_SCAN there in the first place.
+obj-$(CONFIG_OS_SCAN) += scan.o $(ARCH).o

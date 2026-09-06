@@ -6,14 +6,30 @@ ldflags()
 {
 	pkg-config --libs ncursesw 2>/dev/null && exit
 	pkg-config --libs ncurses 2>/dev/null && exit
-	for ext in so a dll.a dylib ; do
-		for lib in ncursesw ncurses curses ; do
-			$cc -print-file-name=lib${lib}.${ext} | grep -q /
-			if [ $? -eq 0 ]; then
-				echo "-l${lib}"
-				exit
-			fi
-		done
+	# No pkg-config: ask the compiler by trying an actual link.
+	#
+	# This used to probe with -print-file-name, which only ever names a
+	# library that sits in the compiler's own search path as a real file.
+	# On macOS the system ncurses is the SDK stub plus the dyld shared
+	# cache, so no candidate ever matched, we printed nothing, and mconf
+	# was linked with no -l at all -- the whole of curses came back
+	# undefined at link time. A link probe answers the question we
+	# actually have, and works the same way everywhere.
+	#
+	# eval, because ccflags quotes the header for the make command line
+	# it is normally pasted into (-DCURSES_LOC="<curses.h>"); expanding
+	# it here without a round of shell parsing would hand the compiler
+	# the quote characters themselves.
+	cflags=$(ccflags | tr '\n' ' ')
+	for lib in ncursesw ncurses curses ; do
+		if eval "$cc $cflags -x c - -l${lib} -o $tmp" 2>/dev/null <<-EOF
+			#include CURSES_LOC
+			int main(void) { initscr(); return 0; }
+		EOF
+		then
+			echo "-l${lib}"
+			exit
+		fi
 	done
 	exit 1
 }

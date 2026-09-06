@@ -27,7 +27,7 @@ buffering, no locale and no allocation. The `_sys_` prefix is what marks that
 The `nolibc_` loops are why this directory is built `-fno-builtin` (see `io/Kbuild`)
 
 hpc's logger is the third caller, and it is the one that is neither of the two
-above: `hpc/log/write.c` reaches this header when `CONFIG_OS_LINUX_IO` is set
+above: `hpc/log/write.c` reaches this header when `CONFIG_OS_IO` is set
 and makes its `open(2)` and its `write(2)` here. Both reasons apply to it at
 once — a `-nostdlib` program that logs has no `write()` to call, and an object
 that exports `write` to interpose on other people's would otherwise bind its

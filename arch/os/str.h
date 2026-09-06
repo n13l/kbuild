@@ -1,5 +1,5 @@
-#ifndef OS_LINUX_IO_STR_H
-#define OS_LINUX_IO_STR_H
+#ifndef OS_STR_H
+#define OS_STR_H
 
 #include <stddef.h>
 
@@ -14,7 +14,7 @@
  * Each public name is an xstr* macro that resolves two ways. Where a build has
  * a C library it resolves to the library's own function — which is the tuned,
  * often vectorised one, and worth using. Where a build carries its own way to
- * the kernel instead (CONFIG_OS_LINUX_IO, the same switch the system calls next
+ * the kernel instead (CONFIG_OS_IO, the same switch the system calls next
  * door answer to) it resolves to the nolibc_ implementation here. So a caller
  * writes xstrlen() and gets the right one for the image it is being built into,
  * and the nolibc_ names stay available for code that wants the own copy outright.
@@ -24,6 +24,12 @@
  * src) rather than the BSD (dst, src, size), so there is no library name with a
  * matching signature to hand them to. io_say()'s replacement, nolibc_say(), is
  * not here either — it makes a system call, so it lives with them in io.c.
+ *
+ * This file is arch/os/str.h rather than arch/os/<platform>/io/str.h because
+ * there is no platform in it: a byte loop over a NUL-terminated string is the
+ * same loop on every kernel, and the one thing it asks about — is there a C
+ * library in this image — is CONFIG_OS_IO, which every platform layer here
+ * answers with the same symbol. Each platform's <io.h> includes it.
  */
 
 static inline size_t
@@ -131,7 +137,7 @@ nolibc_utoa(unsigned long v, char *buf, size_t size)
 	return buf;
 }
 
-#ifdef CONFIG_OS_LINUX_IO		/* own shims: this image carries no libc */
+#ifdef CONFIG_OS_IO		/* own shims: this image carries no libc */
 
 #define xstrlen		nolibc_strlen
 #define xstrcmp		nolibc_strcmp

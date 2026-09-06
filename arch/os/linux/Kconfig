@@ -11,14 +11,16 @@
 menu "Linux process services"
 	depends on PLATFORM = "linux"
 
-config OS_LINUX_IO
+config OS_IO
 	bool "the system call, without a C library to make it through"
 	default y
 	help
 	  _syscall6() and the calls a program makes with it, one _sys_ name
 	  each: _sys_read, _sys_write, _sys_open, _sys_close, _sys_readlink,
 	  _sys_access, _sys_execve, _sys_exit, _sys_getpid, _sys_getppid,
-	  _sys_sendto, _sys_recvfrom, _sys_stat. Beside them, in str.h, are the
+	  _sys_gettid, _sys_gettimeofday, _sys_sendto, _sys_recvfrom,
+	  _sys_stat. Beside them, in <arch/os/str.h> — shared with every other
+	  platform layer, because there is no kernel anywhere in it — are the
 	  string helpers a program with no <string.h> still needs: xstr* macros
 	  that resolve to the C library's strlen/strcmp/... where a build has a
 	  libc and to the hand-written nolibc_ loops here where it does not, plus
@@ -50,7 +52,7 @@ config OS_LINUX_IO
 	  image is loaded rather than when the code runs. That file says what it
 	  does about them and why.
 
-config OS_LINUX_ENTROPY
+config OS_ENTROPY
 	bool "the entropy system call, without a C library to make it through"
 	default y
 	help
@@ -70,25 +72,25 @@ config OS_LINUX_ENTROPY
 	  Say N and neither the wrapper nor the seam is in the tree; a build
 	  that watches io still builds, and simply does not watch entropy.
 
-config OS_LINUX_ENTROPY_HOOKS
+config OS_ENTROPY_HOOKS
 	bool
-	depends on OS_LINUX_ENTROPY
+	depends on OS_ENTROPY
 	help
 	  Whether the entropy seam is asked for. Left to a consumer to turn on
 	  — modules/ub/entropy does, the way modules/ub/tls turns on un's
 	  NET_TLS_HOOKS — because a seam nothing reads is a call to nothing.
 	  With it on, the header below names where the definitions come from.
 
-config OS_LINUX_ENTROPY_HOOKS_HEADER
+config OS_ENTROPY_HOOKS_HEADER
 	string
-	depends on OS_LINUX_ENTROPY_HOOKS
+	depends on OS_ENTROPY_HOOKS
 	help
 	  The header <arch/os/linux/entropy/hooks.h> includes, written as it
 	  would be inside the angle brackets — a path against one of the
 	  build's header roots ("modules/ub/entropy/entropy.h"). Whatever it
 	  does not define falls back to the same nothing.
 
-config OS_LINUX_SCAN
+config OS_SCAN
 	bool "the syscall instruction sites in a run of code"
 	depends on ARCH = "x86_64" || ARCH = "arm64"
 	default y
@@ -111,10 +113,10 @@ config OS_LINUX_SCAN
 	  is what lets the agent and ub-patch share one answer to the same
 	  question, one of them at run time and the other at patch time.
 
-config OS_LINUX_SC
+config OS_SC
 	bool "arm the syscall sites in this process and dispatch the trap"
-	depends on OS_LINUX_SCAN
-	depends on OS_LINUX_IO
+	depends on OS_SCAN
+	depends on OS_IO
 	default y
 	help
 	  sc_open()/sc_arm_self()/sc_close(): walk this process's mappings,

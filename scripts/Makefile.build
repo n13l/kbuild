@@ -349,11 +349,41 @@ $(sort $(subdir-obj-y)): $(subdir-ym) ;
 #
 ifdef builtin-target
 quiet_cmd_link_o_target = LD      $@
-# If the list of objects to link is empty, just create an empty built-in.o
+# If the list of objects to link is empty, just create an empty built-in.o.
+# An empty *object* rather than an empty *archive*: ar(1) on macOS refuses to
+# create an archive with no members at all, and an empty translation unit is
+# something every toolchain here can compile and every ld -r can take.
+# The ABI flags come with it and nothing else does: those are what decide the
+# architecture of the object that comes out, and an object of the wrong one is
+# an object the ld -r above would refuse to merge -- or, on macOS, one the
+# linker drops from the final link with "found architecture 'arm64', required
+# architecture 'arm64e'". The rest of KBUILD_CFLAGS has nothing to say about an
+# empty translation unit and some of it is a link flag the compiler would warn
+# about.
+#
+# Two spellings of the same thing, from both places a flag can reach a compile:
+#
+#   -m%     one word (arch/s390 puts -m64 there), so $(filter) has it
+#   -arch % two words, which $(filter) cannot see as a pair. Gluing the pair
+#           into one word before the filter and taking it apart after is what
+#           abi_flags does; macOS puts -arch arm64e here for a whole tree.
+#
+# KBUILD_SUBDIR_CCFLAGS as well as KBUILD_CFLAGS, because a subdir-ccflags-y in
+# a Kbuild above this directory is exactly how a tree says "this architecture,
+# everything below here" -- and it is the one an empty directory would
+# otherwise miss.
+abi_all   = $(KBUILD_CFLAGS) $(KBUILD_SUBDIR_CCFLAGS)
+abi_flags = $(subst @arch@,-arch ,$(filter -m% @arch@%,$(subst -arch ,@arch@,$(abi_all))))
+# -m% also catches flags clang takes but has no use for on an empty unit
+# (-mno-global-merge), and CC can carry a link flag (-fuse-ld under LLVM=1);
+# clang's -Qunused-arguments, where the build has it, keeps both quiet here as
+# it does on every other compile line.
+abi_flags += $(filter -Qunused-arguments,$(KBUILD_CPPFLAGS))
+
 cmd_link_o_target = $(if $(strip $(obj-y)),\
 		      $(LD) $(ld_flags) -r -o $@ $(filter $(obj-y), $^) \
 		      $(cmd_secanalysis),\
-		      rm -f $@; $(AR) rcs$(KBUILD_ARFLAGS) $@)
+		      rm -f $@; $(CC) $(abi_flags) -x c /dev/null -c -o $@)
 
 $(builtin-target): $(obj-y) FORCE
 	$(call if_changed,link_o_target)

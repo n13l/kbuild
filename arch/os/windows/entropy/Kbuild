@@ -1,0 +1,12 @@
+# arch/os/windows/entropy — the entropy call, without a C library.
+#
+# The sibling of arch/os/windows/io: one _sys_ name for the call a program
+# draws randomness with, made the same freestanding way and for the same
+# reason. The name is getrandom's because that is what the callers are written
+# against; the call underneath is BCryptGenRandom(), which is what this system
+# has. Built as io is, so the compiler turns none of this back into a call into
+# the library this tree does not link.
+obj-$(CONFIG_OS_ENTROPY) += entropy.o
+
+ccflags-y += -fno-builtin -fno-stack-protector
+ccflags-y += $(call cc-option,-fno-tree-loop-distribute-patterns)

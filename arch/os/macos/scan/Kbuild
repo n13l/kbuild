@@ -1,0 +1,17 @@
+# arch/os/macos/scan — where the system calls in a run of code are.
+#
+# Pure functions over a buffer: no system calls, no allocation, no state. The
+# driver is machine-independent; the step is not, and is the file named after
+# the architecture being built for.
+#
+# arm64 only, and that is a fact about what this platform runs rather than a
+# gap: `syscall` on an x86-64 Mach-O image needs the same instruction length
+# decoder arch/os/linux/scan carries, and there is no Rosetta-era consumer here
+# to have written it for. Kconfig will not offer CONFIG_OS_SCAN on anything
+# else, so a build for one gets told rather than quietly watching nothing.
+#
+# Nothing in this tree links it on macOS today — there is no sc/ here (see the
+# platform README) and tools/ub-patch is an ELF editor. It is built because the
+# question it answers is about a run of bytes and not about a process, and the
+# answer is the same one whether it is asked of a mapping or of a file.
+obj-$(CONFIG_OS_SCAN) += scan.o $(ARCH).o

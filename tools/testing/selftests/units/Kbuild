@@ -1,0 +1,46 @@
+# kbuild's own unit selftests for the platform layer (arch/os/<platform>).
+#
+# These are kbuild's tests of its own code, built when kbuild is checked out and
+# built on its own (a consumer tree builds its own selftests, not these). The
+# cmocka sources drop the test_ prefix (the units/ directory already says
+# "test"); the built binaries keep it, because the shared runner discovers unit
+# executables via the units/test_* glob.
+#
+# What each needs is what it links, so each is gated on the platform symbol that
+# builds its objects — str is the exception, a header of byte loops with no
+# object behind it, built wherever cmocka is.
+ifdef CONFIG_CMOCKA
+cmockatest-y                    += test_os_str
+cmockatest-$(CONFIG_OS_SCAN)    += test_os_scan
+cmockatest-$(CONFIG_OS_IO)      += test_os_io
+cmockatest-$(CONFIG_OS_ENTROPY) += test_os_entropy
+endif
+
+test_os_str-y     := os_str.o
+test_os_scan-y    := os_scan.o
+test_os_io-y      := os_io.o
+test_os_entropy-y := os_entropy.o
+
+# The platform layer's objects, by component, each built when its directory is
+# descended (arch/os/<platform>/Kbuild). Paths are relative to the object tree,
+# where make runs, as the other packages' CMOCKA_LIBS are.
+#
+# io.o, not io/built-in.o: on Linux the io directory's built-in.o also carries
+# nostdlib.o, which DEFINES stdout, stderr and the getopt globals for a program
+# linked -nostdlib. These tests are ordinary libc programs, and those
+# definitions would collide with the C library's own — glibc aborts with
+# "invalid stdio handle" the first time one printf's. The single object has only
+# the system calls, which is all the tests want.
+P := arch/os/$(PLATFORM)
+CMOCKA_LIBS_test_os_scan    = $(P)/scan/built-in.o
+CMOCKA_LIBS_test_os_io      = $(P)/io/io.o
+CMOCKA_LIBS_test_os_entropy = $(P)/entropy/built-in.o $(P)/io/io.o
+
+# sc is the in-process half (arm this process, dispatch the trap): Linux only,
+# and not a pure function, so it is a standalone program rather than a cmocka
+# group — it installs a SIGILL handler and rewrites live code, and wants neither
+# cmocka's own signal handling nor its setjmp between it and the kernel. The
+# test_ prefix is in the name so the same units/test_* glob finds it; it links
+# sc, the scan it is built on, io, and dl_iterate_phdr/dladdr from -ldl.
+testprogs-$(CONFIG_OS_SC) += test_os_sc
+LIBS_test_os_sc = $(P)/sc/built-in.o $(P)/scan/built-in.o $(P)/io/io.o -ldl

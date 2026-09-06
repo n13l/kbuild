@@ -18,7 +18,12 @@
 #   CMOCKA_CFLAGS = -I$(srctree)/some/path
 #
 
-__cmockatest := $(sort $(cmockatest-y))
+# CONFIG_CMOCKA is the one switch for every suite. A Kbuild that lists its
+# tests as cmockatest-$(CONFIG_CMOCKA) says so itself; one that writes plain
+# cmockatest-y (or gates on the feature under test instead) would otherwise
+# build them into a configuration that has turned cmocka off — which is every
+# build whose target toolchain cannot link it (Kconfig.test, CC_HAS_LIBCMOCKA).
+__cmockatest := $(if $(CONFIG_CMOCKA),$(sort $(cmockatest-y)))
 
 # Executables compiled from a single .c file
 cmocka-csingle := $(foreach m,$(__cmockatest),$(if $($(m)-y),,$(m)))
@@ -29,11 +34,16 @@ cmocka-cmulti := $(foreach m,$(__cmockatest),$(if $($(m)-y),$(m)))
 # Object (.o) files compiled from .c files
 cmocka-cobjs := $(sort $(foreach m,$(__cmockatest),$($(m)-y)))
 
+# Programs are named with the target's executable suffix — $(EXEC_EX), .exe on
+# Windows and nothing anywhere else (scripts/Makefile.target). A mingw linker
+# asked for foo writes foo.exe, so a target spelled without the suffix is one
+# make never finds and relinks on every build. The stem is still the bare name,
+# which is what $(*F) gives the per-program variables (foo-y, LIBS_foo, ...).
 __obj_fixed := $(patsubst %/,%,$(obj))
 __src_fixed := $(patsubst %/,%,$(src))
 
-cmocka-csingle := $(addprefix $(__obj_fixed)/,$(cmocka-csingle))
-cmocka-cmulti  := $(addprefix $(__obj_fixed)/,$(cmocka-cmulti))
+cmocka-csingle := $(addsuffix $(EXEC_EX),$(addprefix $(__obj_fixed)/,$(cmocka-csingle)))
+cmocka-cmulti  := $(addsuffix $(EXEC_EX),$(addprefix $(__obj_fixed)/,$(cmocka-cmulti)))
 cmocka-cobjs   := $(addprefix $(__obj_fixed)/,$(cmocka-cobjs))
 
 # Compiler flags for cmocka tests
@@ -42,8 +52,9 @@ cmockac_flags = -Wp,-MD,$(depfile) \
 	      $(USERINCLUDE) $(CMOCKA_CFLAGS) -I. -I../ -I../include \
 	      -include $(srctree)/arch/os/$(PLATFORM)/platform.h
 
-# cmocka tests always require libc (setjmp, malloc, etc.)
-cmocka_ldlibs = -lcmocka -lc -lrt -lm
+# cmocka tests always require libc (setjmp, malloc, etc.), spelled for the
+# target by scripts/Makefile.target.
+cmocka_ldlibs = -lcmocka $(LIBC_LDLIBS)
 
 # Every object a test in this directory links in from elsewhere
 # (CMOCKA_LIBS_*), as a prerequisite of all of them.
@@ -68,7 +79,7 @@ quiet_cmd_cmocka-csingle = CC    $@
       cmd_cmocka-csingle = $(CC) $(LDFLAGS_$(*F)) $(cmockac_flags) -o $@ $< \
                                $(CMOCKA_LIBS_$(*F)) $(cmocka_ldlibs)
 
-$(cmocka-csingle): $(__obj_fixed)/%: $(__src_fixed)/%.c $(cmocka-libs) FORCE
+$(cmocka-csingle): $(__obj_fixed)/%$(EXEC_EX): $(__src_fixed)/%.c $(cmocka-libs) FORCE
 	$(call if_changed_dep,cmocka-csingle)
 
 # cmocka-cobjs -> .o
@@ -81,10 +92,10 @@ $(cmocka-cobjs): $(__obj_fixed)/%.o: $(__src_fixed)/%.c FORCE
 # Link an executable based on list of .o files
 quiet_cmd_cmocka-cmulti	= CC      $@
       cmd_cmocka-cmulti	= $(CC) -o $@ \
-			  $(addprefix $(obj)/,$($(@F)-y)) \
+			  $(addprefix $(obj)/,$($(*F)-y)) \
 			  $(CMOCKA_LIBS_$(*F)) $(cmocka_ldlibs)
 
-$(cmocka-cmulti): $(__obj_fixed)/%: $(cmocka-cobjs) $(cmocka-libs) FORCE
+$(cmocka-cmulti): $(__obj_fixed)/%$(EXEC_EX): $(cmocka-cobjs) $(cmocka-libs) FORCE
 	$(call if_changed,cmocka-cmulti)
 
 targets += $(cmocka-csingle) $(cmocka-cmulti) $(cmocka-cobjs)

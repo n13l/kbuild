@@ -1,20 +1,59 @@
-ifeq ($(PLATFORM),win32)
-KBUILD_LIBS           += -lcomdlg32 -lwinspool -lcomctl32 -lsetupapi -lwininet \
-                         -lwin32spl -lws2_32 -lpsapi -lshlwapi -ladvapi32 \
-                         -lgdi32 -lpsapi -lole32 -lshlwapi
-SHLIB_LDFLAGS         := -shared -static-libgcc -static-libstdc++ \
-                         -Wl,--subsystem,console -Wl,--add-stdcall-alias
-#LD                    := $(CC)
+ifeq ($(PLATFORM),windows)
+# Windows, through mingw-w64 (gcc or clang). See arch/os/windows/README.md.
+#
+# _WIN32_WINNT names the oldest Windows the result has to run on, and the
+# headers hide what is newer. 0x0A00 is Windows 10: GetSystemTimePreciseAsFile
+# Time is 8, and nothing older than 10 is still supported by anyone. NOMINMAX
+# because <windows.h> otherwise defines min() and max() as macros, which the
+# hpc headers define as functions of their own. __USE_MINGW_ANSI_STDIO because
+# msvcrt's printf predates C99 and reads %zu and %lld wrong; with it, mingw's
+# own conforming printf is what the format strings of this tree are handed.
+#
+# arch/os/windows/include is where the POSIX headers Windows does not have are
+# answered — <sys/mman.h> over VirtualAlloc, <netinet/in.h> and <arpa/inet.h>
+# over Winsock — so sources that include them build unchanged. It is searched
+# after the toolchain's own headers would be for anything mingw does carry,
+# because nothing in it has a name mingw also uses.
+#
+# The libraries are the ones arch/os/windows itself is written against: Winsock
+# for the socket calls and byte order, bcrypt for randomness, ntdll for the one
+# call (the parent's process id) that has no kernel32 name. An import library
+# adds nothing to a program that references nothing in it. -static so a program
+# carries libgcc and winpthreads instead of needing their DLLs beside it — the
+# system DLLs are always dynamic whatever this says.
+KBUILD_CPPFLAGS       += -D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00 \
+                         -DNOMINMAX -DWIN32_LEAN_AND_MEAN \
+                         -D__USE_MINGW_ANSI_STDIO=1 \
+                         -idirafter $(srctree)/arch/os/windows/include
+# The printf format archetype. On a Windows target gcc reads `printf` and
+# `__printf__` in a format attribute as msvcrt's printf, which has no %zu, %jd
+# or %lld, and warns about every one of them — while __USE_MINGW_ANSI_STDIO
+# above has swapped in a printf that has all three. mingw's own headers say
+# __gnu_printf__ for exactly this reason; this says it for the tree's, which
+# spell it __printf__. clang's printf archetype is the C99 one already.
+#
+# The -fno-builtin- list is the same fix for the library's own functions. gcc
+# knows printf and its family as builtins, and on this target the builtin's
+# format is msvcrt's — which it checks in addition to the __gnu_printf__ that
+# mingw's declaration carries, so a correct %zu warns while a wrong argument is
+# still caught by the declaration. Without the builtin only the declaration is
+# checked. What is lost is the rewrite of printf("x\n") into puts("x").
+ifneq ($(COMPILER),clang)
+KBUILD_CPPFLAGS       += -D__printf__=__gnu_printf__
+KBUILD_CFLAGS         += $(addprefix -fno-builtin-,printf fprintf sprintf \
+                         snprintf vprintf vfprintf vsprintf vsnprintf)
+endif
+KBUILD_LIBS           += -static -lpthread -lws2_32 -lbcrypt -lntdll
+SHLIB_LDFLAGS         := -shared -static-libgcc
 so                    := dll
 exe                   := .exe
-KBUILD_CFLAGS         += -D_WIN32_WINNT=0x0501
 export KBUILD_LIBS SHLIB_LDFLAGS so exe
 endif
 ifeq ($(PLATFORM),os390)
 so                    := so
 export so
 endif
-ifeq ($(PLATFORM),darwin)
+ifeq ($(PLATFORM),macos)
 so                    := dylib
 SHLIB_LDFLAGS         := -dynamiclib
 #EXE_LDFLAGS           := -Wl,-pie

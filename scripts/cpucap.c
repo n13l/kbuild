@@ -215,7 +215,9 @@ run_x86(int env)
 
 #elif defined(__aarch64__)
 
+#if !defined(__APPLE__)
 #include <sys/auxv.h>
+#endif
 
 /* HWCAP bits — mirror OpenSSL's detector so the report matches OPENSSL_armcap_P. */
 #ifndef HWCAP_ASIMD
@@ -258,11 +260,102 @@ run_x86(int env)
 #endif
 
 /*
- * MIDR_EL1 CPU identification, read from sysfs, to recognise the CPU
- * implementer for the native model mapping — notably Apple silicon.
+ * MIDR_EL1 CPU identification, to recognise the CPU implementer for the native
+ * model mapping — notably Apple silicon.
  */
 #define MIDR_IMPLEMENTER(m) (((m) >> 24) & 0xff)
 #define MIDR_IMPL_APPLE     0x61
+
+#if defined(__APPLE__)
+#define APPLE_SYNTHESISED   "   (from sysctl; this system has no auxv)"
+#else
+#define APPLE_SYNTHESISED   ""
+#endif
+
+#if defined(__APPLE__)
+
+/*
+ * macOS has neither of the two things the decode above is written against: no
+ * auxiliary vector to carry a HWCAP word, and no MIDR_EL1 for a program to
+ * read — the register is EL1 and the sysfs file it is read out of on Linux is
+ * Linux's. What it has instead is a sysctl per architectural feature, which is
+ * the same set of facts under different names.
+ *
+ * So the two words are built here rather than the decode being rewritten: one
+ * sysctl per HWCAP bit, and a MIDR with the implementer field filled in from
+ * the brand string and the rest left zero, because the implementer is the only
+ * part of it anything below asks about. The report prints the brand rather than
+ * that half-made number, so nothing claims to have read a register it did not.
+ */
+#include <sys/sysctl.h>
+
+#define AT_HWCAP	16
+#define AT_HWCAP2	26
+
+static int
+sysctl_yes(const char *name)
+{
+	int v = 0;
+	size_t n = sizeof(v);
+
+	return sysctlbyname(name, &v, &n, NULL, 0) == 0 && v;
+}
+
+static const char *
+cpu_brand_string(void)
+{
+	static char brand[128];
+	size_t n = sizeof(brand);
+
+	if (!brand[0] && sysctlbyname("machdep.cpu.brand_string", brand, &n,
+	                              NULL, 0) != 0)
+		brand[0] = '\0';
+	return brand;
+}
+
+static unsigned long
+getauxval(unsigned long which)
+{
+	unsigned long w = 0;
+
+	if (which == AT_HWCAP) {
+		if (sysctl_yes("hw.optional.neon"))
+			w |= HWCAP_ASIMD;
+		if (sysctl_yes("hw.optional.arm.FEAT_AES"))
+			w |= HWCAP_AES;
+		if (sysctl_yes("hw.optional.arm.FEAT_PMULL"))
+			w |= HWCAP_PMULL;
+		if (sysctl_yes("hw.optional.arm.FEAT_SHA1"))
+			w |= HWCAP_SHA1;
+		if (sysctl_yes("hw.optional.arm.FEAT_SHA256"))
+			w |= HWCAP_SHA2;
+		if (sysctl_yes("hw.optional.arm.FEAT_SHA512"))
+			w |= HWCAP_SHA512;
+		if (sysctl_yes("hw.optional.arm.FEAT_SHA3"))
+			w |= HWCAP_SHA3;
+		if (sysctl_yes("hw.optional.armv8_crc32"))
+			w |= HWCAP_CRC32;
+		if (sysctl_yes("hw.optional.arm.FEAT_DIT"))
+			w |= HWCAP_DIT;
+		if (sysctl_yes("hw.optional.arm.FEAT_SVE"))
+			w |= HWCAP_SVE;
+	} else if (which == AT_HWCAP2) {
+		if (sysctl_yes("hw.optional.arm.FEAT_RNG"))
+			w |= HWCAP2_RNG;
+		if (sysctl_yes("hw.optional.arm.FEAT_SVE2"))
+			w |= HWCAP2_SVE2;
+	}
+	return w;
+}
+
+static unsigned long
+read_midr(void)
+{
+	return strncmp(cpu_brand_string(), "Apple", 5) == 0
+	       ? (unsigned long)MIDR_IMPL_APPLE << 24 : 0;
+}
+
+#else
 
 static unsigned long
 read_midr(void)
@@ -277,6 +370,8 @@ read_midr(void)
 	}
 	return midr;
 }
+
+#endif
 
 /* OpenSSL OPENSSL_armcap_P bits. */
 #define ARMV7_NEON   (1 << 0)
@@ -358,15 +453,21 @@ run_arm(int env)
 	print_table("aarch64", rows, (int)(sizeof(rows) / sizeof(rows[0])));
 
 	printf("\n");
+#if defined(__APPLE__)
+	printf("implementer       : %s\n", cpu_brand_string());
+#else
 	if (MIDR_IMPLEMENTER(midr) == MIDR_IMPL_APPLE)
 		printf("implementer       : Apple silicon (MIDR 0x%08lx)\n", midr);
 	else if (midr)
 		printf("implementer       : 0x%02lx (MIDR 0x%08lx)\n",
 		       MIDR_IMPLEMENTER(midr), midr);
+#endif
 	printf("detected model    : %s   (CPU_NATIVE selects this core)\n",
 	       arm_model(hwcap, midr));
-	printf("AT_HWCAP          : 0x%lx\n", hwcap);
-	printf("AT_HWCAP2         : 0x%lx\n", hwcap2);
+	printf("AT_HWCAP          : 0x%lx%s\n", hwcap,
+	       APPLE_SYNTHESISED);
+	printf("AT_HWCAP2         : 0x%lx%s\n", hwcap2,
+	       APPLE_SYNTHESISED);
 	printf("OPENSSL_armcap_P  : 0x%08x\n", armcap);
 	return 0;
 }

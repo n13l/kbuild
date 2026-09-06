@@ -1,0 +1,24 @@
+# arch/os/windows/io — the system call, without a C library to make it through.
+#
+# On Windows that is kernel32 and Winsock rather than an instruction (io.h says
+# why), and everything in here exists to not be a call into msvcrt. The
+# compiler is entitled to make one anyway: a byte loop becomes memcpy(), an
+# array makes the stack protector emit __stack_chk_fail. A build where the
+# line below prints anything but __imp_ names has grown a dependency this
+# directory exists to not have:
+#
+#	nm -u obj/arch/os/windows/io/io.o
+#
+# There is no nostdlib.o beside io.o the way there is under arch/os/linux. That
+# file is the six data symbols an ELF -nostdlib link leaves undefined; nothing
+# on this platform is linked without the C runtime's startup code, so there is
+# no link here that would leave them so.
+obj-$(CONFIG_OS_IO) += io.o
+
+# -fno-builtin, and -fno-stack-protector for the same reason one step further
+# out. -fno-tree-loop-distribute-patterns is the third door to the same room:
+# gcc recognises a hand-written copy or clear loop as memcpy or memset at -O2
+# and up, whatever -fno-builtin says, and the loops in io.c are hand-written
+# precisely so that they are not those calls.
+ccflags-y += -fno-builtin -fno-stack-protector
+ccflags-y += $(call cc-option,-fno-tree-loop-distribute-patterns)

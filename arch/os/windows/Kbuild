@@ -1,0 +1,32 @@
+# arch/os/windows — Windows process services.
+#
+# The counterpart of arch/os/linux and arch/os/macos, directory for directory
+# where Windows has an answer:
+#
+#   io/      the calls a program makes when there is no C library under it to
+#            make them through — kernel32, ntdll and Winsock, because on
+#            Windows the system call numbers are ntdll's and change with every
+#            build, so the instruction is not a thing a program may make.
+#
+#   entropy/ BCryptGenRandom() the same freestanding way, beside io/ and for
+#            the same reason: the one call a program draws randomness with, and
+#            the seam a reader of it rides.
+#
+#   scan/    pure functions over a run of code: where the system call
+#            instructions in it are — on Windows, in ntdll's stubs.
+#
+#   include/ not built: the POSIX headers Windows does not have, answered over
+#            the Windows API so that sources which include them compile
+#            unchanged. kbuild puts it on the include path of every Windows
+#            compile (scripts/Makefile.shared).
+#
+# There is no sc/ here yet; README.md says what it would take.
+#
+# PLATFORM is not a Kconfig symbol. kbuild derives it from the target triple
+# before the configuration is read — x86_64-w64-mingw32, aarch64-w64-mingw32 and
+# clang's *-windows-gnu all name this directory — and every tool and test
+# compile force-includes arch/os/$(PLATFORM)/platform.h, which is empty here and
+# is only ever the file that has to exist.
+obj-$(CONFIG_OS_IO)      += io/
+obj-$(CONFIG_OS_ENTROPY) += entropy/
+obj-$(CONFIG_OS_SCAN)    += scan/
