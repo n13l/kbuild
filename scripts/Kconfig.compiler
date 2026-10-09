@@ -40,7 +40,7 @@ config THREADS
 	  If unsure, say Y.
 
 config RCU
-	bool "Enable (RCU) Read-Write-Update"
+	bool "Enable (RCU) Read-Copy-Update"
 	default n
 	depends on THREADS
 	depends on PLATFORM != "windows"
